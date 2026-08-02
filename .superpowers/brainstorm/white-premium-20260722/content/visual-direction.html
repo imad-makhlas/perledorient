@@ -1,0 +1,38 @@
+<style>
+  .direction-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:28px}.direction{overflow:hidden;padding:0!important}.direction-preview{height:360px;background:#fff;color:#101828;border-bottom:1px solid #e8e3db}.mini-top{height:16px;background:#080808;color:#fff;font:600 5px/16px Arial;text-align:center;letter-spacing:.14em}.mini-nav{height:42px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid #eee9e2;font:600 6px Arial;letter-spacing:.13em}.mini-logo{font:700 18px Georgia;color:#10264a;letter-spacing:-.04em}.mini-logo span{color:#b88a35}.mini-links{display:flex;gap:10px;color:#526071}.mini-hero{position:relative;height:175px;display:flex;align-items:center;padding:24px;overflow:hidden}.mini-copy{position:relative;z-index:2;max-width:62%}.mini-kicker{font:700 6px Arial;letter-spacing:.22em;text-transform:uppercase;color:#b88a35}.mini-title{margin:8px 0 10px;font:600 26px/.9 Georgia;color:#10264a}.mini-text{font:7px/1.5 Arial;color:#677085}.mini-button{display:inline-block;margin-top:12px;background:#10264a;color:#fff;padding:8px 12px;font:700 5px Arial;letter-spacing:.14em;text-transform:uppercase}.mini-products{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:13px 16px}.mini-product{height:76px;background:linear-gradient(145deg,#f4f1ec,#fff);border:1px solid #eee8df;position:relative}.mini-product:after{content:'';position:absolute;left:8px;right:8px;bottom:7px;height:3px;background:#d9d4cc;box-shadow:0 -7px 0 #eeeae4}.editorial .mini-hero{background:#fff}.editorial .mini-hero:after{content:'';position:absolute;right:20px;top:15px;width:39%;height:145px;background:linear-gradient(145deg,#d7c4ab,#7f8994);clip-path:polygon(12% 0,100% 0,100% 88%,0 100%)}.editorial .mini-hero:before{content:'01';position:absolute;right:4px;bottom:-8px;font:700 54px Georgia;color:#f0ebe3}.quiet .mini-nav{border:0}.quiet .mini-hero{margin:0 14px;background:linear-gradient(120deg,#f6f2eb 0%,#f6f2eb 58%,#d4c4af 58%)}.quiet .mini-title{font-size:24px}.quiet .mini-products{padding-top:18px}.quiet .mini-product{border:0;background:#f7f5f1}.modern .mini-logo{font-family:Arial;font-size:14px;letter-spacing:.08em}.modern .mini-hero{background:#f7f8fa;border-bottom:1px solid #e4e8ef}.modern .mini-hero:after{content:'CA';position:absolute;right:12px;top:17px;font:800 92px/.9 Arial;color:#e8edf3;letter-spacing:-.12em}.modern .mini-title{font-family:Arial;font-weight:800;font-size:25px;letter-spacing:-.06em}.modern .mini-button{background:#c79a43;color:#0c1d39}.recommend{display:inline-block;margin-left:8px;padding:4px 7px;background:#10264a;color:#fff;border-radius:999px;font:700 9px Arial;letter-spacing:.08em;text-transform:uppercase}@media(max-width:900px){.direction-grid{grid-template-columns:1fr}.direction-preview{height:330px}}
+</style>
+
+<h2>Choose CODAvenue's premium white direction</h2>
+<p class="subtitle">All three keep the black delivery strip, white background, navy identity and champagne accents. Click the design that feels most like CODAvenue.</p>
+
+<div class="direction-grid cards">
+  <div class="card direction editorial" data-choice="editorial-gallery" onclick="toggleSelect(this)">
+    <div class="direction-preview">
+      <div class="mini-top">COMPLIMENTARY DELIVERY FROM 500 MAD &nbsp; / &nbsp; ACROSS MOROCCO</div>
+      <div class="mini-nav"><div class="mini-logo">COD<span>A</span>venue</div><div class="mini-links"><span>NEW</span><span>SHOP</span><span>EDIT</span><span>FR</span></div></div>
+      <div class="mini-hero"><div class="mini-copy"><div class="mini-kicker">The new collection</div><div class="mini-title">Objects worth<br>living with.</div><div class="mini-text">A considered edit of fashion, beauty, technology and home.</div><div class="mini-button">Explore the avenue</div></div></div>
+      <div class="mini-products"><div class="mini-product"></div><div class="mini-product"></div><div class="mini-product"></div></div>
+    </div>
+    <div class="card-body"><h3>A — Editorial Gallery <span class="recommend">Recommended</span></h3><p>Asymmetric magazine composition, elegant serif type and generous white space. Distinctive, premium and flexible across categories.</p></div>
+  </div>
+
+  <div class="card direction quiet" data-choice="quiet-luxury" onclick="toggleSelect(this)">
+    <div class="direction-preview">
+      <div class="mini-top">COMPLIMENTARY DELIVERY FROM 500 MAD &nbsp; / &nbsp; ACROSS MOROCCO</div>
+      <div class="mini-nav"><div class="mini-logo">COD<span>A</span>venue</div><div class="mini-links"><span>COLLECTIONS</span><span>STORY</span><span>FR</span></div></div>
+      <div class="mini-hero"><div class="mini-copy"><div class="mini-kicker">Curated for modern life</div><div class="mini-title">The art of<br>good choice.</div><div class="mini-text">Timeless pieces. Beautiful details. Delivered across Morocco.</div><div class="mini-button">Discover</div></div></div>
+      <div class="mini-products"><div class="mini-product"></div><div class="mini-product"></div><div class="mini-product"></div></div>
+    </div>
+    <div class="card-body"><h3>B — Quiet Luxury</h3><p>Soft ivory panels, centered calm and restrained decoration. Sophisticated and warm, but visually safer and less ownable.</p></div>
+  </div>
+
+  <div class="card direction modern" data-choice="modern-avenue" onclick="toggleSelect(this)">
+    <div class="direction-preview">
+      <div class="mini-top">COMPLIMENTARY DELIVERY FROM 500 MAD &nbsp; / &nbsp; ACROSS MOROCCO</div>
+      <div class="mini-nav"><div class="mini-logo">CODAVENUE</div><div class="mini-links"><span>DISCOVER</span><span>BRANDS</span><span>FR</span></div></div>
+      <div class="mini-hero"><div class="mini-copy"><div class="mini-kicker">CODAvenue / 2026</div><div class="mini-title">Curated<br>without limits.</div><div class="mini-text">One avenue. Exceptional objects from every category.</div><div class="mini-button">Shop the edit</div></div></div>
+      <div class="mini-products"><div class="mini-product"></div><div class="mini-product"></div><div class="mini-product"></div></div>
+    </div>
+    <div class="card-body"><h3>C — Modern Avenue</h3><p>Sharper sans-serif identity, bolder monogram graphics and cooler structure. Contemporary and energetic, with less classic luxury.</p></div>
+  </div>
+</div>

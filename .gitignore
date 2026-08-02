@@ -1,0 +1,12 @@
+node_modules/
+dist/
+build-check/
+target/
+.env
+.env.local
+uploads/
+playwright-report/
+test-results/
+*.log
+work/
+!.env.example

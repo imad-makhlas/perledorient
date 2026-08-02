@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Perle d'Orient — filtre catalogue</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;background:#f7f3ed;color:#2e2023;font-family:Arial,sans-serif}.wrap{max-width:1440px;margin:auto;padding:42px}.intro{display:flex;align-items:end;justify-content:space-between;margin-bottom:24px}.eyebrow{color:#aa7a33;font:700 10px/1 Arial;letter-spacing:.24em;text-transform:uppercase}.intro h1{margin:9px 0 0;font-family:Georgia,serif;font-size:34px;font-weight:500}.intro p{max-width:460px;margin:0;color:#75686a;font-size:13px;line-height:1.7}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.option{cursor:pointer;border:1px solid #e3d8cc;background:#fff;transition:.2s;box-shadow:0 12px 34px rgba(75,30,40,.05)}.option:hover,.option.selected{border-color:#9d6c27;transform:translateY(-2px);box-shadow:0 18px 46px rgba(75,30,40,.1)}.label{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #eee5dc;padding:15px 18px}.label b{font-family:Georgia,serif;font-size:18px;font-weight:500}.badge{background:#681f32;color:#fff;padding:7px 9px;font-size:8px;font-weight:700;letter-spacing:.15em}.mock{min-height:420px;padding:24px 20px;background:#fff}.caption{padding:15px 18px 18px;color:#786b6e;font-size:12px;line-height:1.6}.caption strong{display:block;color:#3c292d;margin-bottom:3px;font-size:12px}.tiny{font-size:8px;font-weight:700;letter-spacing:.16em;text-transform:uppercase}.search{display:flex;align-items:center;gap:12px;height:48px;border-bottom:1px solid #d9ccc0;color:#95888a;font-size:11px}.icon{font-size:18px}.count{font-family:Georgia,serif;color:#681f32;font-size:19px}.categories{display:flex;gap:20px;overflow:hidden;white-space:nowrap}.categories span{padding:15px 0 12px;color:#776a6c;font-size:8px;font-weight:700;letter-spacing:.12em}.categories .active{border-bottom:2px solid #681f32;color:#681f32}.right{display:flex;align-items:center;gap:16px}.switch{display:inline-flex;align-items:center;gap:7px}.dot{width:28px;height:14px;border-radius:20px;background:#681f32;padding:3px}.dot:after{content:"";display:block;margin-left:14px;width:8px;height:8px;border-radius:50%;background:#fff}.select{border-left:1px solid #e4d8ce;padding-left:14px;color:#681f32}.a-top{display:flex;align-items:center;justify-content:space-between}.a-sub{margin:8px 0 27px;color:#8a7d7f;font-size:10px}.a-row{display:flex;align-items:center;justify-content:space-between;border-top:1px solid #e5dad0;border-bottom:1px solid #e5dad0}.a-search{margin-top:22px}.b-shell{border-radius:18px;background:#fffaf4;padding:17px;box-shadow:0 16px 42px rgba(69,25,36,.08)}.b-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.b-search{height:44px;border:1px solid #e3d5c8;border-radius:99px;padding:0 15px}.pills{display:flex;flex-wrap:wrap;gap:7px;margin:17px 0}.pill{border:1px solid #dfd1c5;border-radius:99px;padding:10px 12px;font-size:8px;font-weight:700;letter-spacing:.08em}.pill.active{background:#681f32;color:#fff;border-color:#681f32}.b-bottom{display:flex;justify-content:space-between;align-items:center;border-top:1px solid #eadfd5;padding-top:14px}.c-title{border-left:2px solid #b8893d;padding-left:12px}.c-layout{display:grid;grid-template-columns:115px 1fr;gap:18px;margin-top:24px}.c-side{border-right:1px solid #eadfd6;padding-right:14px}.c-side span{display:block;padding:10px 0;color:#7d7072;font-size:8px;font-weight:700;letter-spacing:.1em}.c-side .active{color:#681f32}.c-main .search{margin-bottom:23px}.c-controls{display:grid;gap:10px}.line-control{display:flex;justify-content:space-between;border-bottom:1px solid #eadfd6;padding:10px 0;color:#77696c;font-size:9px}.product-lines{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:28px}.product-lines div{height:90px;background:linear-gradient(145deg,#e6ddd4,#f7f3ed)}.choice{text-align:center;padding:0 20px 25px;color:#681f32;font-size:10px;font-weight:700;letter-spacing:.13em;text-transform:uppercase}@media(max-width:980px){.grid{grid-template-columns:1fr}.wrap{padding:24px}.intro{display:block}.intro p{margin-top:14px}.mock{min-height:330px}}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <div class="intro">
+      <div><div class="eyebrow">Perle d'Orient · Direction visuelle</div><h1>Quel filtre paraît le plus premium&nbsp;?</h1></div>
+      <p>Les trois options conservent la recherche, les catégories, la disponibilité et le tri. Seule la présentation change.</p>
+    </div>
+    <section class="grid">
+      <article class="option" data-choice="a" onclick="toggleSelect(this)">
+        <div class="label"><b>A. Ruban éditorial</b><span class="badge">RECOMMANDÉ</span></div>
+        <div class="mock">
+          <div class="a-top"><span class="eyebrow">La collection</span><span class="count">10 <small class="tiny">pièces</small></span></div>
+          <div class="a-sub">Bijoux artisanaux inspirés d’un souffle oriental</div>
+          <div class="search a-search"><span class="icon">⌕</span><span>Rechercher un bijou</span></div>
+          <div class="a-row">
+            <div class="categories"><span class="active">TOUS</span><span>COLLIERS</span><span>BOUCLES</span><span>BRACELETS</span></div>
+            <div class="right tiny"><span class="switch"><i class="dot"></i> DISPONIBLES</span><span class="select">TRIER · NOS FAVORIS&nbsp;⌄</span></div>
+          </div>
+        </div>
+        <div class="caption"><strong>Calme, mode et très lisible</strong>Une seule ligne structurante, presque sans boîtes. Le tri s’ouvre discrètement au clic.</div>
+        <div class="choice">Choisir A</div>
+      </article>
+      <article class="option" data-choice="b" onclick="toggleSelect(this)">
+        <div class="label"><b>B. Atelier doux</b><span></span></div>
+        <div class="mock">
+          <div class="b-shell">
+            <div class="b-top"><span class="eyebrow">Explorer les bijoux</span><span class="count">10</span></div>
+            <div class="search b-search"><span class="icon">⌕</span><span>Rechercher dans la collection</span></div>
+            <div class="pills"><span class="pill active">Tous</span><span class="pill">Colliers</span><span class="pill">Boucles</span><span class="pill">Bracelets</span><span class="pill">Bagues</span><span class="pill">Coffrets</span></div>
+            <div class="b-bottom tiny"><span class="switch"><i class="dot"></i> Disponibles</span><span class="select">Nos favoris&nbsp;⌄</span></div>
+          </div>
+        </div>
+        <div class="caption"><strong>Chaleureux et accessible</strong>Des formes arrondies et une surface ivoire douce. Plus convivial, légèrement moins éditorial.</div>
+        <div class="choice">Choisir B</div>
+      </article>
+      <article class="option" data-choice="c" onclick="toggleSelect(this)">
+        <div class="label"><b>C. Galerie raffinée</b><span></span></div>
+        <div class="mock">
+          <div class="c-title"><span class="eyebrow">Affiner la sélection</span><div style="margin-top:7px;font-family:Georgia,serif;font-size:22px">Trouvez votre pièce</div></div>
+          <div class="c-layout">
+            <aside class="c-side"><span class="active">TOUS</span><span>COLLIERS</span><span>BOUCLES</span><span>BRACELETS</span><span>BAGUES</span><span>COFFRETS</span></aside>
+            <div class="c-main"><div class="search"><span class="icon">⌕</span><span>Rechercher</span></div><div class="c-controls"><div class="line-control"><span>Disponibles</span><b>Oui</b></div><div class="line-control"><span>Trier par</span><b>Nos favoris⌄</b></div></div><div class="product-lines"><div></div><div></div></div></div>
+          </div>
+        </div>
+        <div class="caption"><strong>Galerie de créateur</strong>Catégories verticales et outils séparés. Élégant sur grand écran, mais plus imposant.</div>
+        <div class="choice">Choisir C</div>
+      </article>
+    </section>
+  </main>
+</body>
+</html>
