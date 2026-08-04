@@ -40,7 +40,7 @@ export type CatalogFilters = {
   sort?: 'featured' | 'newest' | 'price-asc' | 'price-desc' | 'name-asc' | 'name-desc'
 }
 
-export function filterProducts(products: ProductSummary[], filters: CatalogFilters): ProductSummary[] {
+export function filterProducts<T extends ProductSummary>(products: T[], filters: CatalogFilters): T[] {
   const query = filters.search?.trim().toLocaleLowerCase() ?? ''
   const filtered = products.filter((product) => {
     const matchesSearch = !query || `${product.name} ${product.brand} ${product.category} ${product.material ?? ''}`.toLocaleLowerCase().includes(query)

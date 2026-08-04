@@ -1,8 +1,13 @@
-const announcements = {
-  en: 'Complimentary delivery from 500 MAD in Morocco - International delivery available',
-  fr: 'Livraison offerte dès 500 MAD au Maroc - Livraison internationale disponible',
+const announcementParts = {
+  en: { lead: 'Complimentary delivery from', threshold: '500 MAD', country: 'in Morocco', international: 'International delivery available' },
+  fr: { lead: 'Livraison offerte dès', threshold: '500 MAD', country: 'au Maroc', international: 'Livraison internationale disponible' },
 } as const
 
-export function getHeaderAnnouncement(locale: keyof typeof announcements) {
-  return announcements[locale]
+export function getHeaderAnnouncementParts(locale: keyof typeof announcementParts) {
+  return announcementParts[locale]
+}
+
+export function getHeaderAnnouncement(locale: keyof typeof announcementParts) {
+  const announcement = announcementParts[locale]
+  return `${announcement.lead} ${announcement.threshold} ${announcement.country} - ${announcement.international}`
 }
