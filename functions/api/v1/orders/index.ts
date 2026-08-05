@@ -46,13 +46,13 @@ export async function onRequestPost({ request, env }: PagesContext) {
       env.DB.prepare(`
         INSERT INTO orders (
           id, order_number, idempotency_key, customer_name, customer_telephone, city, address,
-          notes, subtotal, delivery_fee, total, payment_method, status, whatsapp_url
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          notes, subtotal, delivery_fee, total, payment_method, status, whatsapp_url, stock_reserved
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `).bind(
         orderId, prepared.orderNumber, body.idempotencyKey, prepared.customerName,
         prepared.customerTelephone, prepared.city, prepared.address, prepared.notes,
         prepared.subtotal, prepared.deliveryFee, prepared.total, prepared.paymentMethod,
-        prepared.status, whatsappUrl,
+        prepared.status, whatsappUrl, 1,
       ),
       ...prepared.items.map((item) => env.DB.prepare(`
         INSERT INTO order_items (
@@ -67,6 +67,10 @@ export async function onRequestPost({ request, env }: PagesContext) {
     await env.DB.batch(statements)
     return json({ orderNumber: prepared.orderNumber, total: prepared.total, deliveryFee: prepared.deliveryFee, whatsappUrl }, { status: 201 })
   } catch (error) {
-    return json({ error: error instanceof Error ? error.message : 'Unable to create order' }, { status: 400 })
+    const message = error instanceof Error ? error.message : 'Unable to create order'
+    if (message.includes('INSUFFICIENT_STOCK') || message.toLowerCase().includes('stock')) {
+      return json({ code: 'STOCK_CONFLICT', error: 'Cette pièce vient d’être réservée. Actualisez votre panier pour voir le stock disponible.' }, { status: 409 })
+    }
+    return json({ error: message }, { status: 400 })
   }
 }

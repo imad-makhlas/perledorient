@@ -1,0 +1,97 @@
+// @vitest-environment node
+import { readFileSync } from 'node:fs'
+import { DatabaseSync } from 'node:sqlite'
+import { describe, expect, it } from 'vitest'
+import { updateAdminOrderStatus, type D1Database } from '../../../../../functions/api/v1/admin/_shared'
+import { onRequestPost } from '../../../../../functions/api/v1/orders/index'
+
+class TestStatement {
+  private values: unknown[] = []
+  constructor(private readonly statement: ReturnType<DatabaseSync['prepare']>) {}
+  bind(...values: unknown[]) { this.values = values; return this }
+  async all<T>() { return { success: true, results: this.statement.all(...this.values) as T[] } }
+  async first<T>() { return (this.statement.get(...this.values) as T | undefined) ?? null }
+  async run() {
+    const result = this.statement.run(...this.values)
+    return { success: true, meta: { changes: Number(result.changes) } }
+  }
+}
+
+class TestDatabase {
+  readonly sqlite = new DatabaseSync(':memory:')
+  prepare(query: string) { return new TestStatement(this.sqlite.prepare(query)) }
+  async batch(statements: TestStatement[]) {
+    this.sqlite.exec('BEGIN')
+    try {
+      const results = []
+      for (const statement of statements) results.push(await statement.run())
+      this.sqlite.exec('COMMIT')
+      return results
+    } catch (error) {
+      this.sqlite.exec('ROLLBACK')
+      throw error
+    }
+  }
+}
+
+function orderDatabase() {
+  const database = new TestDatabase()
+  database.sqlite.exec(`
+    PRAGMA foreign_keys = ON;
+    CREATE TABLE admin_products (
+      id TEXT PRIMARY KEY, product_id TEXT NOT NULL, slug TEXT NOT NULL, product_name TEXT NOT NULL,
+      variant_name TEXT NOT NULL, sku TEXT NOT NULL, price INTEGER NOT NULL, stock INTEGER NOT NULL,
+      active INTEGER NOT NULL, image_url TEXT NOT NULL DEFAULT '', updated_at TEXT
+    );
+    CREATE TABLE orders (
+      id TEXT PRIMARY KEY, order_number TEXT NOT NULL UNIQUE, idempotency_key TEXT NOT NULL UNIQUE,
+      customer_name TEXT NOT NULL, customer_telephone TEXT NOT NULL, city TEXT NOT NULL, address TEXT NOT NULL,
+      notes TEXT NOT NULL DEFAULT '', subtotal INTEGER NOT NULL, delivery_fee INTEGER NOT NULL, total INTEGER NOT NULL,
+      payment_method TEXT NOT NULL, status TEXT NOT NULL, whatsapp_url TEXT, created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+    CREATE TABLE order_items (
+      id TEXT PRIMARY KEY, order_id TEXT NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+      product_id TEXT NOT NULL, variant_id TEXT NOT NULL, product_name TEXT NOT NULL, variant_name TEXT NOT NULL,
+      sku TEXT NOT NULL, quantity INTEGER NOT NULL, unit_price INTEGER NOT NULL, line_total INTEGER NOT NULL,
+      image_url TEXT NOT NULL DEFAULT ''
+    );
+  `)
+  database.sqlite.exec(readFileSync(new URL('../../../../../migrations/0003_reserve_order_stock.sql', import.meta.url), 'utf8'))
+  database.sqlite.prepare(`
+    INSERT INTO admin_products (id, product_id, slug, product_name, variant_name, sku, price, stock, active, image_url)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `).run('variant-1', 'product-1', 'layali', 'Layali Necklace', 'Gold', 'PDO-001-A', 520, 1, 1, '/layali.jpg')
+  return database
+}
+
+function orderRequest(idempotencyKey: string) {
+  return new Request('https://shop.test/api/v1/orders', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      idempotencyKey,
+      customer: { firstName: 'Sara', lastName: 'Amrani', telephone: '+212612345678', city: 'Casablanca', address: '12 rue des Fleurs', deliveryNotes: '', paymentMethod: 'WHATSAPP', acceptedTerms: true },
+      items: [{ variantId: 'variant-1', quantity: 1 }],
+    }),
+  })
+}
+
+describe('order stock reservation API', () => {
+  it('reserves the last unit, rejects a competing order, and restores it on cancellation', async () => {
+    const database = orderDatabase()
+    const env = { DB: database as unknown as D1Database, WHATSAPP_NUMBER: '212600000000' }
+
+    const first = await onRequestPost({ request: orderRequest('request-1'), env, params: {} })
+    expect(first.status).toBe(201)
+    const firstOrder = await first.json() as { orderNumber: string }
+    expect(database.sqlite.prepare('SELECT stock FROM admin_products WHERE id = ?').get('variant-1')).toEqual({ stock: 0 })
+
+    const competing = await onRequestPost({ request: orderRequest('request-2'), env, params: {} })
+    expect(competing.status).toBe(409)
+    await expect(competing.json()).resolves.toMatchObject({ code: 'STOCK_CONFLICT' })
+
+    await updateAdminOrderStatus(env.DB, firstOrder.orderNumber, 'CANCELLED')
+    expect(database.sqlite.prepare('SELECT stock FROM admin_products WHERE id = ?').get('variant-1')).toEqual({ stock: 1 })
+  })
+})

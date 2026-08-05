@@ -61,7 +61,11 @@ export function AdminDashboardPage() {
   const updateOrder = async (order: AdminOrder, status: AdminOrderStatus) => {
     if (!credentials) return
     setBusy(true)
-    try { const saved = await changeAdminOrderStatus(credentials, order.orderNumber, status); setOrders((current) => current.map((item) => item.orderNumber === saved.orderNumber ? saved : item)) }
+    try {
+      const saved = await changeAdminOrderStatus(credentials, order.orderNumber, status)
+      setOrders((current) => current.map((item) => item.orderNumber === saved.orderNumber ? saved : item))
+      if (status === 'CANCELLED' || status === 'RETURNED') setProducts(await fetchAdminProducts(credentials))
+    }
     catch (error) { setMessage(error instanceof Error ? error.message : 'Mise à jour impossible') }
     finally { setBusy(false) }
   }

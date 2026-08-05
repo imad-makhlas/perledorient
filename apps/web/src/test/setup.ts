@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom/vitest'
 
 afterEach(() => {
-  localStorage.clear()
+  if (typeof localStorage !== 'undefined') localStorage.clear()
 })

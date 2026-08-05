@@ -1,6 +1,7 @@
 import { LockKeyhole, MessageCircle } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { clearCart } from '../features/cart/cart'
 import { useCart } from '../features/cart/cart-context'
 import { checkoutSchema, type CheckoutForm } from '../features/checkout/checkout-schema'
 import { createOrder } from '../features/checkout/order-api'
@@ -16,7 +17,7 @@ export function WhatsAppCheckoutPage() {
   const [form, setForm] = useState<CheckoutForm>(defaults)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [submitting, setSubmitting] = useState(false)
-  const { state, subtotal } = useCart()
+  const { state, subtotal, dispatch } = useCart()
   const { locale, t } = useI18n()
   const navigate = useNavigate()
   const delivery = subtotal >= 500 ? 0 : form.city.toLowerCase() === 'casablanca' ? 30 : 45
@@ -35,10 +36,11 @@ export function WhatsAppCheckoutPage() {
     try {
       const order = await createOrder(result.data, state.items)
       sessionStorage.setItem('perle-d-orient-last-order', JSON.stringify({ ...order, customer: result.data, items: state.items }))
+      dispatch(clearCart())
       if (order.whatsappUrl) window.open(order.whatsappUrl, '_blank', 'noopener,noreferrer')
       navigate(`/order-confirmation?order=${order.orderNumber}`)
-    } catch {
-      setErrors({ form: 'We could not prepare your WhatsApp order. Please try again.' })
+    } catch (error) {
+      setErrors({ form: error instanceof Error ? error.message : 'We could not prepare your WhatsApp order. Please try again.' })
       setSubmitting(false)
     }
   }

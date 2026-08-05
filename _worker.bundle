@@ -1,9 +1,9 @@
-------formdata-undici-069629173482
+------formdata-undici-076354760953
 Content-Disposition: form-data; name="metadata"
 
-{"main_module":"functionsWorker-0.8419074626089362.js"}
-------formdata-undici-069629173482
-Content-Disposition: form-data; name="functionsWorker-0.8419074626089362.js"; filename="functionsWorker-0.8419074626089362.js"
+{"main_module":"functionsWorker-0.20132315197228712.js"}
+------formdata-undici-076354760953
+Content-Disposition: form-data; name="functionsWorker-0.20132315197228712.js"; filename="functionsWorker-0.20132315197228712.js"
 Content-Type: application/javascript+module
 
 var __defProp = Object.defineProperty;
@@ -229,7 +229,14 @@ __name(listAdminOrders, "listAdminOrders");
 var orderStatuses = /* @__PURE__ */ new Set(["PENDING_CONFIRMATION", "CONFIRMED", "PREPARING", "READY_FOR_SHIPMENT", "SHIPPED", "DELIVERED", "CANCELLED", "RETURNED"]);
 async function updateAdminOrderStatus(db, orderNumber2, status) {
   if (!orderStatuses.has(status)) throw new Error("Invalid order status");
-  await db.prepare("UPDATE orders SET status = ?, updated_at = datetime('now') WHERE order_number = ?").bind(status, orderNumber2).run();
+  const releasesStock = status === "CANCELLED" || status === "RETURNED";
+  await db.prepare(`
+    UPDATE orders SET
+      status = ?,
+      stock_reserved = CASE WHEN ? = 1 THEN 0 ELSE stock_reserved END,
+      updated_at = datetime('now')
+    WHERE order_number = ?
+  `).bind(status, releasesStock ? 1 : 0, orderNumber2).run();
   const orders = await listAdminOrders(db);
   return orders.find((order) => order.orderNumber === orderNumber2) || null;
 }
@@ -15518,8 +15525,8 @@ async function onRequestPost3({ request, env }) {
       env.DB.prepare(`
         INSERT INTO orders (
           id, order_number, idempotency_key, customer_name, customer_telephone, city, address,
-          notes, subtotal, delivery_fee, total, payment_method, status, whatsapp_url
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          notes, subtotal, delivery_fee, total, payment_method, status, whatsapp_url, stock_reserved
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `).bind(
         orderId,
         prepared.orderNumber,
@@ -15534,7 +15541,8 @@ async function onRequestPost3({ request, env }) {
         prepared.total,
         prepared.paymentMethod,
         prepared.status,
-        whatsappUrl
+        whatsappUrl,
+        1
       ),
       ...prepared.items.map((item) => env.DB.prepare(`
         INSERT INTO order_items (
@@ -15558,7 +15566,11 @@ async function onRequestPost3({ request, env }) {
     await env.DB.batch(statements);
     return json({ orderNumber: prepared.orderNumber, total: prepared.total, deliveryFee: prepared.deliveryFee, whatsappUrl }, { status: 201 });
   } catch (error51) {
-    return json({ error: error51 instanceof Error ? error51.message : "Unable to create order" }, { status: 400 });
+    const message = error51 instanceof Error ? error51.message : "Unable to create order";
+    if (message.includes("INSUFFICIENT_STOCK") || message.toLowerCase().includes("stock")) {
+      return json({ code: "STOCK_CONFLICT", error: "Cette pi\xE8ce vient d\u2019\xEAtre r\xE9serv\xE9e. Actualisez votre panier pour voir le stock disponible." }, { status: 409 });
+    }
+    return json({ error: message }, { status: 400 });
   }
 }
 __name(onRequestPost3, "onRequestPost");
@@ -15571,7 +15583,7 @@ async function onRequestGet3({ request, env }) {
 }
 __name(onRequestGet3, "onRequestGet");
 
-// ../.wrangler/tmp/pages-5K5Hy5/functionsRoutes-0.3490339649732417.mjs
+// ../.wrangler/tmp/pages-pOZHMa/functionsRoutes-0.1379713612931308.mjs
 var routes = [
   {
     routePath: "/api/v1/admin/orders/:orderNumber/status",
@@ -16094,4 +16106,4 @@ export {
   pages_template_worker_default as default
 };
 
-------formdata-undici-069629173482--
+------formdata-undici-076354760953--

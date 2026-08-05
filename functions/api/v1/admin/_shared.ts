@@ -146,7 +146,14 @@ const orderStatuses = new Set(['PENDING_CONFIRMATION', 'CONFIRMED', 'PREPARING',
 
 export async function updateAdminOrderStatus(db: D1Database, orderNumber: string, status: string) {
   if (!orderStatuses.has(status)) throw new Error('Invalid order status')
-  await db.prepare("UPDATE orders SET status = ?, updated_at = datetime('now') WHERE order_number = ?").bind(status, orderNumber).run()
+  const releasesStock = status === 'CANCELLED' || status === 'RETURNED'
+  await db.prepare(`
+    UPDATE orders SET
+      status = ?,
+      stock_reserved = CASE WHEN ? = 1 THEN 0 ELSE stock_reserved END,
+      updated_at = datetime('now')
+    WHERE order_number = ?
+  `).bind(status, releasesStock ? 1 : 0, orderNumber).run()
   const orders = await listAdminOrders(db)
   return orders.find((order) => order.orderNumber === orderNumber) || null
 }
