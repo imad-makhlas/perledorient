@@ -2,6 +2,7 @@ import { ArrowLeft, CheckCircle2, Clock3, Edit3, LayoutDashboard, LogOut, Messag
 import { useMemo, useState } from 'react'
 import { AdminLogin } from '../components/admin/AdminLogin'
 import { ProductEditor } from '../components/admin/ProductEditor'
+import { deleteAdminImage, uploadAdminImage } from '../features/admin/admin-images'
 import { changeAdminOrderStatus, fetchAdminOrders, getNextAdminActions, orderStatusLabel, type AdminCredentials, type AdminOrder, type AdminOrderStatus } from '../features/admin/admin-orders'
 import { createAdminProduct, deleteAdminProduct, fetchAdminProducts, updateAdminProduct, type AdminProduct, type EditableAdminProduct } from '../features/admin/admin-products'
 import { formatMoney } from '../lib/format'
@@ -29,7 +30,7 @@ export function AdminDashboardPage() {
   const visibleProducts = useMemo(() => products.filter((product) => `${product.nameEn} ${product.nameFr} ${product.sku}`.toLowerCase().includes(query.toLowerCase())), [products, query])
   const pendingOrders = orders.filter((order) => order.status === 'PENDING_CONFIRMATION').length
 
-  const saveProduct = async (draft: EditableAdminProduct) => {
+  const saveProduct = async (draft: EditableAdminProduct, replacedImageUrl?: string) => {
     if (!credentials) return
     setBusy(true); setMessage('')
     try {
@@ -40,6 +41,7 @@ export function AdminDashboardPage() {
         const saved = await updateAdminProduct(credentials, { ...editing, ...draft })
         setProducts((current) => current.map((item) => item.id === saved.id ? saved : item))
       }
+      if (replacedImageUrl) await deleteAdminImage(credentials, replacedImageUrl).catch(() => undefined)
       setEditing(null); setMessage('Bijou enregistré avec succès.')
     } catch (error) { setMessage(error instanceof Error ? error.message : 'Enregistrement impossible') }
     finally { setBusy(false) }
@@ -47,7 +49,12 @@ export function AdminDashboardPage() {
   const removeProduct = async (product: AdminProduct) => {
     if (!credentials || !window.confirm(`Supprimer ${product.nameFr} ?`)) return
     setBusy(true)
-    try { await deleteAdminProduct(credentials, product.id); setProducts((current) => current.filter((item) => item.id !== product.id)); setMessage('Bijou supprimé.') }
+    try {
+      await deleteAdminProduct(credentials, product.id)
+      setProducts((current) => current.filter((item) => item.id !== product.id))
+      try { await deleteAdminImage(credentials, product.imageUrl); setMessage('Bijou et photo supprimés.') }
+      catch { setMessage('Bijou supprimé. La photo devra être retirée depuis Cloudinary.') }
+    }
     catch (error) { setMessage(error instanceof Error ? error.message : 'Suppression impossible') }
     finally { setBusy(false) }
   }
@@ -73,7 +80,7 @@ export function AdminDashboardPage() {
         {view === 'orders' && <Orders orders={orders} busy={busy} onUpdate={updateOrder} />}
       </section>
     </div>
-    {editing && <ProductEditor product={editing === 'new' ? null : editing} onClose={() => setEditing(null)} onSave={saveProduct} busy={busy} />}
+    {editing && <ProductEditor product={editing === 'new' ? null : editing} onClose={() => setEditing(null)} onSave={saveProduct} onUploadImage={(file) => uploadAdminImage(credentials, file)} onDeleteImage={(imageUrl) => deleteAdminImage(credentials, imageUrl)} busy={busy} />}
   </main>
 }
 

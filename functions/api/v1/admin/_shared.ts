@@ -16,7 +16,15 @@ export type D1Database = {
   prepare(query: string): D1PreparedStatement
   batch<T = unknown>(statements: D1PreparedStatement[]): Promise<D1Result<T>[]>
 }
-export type PagesEnv = { DB: D1Database; ADMIN_EMAIL?: string; ADMIN_PASSWORD?: string; WHATSAPP_NUMBER?: string }
+export type PagesEnv = {
+  DB: D1Database
+  ADMIN_EMAIL?: string
+  ADMIN_PASSWORD?: string
+  WHATSAPP_NUMBER?: string
+  CLOUDINARY_CLOUD_NAME?: string
+  CLOUDINARY_API_KEY?: string
+  CLOUDINARY_API_SECRET?: string
+}
 export type PagesContext = { request: Request; env: PagesEnv; params: Record<string, string | string[]> }
 
 export const productColumns = `
