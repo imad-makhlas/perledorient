@@ -1,0 +1,72 @@
+import { checkoutSchema, type CheckoutForm } from '../../../../apps/web/src/features/checkout/checkout-schema'
+import { prepareOrder, type OrderCatalogRow } from '../../../../apps/web/src/features/checkout/order-record'
+import { buildWhatsAppMessage, buildWhatsAppUrl } from '../../../../apps/web/src/features/checkout/whatsapp-order'
+import { json, type PagesContext } from '../admin/_shared'
+
+type RequestBody = { customer?: CheckoutForm; items?: Array<{ variantId: string; quantity: number }>; idempotencyKey?: string }
+type ExistingOrder = { order_number: string; total: number; delivery_fee: number; whatsapp_url: string | null }
+
+function orderNumber() {
+  const date = new Date().toISOString().slice(0, 10).replaceAll('-', '')
+  return `PDO-${date}-${crypto.randomUUID().slice(0, 6).toUpperCase()}`
+}
+
+export async function onRequestPost({ request, env }: PagesContext) {
+  try {
+    const body = await request.json() as RequestBody
+    const parsedCustomer = checkoutSchema.safeParse(body.customer)
+    if (!parsedCustomer.success || !body.idempotencyKey || !Array.isArray(body.items) || !body.items.length) {
+      return json({ error: 'Invalid order details' }, { status: 400 })
+    }
+
+    const existing = await env.DB.prepare('SELECT order_number, total, delivery_fee, whatsapp_url FROM orders WHERE idempotency_key = ?')
+      .bind(body.idempotencyKey).first<ExistingOrder>()
+    if (existing) return json({ orderNumber: existing.order_number, total: existing.total, deliveryFee: existing.delivery_fee, whatsappUrl: existing.whatsapp_url })
+
+    const uniqueIds = [...new Set(body.items.map((item) => item.variantId))]
+    const placeholders = uniqueIds.map(() => '?').join(', ')
+    const catalogue = (await env.DB.prepare(`
+      SELECT id, product_id, slug, product_name, variant_name, sku, price, stock, active, image_url
+      FROM admin_products WHERE id IN (${placeholders})
+    `).bind(...uniqueIds).all<OrderCatalogRow>()).results || []
+    const prepared = prepareOrder(parsedCustomer.data, body.items, catalogue, orderNumber())
+    const whatsappMessage = buildWhatsAppMessage({
+      orderNumber: prepared.orderNumber,
+      customerName: prepared.customerName,
+      telephone: prepared.customerTelephone,
+      city: prepared.city,
+      address: prepared.address,
+      notes: prepared.notes,
+      total: prepared.total,
+      items: prepared.items.map((item) => ({ name: item.productName, variantName: item.variantName, quantity: item.quantity, lineTotal: item.lineTotal })),
+    })
+    const whatsappUrl = buildWhatsAppUrl(env.WHATSAPP_NUMBER || '212600000000', whatsappMessage)
+    const orderId = crypto.randomUUID()
+    const statements = [
+      env.DB.prepare(`
+        INSERT INTO orders (
+          id, order_number, idempotency_key, customer_name, customer_telephone, city, address,
+          notes, subtotal, delivery_fee, total, payment_method, status, whatsapp_url
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).bind(
+        orderId, prepared.orderNumber, body.idempotencyKey, prepared.customerName,
+        prepared.customerTelephone, prepared.city, prepared.address, prepared.notes,
+        prepared.subtotal, prepared.deliveryFee, prepared.total, prepared.paymentMethod,
+        prepared.status, whatsappUrl,
+      ),
+      ...prepared.items.map((item) => env.DB.prepare(`
+        INSERT INTO order_items (
+          id, order_id, product_id, variant_id, product_name, variant_name, sku,
+          quantity, unit_price, line_total, image_url
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).bind(
+        crypto.randomUUID(), orderId, item.productId, item.variantId, item.productName,
+        item.variantName, item.sku, item.quantity, item.unitPrice, item.lineTotal, item.imageUrl,
+      )),
+    ]
+    await env.DB.batch(statements)
+    return json({ orderNumber: prepared.orderNumber, total: prepared.total, deliveryFee: prepared.deliveryFee, whatsappUrl }, { status: 201 })
+  } catch (error) {
+    return json({ error: error instanceof Error ? error.message : 'Unable to create order' }, { status: 400 })
+  }
+}

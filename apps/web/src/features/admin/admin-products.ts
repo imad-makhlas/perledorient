@@ -5,21 +5,48 @@ export type AdminProduct = {
   id: string
   productId: string
   slug: string
-  productName: string
+  nameEn: string
+  nameFr: string
+  descriptionEn: string
+  descriptionFr: string
+  category: string
+  material: string
+  dimensions: string
   variantName: string
   sku: string
   price: number
+  comparisonPrice: number | null
   stock: number
   active: boolean
+  featured: boolean
   imageUrl: string
 }
 
-export type EditableAdminProduct = Pick<AdminProduct, 'productName' | 'variantName' | 'price' | 'stock' | 'active' | 'imageUrl'>
+export type EditableAdminProduct = Omit<AdminProduct, 'id' | 'productId'>
+
+async function apiError(response: Response, fallback: string) {
+  try {
+    const body = await response.json() as { error?: string }
+    return body.error || fallback
+  } catch {
+    return fallback
+  }
+}
 
 export async function fetchAdminProducts(credentials: AdminCredentials): Promise<AdminProduct[]> {
   const response = await fetch('/api/v1/admin/products', { headers: { Authorization: buildBasicAuthHeader(credentials.email, credentials.password) } })
-  if (!response.ok) throw new Error('Unable to load the jewelry catalogue')
+  if (!response.ok) throw new Error(await apiError(response, 'Unable to load the jewelry catalogue'))
   return response.json() as Promise<AdminProduct[]>
+}
+
+export async function createAdminProduct(credentials: AdminCredentials, product: EditableAdminProduct): Promise<AdminProduct> {
+  const response = await fetch('/api/v1/admin/products', {
+    method: 'POST',
+    headers: { Authorization: buildBasicAuthHeader(credentials.email, credentials.password), 'Content-Type': 'application/json' },
+    body: JSON.stringify(productUpdatePayload(product)),
+  })
+  if (!response.ok) throw new Error(await apiError(response, 'Unable to create this piece'))
+  return response.json() as Promise<AdminProduct>
 }
 
 export async function updateAdminProduct(credentials: AdminCredentials, product: AdminProduct): Promise<AdminProduct> {
@@ -28,6 +55,14 @@ export async function updateAdminProduct(credentials: AdminCredentials, product:
     headers: { Authorization: buildBasicAuthHeader(credentials.email, credentials.password), 'Content-Type': 'application/json' },
     body: JSON.stringify(productUpdatePayload(product)),
   })
-  if (!response.ok) throw new Error('Unable to save this piece')
+  if (!response.ok) throw new Error(await apiError(response, 'Unable to save this piece'))
   return response.json() as Promise<AdminProduct>
+}
+
+export async function deleteAdminProduct(credentials: AdminCredentials, id: string) {
+  const response = await fetch(`/api/v1/admin/products/${encodeURIComponent(id)}`, {
+    method: 'DELETE',
+    headers: { Authorization: buildBasicAuthHeader(credentials.email, credentials.password) },
+  })
+  if (!response.ok) throw new Error(await apiError(response, 'Unable to delete this piece'))
 }

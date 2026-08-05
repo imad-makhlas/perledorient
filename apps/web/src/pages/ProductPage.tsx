@@ -1,10 +1,10 @@
 import { Check, ChevronRight, Minus, Plus, Share2, ShoppingBag } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { ProductCard } from '../components/product/ProductCard'
-import { products } from '../data/jewelry-products'
 import { addCartItem } from '../features/cart/cart'
 import { useCart } from '../features/cart/cart-context'
+import { useCatalogProducts } from '../features/catalog/catalog-api'
 import { useI18n } from '../i18n/i18n'
 import { formatMoney } from '../lib/format'
 
@@ -15,14 +15,16 @@ const pageCopy = {
 
 export function ProductPage() {
   const { slug } = useParams()
+  const { locale, t } = useI18n()
+  const products = useCatalogProducts(locale)
   const product = products.find((item) => item.slug === slug) ?? products[0]
   const [variantId, setVariantId] = useState(product.variants[0].id)
   const [quantity, setQuantity] = useState(1)
   const [added, setAdded] = useState(false)
   const [shareState, setShareState] = useState<'idle' | 'copied'>('idle')
   const { dispatch } = useCart()
-  const { locale, t } = useI18n()
   const copy = pageCopy[locale]
+  useEffect(() => { setVariantId(product.variants[0].id); setQuantity(1) }, [product.id, product.variants])
   const variant = useMemo(() => product.variants.find((item) => item.id === variantId) ?? product.variants[0], [product, variantId])
   const add = () => { dispatch(addCartItem({ productId: product.id, variantId: variant.id, slug: product.slug, name: product.name, variantName: variant.name, imageUrl: variant.image ?? product.image, unitPrice: variant.price, stockQuantity: variant.stock }, quantity)); setAdded(true); setTimeout(() => setAdded(false), 1800) }
   const share = async () => {

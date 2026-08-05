@@ -10,4 +10,6 @@ test-results/
 *.log
 work/
 .superpowers/
+.wrangler/
+.wrangler-functions-*/
 !.env.example

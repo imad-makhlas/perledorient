@@ -1,4 +1,4 @@
-import { json, requireAdmin, updateAdminProduct, type PagesContext } from '../_shared'
+import { deleteAdminProduct, json, requireAdmin, updateAdminProduct, type PagesContext } from '../_shared'
 
 export async function onRequestPatch({ request, env, params }: PagesContext) {
   const authError = requireAdmin(request, env)
@@ -14,4 +14,15 @@ export async function onRequestPatch({ request, env, params }: PagesContext) {
   } catch (error) {
     return json({ error: error instanceof Error ? error.message : 'Invalid product payload' }, { status: 400 })
   }
+}
+
+
+export async function onRequestDelete({ request, env, params }: PagesContext) {
+  const authError = requireAdmin(request, env)
+  if (authError) return authError
+  const id = Array.isArray(params.id) ? params.id[0] : params.id
+  if (!id) return json({ error: 'Product not found' }, { status: 404 })
+  return await deleteAdminProduct(env.DB, id)
+    ? new Response(null, { status: 204 })
+    : json({ error: 'Product not found' }, { status: 404 })
 }

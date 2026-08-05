@@ -2,8 +2,9 @@
 import { useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { ProductCard } from '../components/product/ProductCard'
-import { categories, products } from '../data/jewelry-products'
+import { categories } from '../data/jewelry-products'
 import { filterProducts, type CatalogFilters } from '../features/catalog/catalog'
+import { useCatalogProducts } from '../features/catalog/catalog-api'
 import { CatalogSortMenu } from '../features/catalog/CatalogSortMenu'
 import { catalogUi, categoryLabel, type CatalogCategory } from '../features/catalog/catalog-ui'
 import { useI18n } from '../i18n/i18n'
@@ -11,11 +12,12 @@ import { useI18n } from '../i18n/i18n'
 export function CataloguePage() {
   const [params] = useSearchParams()
   const { locale, t } = useI18n()
+  const products = useCatalogProducts(locale)
   const [search, setSearch] = useState(params.get('q') ?? '')
   const [category, setCategory] = useState(params.get('category') ?? '')
   const [inStockOnly, setInStockOnly] = useState(false)
   const [sort, setSort] = useState<CatalogFilters['sort']>((params.get('sort') as CatalogFilters['sort']) ?? 'featured')
-  const results = useMemo(() => filterProducts(products, { search, category, inStockOnly, sort }), [search, category, inStockOnly, sort])
+  const results = useMemo(() => filterProducts(products, { search, category, inStockOnly, sort }), [products, search, category, inStockOnly, sort])
   const ui = catalogUi(locale)
   const categoryValues = ['', ...categories.map((item) => item.name)]
   const sortEntries = Object.entries(ui.sort) as Array<[CatalogFilters['sort'], string]>

@@ -1,12 +1,14 @@
 import { ArrowRight, Headphones, PackageCheck, ShieldCheck } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { ProductCard } from '../components/product/ProductCard'
-import { categories, products } from '../data/jewelry-products'
+import { categories } from '../data/jewelry-products'
+import { useCatalogProducts } from '../features/catalog/catalog-api'
 import { categoryLabel, type CatalogCategory } from '../features/catalog/catalog-ui'
 import { useI18n } from '../i18n/i18n'
 
 export function HomePage() {
   const { locale, t } = useI18n()
+  const products = useCatalogProducts(locale)
   return <main>
     <section className="overflow-hidden border-b border-line bg-white">
       <div className="container-shell grid items-center md:grid-cols-[46%_54%]">

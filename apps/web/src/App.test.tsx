@@ -6,8 +6,9 @@ const app = readFileSync(join(process.cwd(), 'src', 'App.tsx'), 'utf8')
 
 describe('App routing', () => {
   it('uses /admin for the product manager and redirects the legacy URL', () => {
-    expect(app).toMatch(/<Route path="\/admin" element=\{<AdminProductsPage\s*\/>\}/)
+    expect(app).toMatch(/<Route path="\/admin" element=\{<AdminDashboardPage\s*\/>\}/)
     expect(app).toMatch(/<Route path="\/admin\/products" element=\{<Navigate to="\/admin" replace\s*\/>\}/)
+    expect(app).toMatch(/<Route path="\/admin\/orders" element=\{<Navigate to="\/admin" replace\s*\/>\}/)
   })
 
   it('redirects an unknown URL to the storefront homepage', () => {
