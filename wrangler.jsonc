@@ -1,0 +1,13 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "perle-dorient",
+  "compatibility_date": "2026-08-05",
+  "pages_build_output_dir": "apps/web/dist",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "perle-dorient-db",
+      "database_id": "b43831ac-d287-41ba-8817-1c8eb7bddfad"
+    }
+  ]
+}

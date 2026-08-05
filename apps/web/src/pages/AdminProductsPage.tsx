@@ -9,7 +9,7 @@ const credentialsKey = 'perle-d-orient-owner-credentials'
 
 export function AdminProductsPage() {
   const [credentials, setCredentials] = useState<AdminCredentials>(() => {
-    try { return JSON.parse(localStorage.getItem(credentialsKey) || '{"email":"atelier@perledorient.ma","password":""}') as AdminCredentials } catch { return { email: 'atelier@perledorient.ma', password: '' } }
+    try { return JSON.parse(localStorage.getItem(credentialsKey) || '{"email":"atelier@perledorient.com","password":""}') as AdminCredentials } catch { return { email: 'atelier@perledorient.com', password: '' } }
   })
   const [products, setProducts] = useState<AdminProduct[]>([])
   const [message, setMessage] = useState('')
