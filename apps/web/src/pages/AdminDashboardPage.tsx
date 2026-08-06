@@ -1,5 +1,5 @@
 import { ArrowLeft, CheckCircle2, Clock3, Edit3, LayoutDashboard, LogOut, MessageCircle, Package, Plus, Search, ShoppingBag, Trash2, X } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useLayoutEffect, useMemo, useState } from 'react'
 import { AdminLogin } from '../components/admin/AdminLogin'
 import { ProductEditor } from '../components/admin/ProductEditor'
 import { deleteAdminImage, uploadAdminImage } from '../features/admin/admin-images'
@@ -18,6 +18,10 @@ export function AdminDashboardPage() {
   const [message, setMessage] = useState('')
   const [busy, setBusy] = useState(false)
   const [editing, setEditing] = useState<AdminProduct | 'new' | null>(null)
+
+  useLayoutEffect(() => {
+    if (credentials) window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior })
+  }, [credentials])
 
   const login = async (next: AdminCredentials) => {
     setBusy(true); setMessage('')

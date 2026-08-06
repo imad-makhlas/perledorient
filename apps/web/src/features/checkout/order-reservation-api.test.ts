@@ -78,6 +78,17 @@ function orderRequest(idempotencyKey: string) {
 }
 
 describe('order stock reservation API', () => {
+  it('does not disguise a missing stock reservation migration as a customer stock conflict', async () => {
+    const database = orderDatabase()
+    database.batch = async () => { throw new Error('table orders has no column named stock_reserved') }
+    const env = { DB: database as unknown as D1Database, WHATSAPP_NUMBER: '212600000000' }
+
+    const response = await onRequestPost({ request: orderRequest('missing-migration'), env, params: {} })
+
+    expect(response.status).toBe(500)
+    await expect(response.json()).resolves.toMatchObject({ code: 'DATABASE_MIGRATION_REQUIRED' })
+  })
+
   it('reserves the last unit, rejects a competing order, and restores it on cancellation', async () => {
     const database = orderDatabase()
     const env = { DB: database as unknown as D1Database, WHATSAPP_NUMBER: '212600000000' }

@@ -68,7 +68,10 @@ export async function onRequestPost({ request, env }: PagesContext) {
     return json({ orderNumber: prepared.orderNumber, total: prepared.total, deliveryFee: prepared.deliveryFee, whatsappUrl }, { status: 201 })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unable to create order'
-    if (message.includes('INSUFFICIENT_STOCK') || message.toLowerCase().includes('stock')) {
+    if (message.includes('stock_reserved')) {
+      return json({ code: 'DATABASE_MIGRATION_REQUIRED', error: 'La base de données des commandes doit être mise à jour avant de pouvoir réserver une pièce.' }, { status: 500 })
+    }
+    if (message.includes('INSUFFICIENT_STOCK') || message.includes('The requested quantity exceeds stock')) {
       return json({ code: 'STOCK_CONFLICT', error: 'Cette pièce vient d’être réservée. Actualisez votre panier pour voir le stock disponible.' }, { status: 409 })
     }
     return json({ error: message }, { status: 400 })
