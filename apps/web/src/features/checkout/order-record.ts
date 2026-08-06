@@ -25,6 +25,18 @@ export type PreparedOrderItem = {
   imageUrl: string
 }
 
+export function generateOrderNumber(existingOrderNumbers: string[], date = new Date()) {
+  const year = date.getUTCFullYear()
+  const prefix = `PDO-${year}-`
+  const nextSequence = existingOrderNumbers.reduce((highest, orderNumber) => {
+    if (!orderNumber.startsWith(prefix)) return highest
+    const sequence = Number(orderNumber.slice(prefix.length))
+    return Number.isInteger(sequence) && sequence > highest ? sequence : highest
+  }, 0) + 1
+
+  return `${prefix}${String(nextSequence).padStart(4, '0')}`
+}
+
 export function prepareOrder(customer: CheckoutForm, requestedItems: Array<{ variantId: string; quantity: number }>, catalogue: OrderCatalogRow[], orderNumber: string) {
   if (!requestedItems.length) throw new Error('The order is empty')
   const items = requestedItems.map((requested): PreparedOrderItem => {

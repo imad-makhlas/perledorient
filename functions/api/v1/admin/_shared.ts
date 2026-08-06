@@ -162,3 +162,8 @@ export async function updateAdminOrderStatus(db: D1Database, orderNumber: string
   const orders = await listAdminOrders(db)
   return orders.find((order) => order.orderNumber === orderNumber) || null
 }
+
+export async function deleteAdminOrder(db: D1Database, orderNumber: string) {
+  const result = await db.prepare("DELETE FROM orders WHERE order_number = ? AND status = 'CANCELLED'").bind(orderNumber).run()
+  return (result.meta?.changes || 0) > 0
+}

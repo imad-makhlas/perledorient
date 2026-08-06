@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { prepareOrder } from './order-record'
+import { generateOrderNumber, prepareOrder } from './order-record'
 
 const customer = {
   firstName: 'Sara', lastName: 'Amrani', telephone: '+212612345678', city: 'Casablanca', address: '12 rue des Fleurs',
@@ -7,6 +7,16 @@ const customer = {
 }
 
 describe('D1 WhatsApp orders', () => {
+  it('generates the next readable yearly order reference', () => {
+    expect(generateOrderNumber([], new Date('2026-08-06T12:00:00Z'))).toBe('PDO-2026-0001')
+    expect(generateOrderNumber([
+      'PDO-2025-0099',
+      'PDO-2026-0002',
+      'PDO-2026-0012',
+      'PDO-20260806-233663',
+    ], new Date('2026-08-06T12:00:00Z'))).toBe('PDO-2026-0013')
+  })
+
   it('uses catalogue prices, calculates delivery and prepares persisted items', () => {
     const order = prepareOrder(customer, [{ variantId: 'variant-1', quantity: 2 }], [{
       id: 'variant-1', product_id: 'product-1', slug: 'layali', product_name: 'Layali Necklace', variant_name: 'Gold', sku: 'PDO-001-A', price: 220, stock: 4, active: 1, image_url: '/layali.jpg',

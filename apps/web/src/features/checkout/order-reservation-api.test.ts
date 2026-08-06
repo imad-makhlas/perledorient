@@ -2,7 +2,7 @@
 import { readFileSync } from 'node:fs'
 import { DatabaseSync } from 'node:sqlite'
 import { describe, expect, it } from 'vitest'
-import { updateAdminOrderStatus, type D1Database } from '../../../../../functions/api/v1/admin/_shared'
+import { deleteAdminOrder, listAdminOrders, updateAdminOrderStatus, type D1Database } from '../../../../../functions/api/v1/admin/_shared'
 import { onRequestPost } from '../../../../../functions/api/v1/orders/index'
 
 class TestStatement {
@@ -98,7 +98,7 @@ describe('order stock reservation API', () => {
     await expect(response.json()).resolves.toMatchObject({ code: 'DATABASE_MIGRATION_REQUIRED' })
   })
 
-  it('reserves the last unit, rejects a competing order, and restores it on cancellation', async () => {
+  it('reserves the last unit, rejects a competing order, and restores it on cancellation while keeping history', async () => {
     const database = orderDatabase()
     const env = { DB: database as unknown as D1Database, WHATSAPP_NUMBER: '212600000000' }
 
@@ -111,7 +111,24 @@ describe('order stock reservation API', () => {
     expect(competing.status).toBe(409)
     await expect(competing.json()).resolves.toMatchObject({ code: 'STOCK_CONFLICT' })
 
-    await updateAdminOrderStatus(env.DB, firstOrder.orderNumber, 'CANCELLED')
+    const cancelled = await updateAdminOrderStatus(env.DB, firstOrder.orderNumber, 'CANCELLED')
+    expect(cancelled).toMatchObject({ orderNumber: firstOrder.orderNumber, status: 'CANCELLED' })
     expect(database.sqlite.prepare('SELECT stock FROM admin_products WHERE id = ?').get('variant-1')).toEqual({ stock: 1 })
+    expect(database.sqlite.prepare('SELECT status FROM orders WHERE order_number = ?').get(firstOrder.orderNumber)).toEqual({ status: 'CANCELLED' })
+  })
+
+  it('deletes an order permanently after it is cancelled', async () => {
+    const database = orderDatabase()
+    database.sqlite.prepare(`
+      INSERT INTO orders (
+        id, order_number, idempotency_key, customer_name, customer_telephone, city, address,
+        subtotal, delivery_fee, total, payment_method, status, stock_reserved
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run('old-order', 'PDO-20260806-233663', 'old-request', 'Imad Ma', '+212652603417', 'Casablanca', 'Atlas de fes', 520, 0, 520, 'WHATSAPP', 'CANCELLED', 0)
+
+    await expect(listAdminOrders(database as unknown as D1Database)).resolves.toHaveLength(1)
+    await expect(deleteAdminOrder(database as unknown as D1Database, 'PDO-20260806-233663')).resolves.toBe(true)
+    await expect(listAdminOrders(database as unknown as D1Database)).resolves.toEqual([])
+    expect(database.sqlite.prepare('SELECT COUNT(*) AS count FROM orders WHERE order_number = ?').get('PDO-20260806-233663')).toEqual({ count: 0 })
   })
 })

@@ -1,16 +1,11 @@
 import { checkoutSchema, type CheckoutForm } from '../../../../apps/web/src/features/checkout/checkout-schema'
-import { prepareOrder, type OrderCatalogRow } from '../../../../apps/web/src/features/checkout/order-record'
+import { generateOrderNumber, prepareOrder, type OrderCatalogRow } from '../../../../apps/web/src/features/checkout/order-record'
 import { buildWhatsAppMessage, buildWhatsAppUrl } from '../../../../apps/web/src/features/checkout/whatsapp-order'
 import { WHATSAPP_NUMBER } from '../../../../apps/web/src/config/contact'
 import { json, type PagesContext } from '../admin/_shared'
 
 type RequestBody = { customer?: CheckoutForm; items?: Array<{ variantId: string; quantity: number }>; idempotencyKey?: string }
 type ExistingOrder = { order_number: string; total: number; delivery_fee: number; whatsapp_url: string | null }
-
-function orderNumber() {
-  const date = new Date().toISOString().slice(0, 10).replaceAll('-', '')
-  return `PDO-${date}-${crypto.randomUUID().slice(0, 6).toUpperCase()}`
-}
 
 export async function onRequestPost({ request, env }: PagesContext) {
   try {
@@ -24,13 +19,17 @@ export async function onRequestPost({ request, env }: PagesContext) {
       .bind(body.idempotencyKey).first<ExistingOrder>()
     if (existing) return json({ orderNumber: existing.order_number, total: existing.total, deliveryFee: existing.delivery_fee, whatsappUrl: existing.whatsapp_url })
 
+    const year = new Date().getUTCFullYear()
+    const orderPrefix = `PDO-${year}-%`
+    const existingOrderNumbers = (await env.DB.prepare('SELECT order_number FROM orders WHERE order_number LIKE ?')
+      .bind(orderPrefix).all<{ order_number: string }>()).results || []
     const uniqueIds = [...new Set(body.items.map((item) => item.variantId))]
     const placeholders = uniqueIds.map(() => '?').join(', ')
     const catalogue = (await env.DB.prepare(`
       SELECT id, product_id, slug, product_name, variant_name, sku, price, stock, active, image_url
       FROM admin_products WHERE id IN (${placeholders})
     `).bind(...uniqueIds).all<OrderCatalogRow>()).results || []
-    const prepared = prepareOrder(parsedCustomer.data, body.items, catalogue, orderNumber())
+    const prepared = prepareOrder(parsedCustomer.data, body.items, catalogue, generateOrderNumber(existingOrderNumbers.map((order) => order.order_number)))
     const whatsappMessage = buildWhatsAppMessage({
       orderNumber: prepared.orderNumber,
       customerName: prepared.customerName,

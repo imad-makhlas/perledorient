@@ -1,5 +1,6 @@
 import type { CartItem } from '../cart/cart'
 import type { CheckoutForm } from './checkout-schema'
+import { generateOrderNumber } from './order-record'
 import { buildWhatsAppMessage, buildWhatsAppUrl } from './whatsapp-order'
 import { WHATSAPP_NUMBER } from '../../config/contact'
 
@@ -21,7 +22,7 @@ export async function createOrder(customer: CheckoutForm, items: CartItem[]): Pr
     if (!import.meta.env.DEV || error instanceof OrderApiError) throw error
     const subtotal = items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0)
     const deliveryFee = subtotal >= 500 ? 0 : customer.city.toLowerCase() === 'casablanca' ? 30 : 45
-    const orderNumber = `PDO-${new Date().toISOString().slice(0, 10).replaceAll('-', '')}-${Math.floor(100000 + Math.random() * 900000)}`
+    const orderNumber = generateOrderNumber([])
     const preparedMessage = buildWhatsAppMessage({
       orderNumber,
       customerName: `${customer.firstName} ${customer.lastName}`,

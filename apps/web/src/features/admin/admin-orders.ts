@@ -37,6 +37,8 @@ export type AdminOrder = {
   items: AdminOrderItem[]
 }
 
+export type DeletedAdminOrder = { orderNumber: string; deleted: true }
+export type AdminOrderStatusResult = AdminOrder | DeletedAdminOrder
 export type AdminCredentials = { email: string; password: string }
 
 const nextActions: Record<AdminOrderStatus, AdminOrderStatus[]> = {
@@ -104,12 +106,21 @@ export async function fetchAdminOrders(credentials: AdminCredentials): Promise<A
   return response.json() as Promise<AdminOrder[]>
 }
 
-export async function changeAdminOrderStatus(credentials: AdminCredentials, orderNumber: string, status: AdminOrderStatus, comment = ''): Promise<AdminOrder> {
+export async function changeAdminOrderStatus(credentials: AdminCredentials, orderNumber: string, status: AdminOrderStatus, comment = ''): Promise<AdminOrderStatusResult> {
   const response = await fetch(`/api/v1/admin/orders/${encodeURIComponent(orderNumber)}/status`, {
     method: 'PATCH',
     headers: { Authorization: buildBasicAuthHeader(credentials.email, credentials.password), 'Content-Type': 'application/json' },
     body: JSON.stringify({ status, comment }),
   })
   if (!response.ok) throw new Error('Unable to update order status')
-  return response.json() as Promise<AdminOrder>
+  return response.json() as Promise<AdminOrderStatusResult>
+}
+
+export async function deleteAdminOrder(credentials: AdminCredentials, orderNumber: string): Promise<DeletedAdminOrder> {
+  const response = await fetch(`/api/v1/admin/orders/${encodeURIComponent(orderNumber)}`, {
+    method: 'DELETE',
+    headers: { Authorization: buildBasicAuthHeader(credentials.email, credentials.password) },
+  })
+  if (!response.ok) throw new Error('Unable to delete order')
+  return response.json() as Promise<DeletedAdminOrder>
 }

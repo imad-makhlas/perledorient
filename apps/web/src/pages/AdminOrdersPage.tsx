@@ -46,7 +46,9 @@ export function AdminOrdersPage() {
     setMessage('')
     try {
       const updated = await changeAdminOrderStatus(credentials, order.orderNumber, status)
-      setOrders((current) => current.map((item) => item.orderNumber === updated.orderNumber ? updated : item))
+      setOrders((current) => 'deleted' in updated
+        ? current.filter((item) => item.orderNumber !== updated.orderNumber)
+        : current.map((item) => item.orderNumber === updated.orderNumber ? updated : item))
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'Unable to update order status')
     } finally {
