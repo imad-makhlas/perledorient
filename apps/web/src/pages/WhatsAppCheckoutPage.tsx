@@ -1,9 +1,12 @@
 import { LockKeyhole, MessageCircle } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
+import type { Country } from 'react-phone-number-input'
 import { useNavigate } from 'react-router-dom'
+import { InternationalPhoneField } from '../components/checkout/InternationalPhoneField'
 import { clearCart } from '../features/cart/cart'
 import { useCart } from '../features/cart/cart-context'
 import { checkoutSchema, type CheckoutForm } from '../features/checkout/checkout-schema'
+import { toInternationalPhone } from '../features/checkout/international-phone'
 import { createOrder } from '../features/checkout/order-api'
 import { useI18n } from '../i18n/i18n'
 import { formatMoney } from '../lib/format'
@@ -15,6 +18,7 @@ const defaults: CheckoutForm = {
 
 export function WhatsAppCheckoutPage() {
   const [form, setForm] = useState<CheckoutForm>(defaults)
+  const [phoneCountry, setPhoneCountry] = useState<Country>('MA')
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [submitting, setSubmitting] = useState(false)
   const { state, subtotal, dispatch } = useCart()
@@ -26,7 +30,7 @@ export function WhatsAppCheckoutPage() {
   const submit = async (event: FormEvent) => {
     event.preventDefault()
     if (submitting) return
-    const result = checkoutSchema.safeParse(form)
+    const result = checkoutSchema.safeParse({ ...form, telephone: toInternationalPhone(phoneCountry, form.telephone) })
     if (!result.success) {
       setErrors(Object.fromEntries(result.error.issues.map((issue) => [String(issue.path[0]), issue.message])))
       return
@@ -49,14 +53,14 @@ export function WhatsAppCheckoutPage() {
 
   const fields: [keyof CheckoutForm, string, string][] = [
     ['firstName', t('firstName'), 'text'], ['lastName', t('lastName'), 'text'],
-    ['telephone', t('telephone'), 'tel'], ['city', t('city'), 'text'],
+    ['city', t('city'), 'text'],
   ]
 
   return <main className="container-shell py-9 lg:py-16">
     <div className="mb-7 text-center lg:mb-10"><p className="eyebrow">WhatsApp order</p><h1 className="display mt-2 text-[2.4rem] font-semibold sm:text-5xl">{t('checkoutTitle')}</h1><p className="mx-auto mt-4 max-w-xl text-[15px] leading-7 text-muted">{locale === 'fr' ? "Aucun paiement en ligne. Renseignez vos coordonnées, puis confirmez la disponibilité et la livraison directement sur WhatsApp." : 'No online payment. Share your delivery details, then confirm availability and delivery directly on WhatsApp.'}</p></div>
     <form onSubmit={submit} className="grid gap-8 lg:grid-cols-[1fr_420px]">
       <section className="rounded-[24px] border border-line bg-white p-5 shadow-soft sm:p-9">
-        <div className="grid gap-5 sm:grid-cols-2">{fields.map(([key, label, type]) => <label key={key} className="text-[10px] font-bold uppercase tracking-widest">{label}<input className="field mt-2 normal-case tracking-normal" type={type} value={String(form[key])} onChange={(event) => set(key, event.target.value)} aria-invalid={Boolean(errors[key])} />{errors[key] && <span className="mt-1 block text-[10px] normal-case tracking-normal text-red-700">{errors[key]}</span>}</label>)}</div>
+        <div className="grid gap-5 sm:grid-cols-2">{fields.slice(0, 2).map(([key, label, type]) => <label key={key} className="text-[10px] font-bold uppercase tracking-widest">{label}<input className="field mt-2 normal-case tracking-normal" type={type} value={String(form[key])} onChange={(event) => set(key, event.target.value)} aria-invalid={Boolean(errors[key])} />{errors[key] && <span className="mt-1 block text-[10px] normal-case tracking-normal text-red-700">{errors[key]}</span>}</label>)}<InternationalPhoneField country={phoneCountry} value={form.telephone} locale={locale} label={t('telephone')} error={errors.telephone} onCountryChange={setPhoneCountry} onChange={(value) => set('telephone', value)} />{fields.slice(2).map(([key, label, type]) => <label key={key} className="text-[10px] font-bold uppercase tracking-widest">{label}<input className="field mt-2 normal-case tracking-normal" type={type} value={String(form[key])} onChange={(event) => set(key, event.target.value)} aria-invalid={Boolean(errors[key])} />{errors[key] && <span className="mt-1 block text-[10px] normal-case tracking-normal text-red-700">{errors[key]}</span>}</label>)}</div>
         <label className="mt-5 block text-[10px] font-bold uppercase tracking-widest">{t('address')}<input className="field mt-2 normal-case tracking-normal" value={form.address} onChange={(event) => set('address', event.target.value)} />{errors.address && <span className="mt-1 block text-[10px] normal-case tracking-normal text-red-700">{errors.address}</span>}</label>
         <label className="mt-5 block text-[10px] font-bold uppercase tracking-widest">{t('notes')}<textarea className="field mt-2 min-h-24 resize-y normal-case tracking-normal" value={form.deliveryNotes} onChange={(event) => set('deliveryNotes', event.target.value)} /></label>
         <div className="mt-7 flex items-start gap-4 border border-champagne bg-canvas p-5"><MessageCircle className="mt-0.5 shrink-0 text-accent" size={20} /><div><p className="text-xs font-bold uppercase tracking-widest">{locale === 'fr' ? 'Confirmation directe sur WhatsApp' : 'Direct WhatsApp confirmation'}</p><p className="mt-2 text-xs leading-5 text-muted">{locale === 'fr' ? "Sans compte client. Nous confirmons personnellement votre bijou, la livraison et les modalités sur WhatsApp." : 'No customer account. We confirm your piece, delivery and order details personally on WhatsApp.'}</p></div></div>

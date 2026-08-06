@@ -12,6 +12,20 @@ const product: AdminProduct = {
 }
 
 describe('ProductEditor image workflow', () => {
+  it('shows an automatic yearly SKU instead of an editable field for a new product', () => {
+    render(<ProductEditor
+      product={null}
+      busy={false}
+      onClose={vi.fn()}
+      onSave={vi.fn()}
+      onUploadImage={vi.fn()}
+      onDeleteImage={vi.fn()}
+    />)
+
+    expect(screen.queryByRole('textbox', { name: 'Référence SKU' })).not.toBeInTheDocument()
+    expect(screen.getByText(`PDO-BIJ-${new Date().getFullYear()}-0001`)).toBeInTheDocument()
+  })
+
   it('uploads a selected photo and submits the replacement without deleting the old image early', async () => {
     const onSave = vi.fn()
     const onDeleteImage = vi.fn().mockResolvedValue(undefined)

@@ -1,6 +1,7 @@
 import { checkoutSchema, type CheckoutForm } from '../../../../apps/web/src/features/checkout/checkout-schema'
 import { prepareOrder, type OrderCatalogRow } from '../../../../apps/web/src/features/checkout/order-record'
 import { buildWhatsAppMessage, buildWhatsAppUrl } from '../../../../apps/web/src/features/checkout/whatsapp-order'
+import { WHATSAPP_NUMBER } from '../../../../apps/web/src/config/contact'
 import { json, type PagesContext } from '../admin/_shared'
 
 type RequestBody = { customer?: CheckoutForm; items?: Array<{ variantId: string; quantity: number }>; idempotencyKey?: string }
@@ -40,7 +41,7 @@ export async function onRequestPost({ request, env }: PagesContext) {
       total: prepared.total,
       items: prepared.items.map((item) => ({ name: item.productName, variantName: item.variantName, quantity: item.quantity, lineTotal: item.lineTotal })),
     })
-    const whatsappUrl = buildWhatsAppUrl(env.WHATSAPP_NUMBER || '212600000000', whatsappMessage)
+    const whatsappUrl = buildWhatsAppUrl(env.WHATSAPP_NUMBER || WHATSAPP_NUMBER, whatsappMessage)
     const orderId = crypto.randomUUID()
     const statements = [
       env.DB.prepare(`

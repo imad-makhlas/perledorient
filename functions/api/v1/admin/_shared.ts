@@ -1,5 +1,6 @@
 import {
   adminProductFromRow,
+  generateProductSku,
   normalizeAdminProductInput,
   type AdminProductRow,
 } from '../../../../apps/web/src/features/admin/admin-product-record'
@@ -65,7 +66,11 @@ export async function listAdminProducts(db: D1Database) {
 }
 
 export async function createAdminProduct(db: D1Database, input: EditableAdminProduct) {
-  const product = normalizeAdminProductInput(input)
+  const year = new Date().getUTCFullYear()
+  const prefix = `PDO-BIJ-${year}-%`
+  const existing = await db.prepare('SELECT sku FROM admin_products WHERE sku LIKE ?').bind(prefix).all<{ sku: string }>()
+  const sku = generateProductSku((existing.results || []).map((row) => row.sku), year)
+  const product = normalizeAdminProductInput({ ...input, sku })
   const productId = crypto.randomUUID()
   const id = crypto.randomUUID()
   await db.prepare(`

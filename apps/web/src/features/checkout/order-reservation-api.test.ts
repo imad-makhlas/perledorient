@@ -78,6 +78,15 @@ function orderRequest(idempotencyKey: string) {
 }
 
 describe('order stock reservation API', () => {
+  it('uses the official WhatsApp number when no environment override is configured', async () => {
+    const database = orderDatabase()
+    const response = await onRequestPost({ request: orderRequest('official-number'), env: { DB: database as unknown as D1Database }, params: {} })
+
+    expect(response.status).toBe(201)
+    const body = await response.json() as { whatsappUrl: string }
+    expect(body.whatsappUrl).toContain('wa.me/212631210654')
+  })
+
   it('does not disguise a missing stock reservation migration as a customer stock conflict', async () => {
     const database = orderDatabase()
     database.batch = async () => { throw new Error('table orders has no column named stock_reserved') }

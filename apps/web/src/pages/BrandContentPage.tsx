@@ -1,4 +1,5 @@
 import { MessageCircle } from 'lucide-react'
+import { WHATSAPP_URL } from '../config/contact'
 import { useLocation } from 'react-router-dom'
 
 const content: Record<string, [string, string]> = {
@@ -12,5 +13,5 @@ const content: Record<string, [string, string]> = {
 export function BrandContentPage() {
   const { pathname } = useLocation()
   const [title, body] = content[pathname] ?? ["Perle d'Orient", 'Handcrafted jewelry inspired by an oriental breath.']
-  return <main className="container-shell grid min-h-[58vh] place-items-center py-20"><article className="max-w-2xl text-center"><p className="eyebrow">The atelier</p><h1 className="display mt-4 text-5xl font-semibold sm:text-6xl">{title}</h1><p className="mt-6 text-base leading-8 text-muted">{body}</p><a href="https://wa.me/212600000000" target="_blank" rel="noreferrer" className="button-primary button-accent mt-8"><MessageCircle size={16} />Write on WhatsApp</a></article></main>
+  return <main className="container-shell grid min-h-[58vh] place-items-center py-20"><article className="max-w-2xl text-center"><p className="eyebrow">The atelier</p><h1 className="display mt-4 text-5xl font-semibold sm:text-6xl">{title}</h1><p className="mt-6 text-base leading-8 text-muted">{body}</p><a href={WHATSAPP_URL} target="_blank" rel="noreferrer" className="button-primary button-accent mt-8"><MessageCircle size={16} />Write on WhatsApp</a></article></main>
 }

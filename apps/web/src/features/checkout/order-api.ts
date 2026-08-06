@@ -1,6 +1,7 @@
 import type { CartItem } from '../cart/cart'
 import type { CheckoutForm } from './checkout-schema'
 import { buildWhatsAppMessage, buildWhatsAppUrl } from './whatsapp-order'
+import { WHATSAPP_NUMBER } from '../../config/contact'
 
 export type CreatedOrder = { orderNumber: string; total: number; deliveryFee: number; whatsappUrl?: string }
 
@@ -31,6 +32,6 @@ export async function createOrder(customer: CheckoutForm, items: CartItem[]): Pr
       total: subtotal + deliveryFee,
       items: items.map((item) => ({ name: item.name, variantName: item.variantName, quantity: item.quantity, lineTotal: item.unitPrice * item.quantity })),
     })
-    return { orderNumber, total: subtotal + deliveryFee, deliveryFee, whatsappUrl: buildWhatsAppUrl('212600000000', preparedMessage) }
+    return { orderNumber, total: subtotal + deliveryFee, deliveryFee, whatsappUrl: buildWhatsAppUrl(WHATSAPP_NUMBER, preparedMessage) }
   }
 }

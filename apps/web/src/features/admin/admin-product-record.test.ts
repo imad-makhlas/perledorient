@@ -1,7 +1,17 @@
 import { describe, expect, it } from 'vitest'
-import { adminProductFromRow, catalogProductFromRow, normalizeAdminProductInput } from './admin-product-record'
+import { adminProductFromRow, catalogProductFromRow, generateProductSku, normalizeAdminProductInput } from './admin-product-record'
 
 describe('admin product D1 records', () => {
+  it('generates the next centralized yearly SKU', () => {
+    expect(generateProductSku([], 2026)).toBe('PDO-BIJ-2026-0001')
+    expect(generateProductSku([
+      'PDO-BIJ-2025-0099',
+      'PDO-BIJ-2026-0002',
+      'PDO-BIJ-2026-0012',
+      'LEGACY-001',
+    ], 2026)).toBe('PDO-BIJ-2026-0013')
+  })
+
   it('maps D1 rows to the admin UI contract', () => {
     expect(adminProductFromRow({
       id: 'jewel-variant-1-a',

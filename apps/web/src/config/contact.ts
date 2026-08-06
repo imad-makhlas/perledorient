@@ -1,0 +1,3 @@
+export const WHATSAPP_NUMBER = '212631210654'
+export const WHATSAPP_DISPLAY_NUMBER = '+212 631-210654'
+export const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}`

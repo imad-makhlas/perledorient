@@ -23,6 +23,16 @@ export type AdminProductRow = {
   image_url: string
 }
 
+export function generateProductSku(existingSkus: string[], year = new Date().getUTCFullYear()) {
+  const prefix = `PDO-BIJ-${year}-`
+  const highest = existingSkus.reduce((maximum, sku) => {
+    if (!sku.startsWith(prefix)) return maximum
+    const sequence = Number(sku.slice(prefix.length))
+    return Number.isInteger(sequence) ? Math.max(maximum, sequence) : maximum
+  }, 0)
+  return `${prefix}${String(highest + 1).padStart(4, '0')}`
+}
+
 export function adminProductFromRow(row: AdminProductRow): AdminProduct {
   return {
     id: row.id,
