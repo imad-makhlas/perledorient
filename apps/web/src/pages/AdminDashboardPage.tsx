@@ -3,7 +3,7 @@ import { useLayoutEffect, useMemo, useState } from 'react'
 import { AdminLogin } from '../components/admin/AdminLogin'
 import { ProductEditor } from '../components/admin/ProductEditor'
 import { deleteAdminImage, uploadAdminImage } from '../features/admin/admin-images'
-import { changeAdminOrderStatus, deleteAdminOrder, fetchAdminOrders, getNextAdminActions, orderStatusLabel, type AdminCredentials, type AdminOrder, type AdminOrderStatus } from '../features/admin/admin-orders'
+import { changeAdminOrderStatus, deleteAdminOrder, fetchAdminOrders, getNextAdminActions, orderStatusLabel, orderStatusPalette, type AdminCredentials, type AdminOrder, type AdminOrderStatus } from '../features/admin/admin-orders'
 import { createAdminProduct, deleteAdminProduct, fetchAdminProducts, updateAdminProduct, type AdminProduct, type EditableAdminProduct } from '../features/admin/admin-products'
 import { formatMoney } from '../lib/format'
 
@@ -74,7 +74,8 @@ export function AdminDashboardPage() {
     finally { setBusy(false) }
   }
   const removeOrder = async (order: AdminOrder) => {
-    if (!credentials || !window.confirm(`Supprimer la commande ${order.orderNumber} ?`)) return
+    const stockMessage = order.status === 'DELIVERED' ? 'Le stock ne sera pas modifié.' : 'Le stock réservé sera restauré.'
+    if (!credentials || !window.confirm(`Supprimer définitivement la commande ${order.orderNumber} ?\n\n${stockMessage}`)) return
     setBusy(true)
     try {
       await deleteAdminOrder(credentials, order.orderNumber)
@@ -113,17 +114,6 @@ function Catalogue({ products, total, query, setQuery, onAdd, onEdit, onDelete }
   return <div><div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"><div><p className="eyebrow">Gestion des pièces</p><h1 className="display mt-2 text-4xl font-semibold sm:text-5xl">Catalogue</h1><p className="mt-2 text-sm text-[#7B7074]">{total} bijoux enregistrés</p></div><button onClick={onAdd} className="button-primary button-accent"><Plus size={16} />Ajouter un bijou</button></div><label className="mt-7 flex min-h-12 items-center gap-3 rounded-xl border border-[#DDD4C9] bg-white px-4"><Search size={17} /><input className="w-full bg-transparent text-sm outline-none" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Rechercher par nom ou référence…" /></label><div className="mt-5 grid gap-4">{products.map((product) => <article key={product.id} className="grid gap-4 rounded-2xl border border-[#DDD4C9] bg-white p-4 shadow-[0_10px_30px_rgba(48,42,46,.04)] sm:grid-cols-[100px_1fr_auto] sm:items-center"><div className="aspect-square overflow-hidden rounded-xl bg-[#F2EEE8]">{product.imageUrl && <img src={product.imageUrl} alt="" className="h-full w-full object-cover" />}</div><div className="min-w-0"><div className="flex flex-wrap items-center gap-2"><h2 className="display truncate text-xl font-semibold">{product.nameFr}</h2><span className={`rounded-full px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider ${product.active ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-600'}`}>{product.active ? 'Publié' : 'Masqué'}</span></div><p className="mt-1 text-xs text-[#7B7074]">{product.nameEn} · {product.sku}</p><div className="mt-3 flex flex-wrap gap-4 text-sm"><strong>{formatMoney(product.price)}</strong><span>Stock : {product.stock}</span><span>{product.category}</span></div></div><div className="flex gap-2 sm:justify-end"><button onClick={() => onEdit(product)} className="grid h-11 w-11 place-items-center rounded-xl border border-[#DDD4C9]" aria-label="Modifier"><Edit3 size={16} /></button><button onClick={() => onDelete(product)} className="grid h-11 w-11 place-items-center rounded-xl border border-red-200 text-red-700" aria-label="Supprimer"><Trash2 size={16} /></button></div></article>)}</div></div>
 }
 
-const orderStatusTone: Record<AdminOrderStatus, string> = {
-  PENDING_CONFIRMATION: 'border-[#E5CFA7] bg-[#FBF4E7] text-[#765116]',
-  CONFIRMED: 'border-[#C9D7E5] bg-[#F0F6FA] text-[#365C75]',
-  PREPARING: 'border-[#D8D0E1] bg-[#F5F1F8] text-[#62516E]',
-  READY_FOR_SHIPMENT: 'border-[#C9D7E5] bg-[#F0F6FA] text-[#365C75]',
-  SHIPPED: 'border-[#C9D7E5] bg-[#F0F6FA] text-[#365C75]',
-  DELIVERED: 'border-[#BFDCCF] bg-[#EFF8F3] text-[#32664E]',
-  CANCELLED: 'border-[#E8CACA] bg-[#FBF1F1] text-[#8A3D3D]',
-  RETURNED: 'border-[#DDD4C9] bg-[#F5F2EE] text-[#6D6266]',
-}
-
 function Orders({ orders, busy, onUpdate, onDelete }: { orders: AdminOrder[]; busy: boolean; onUpdate: (order: AdminOrder, status: AdminOrderStatus) => void; onDelete: (order: AdminOrder) => void }) {
   return <div>
     <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -135,7 +125,7 @@ function Orders({ orders, busy, onUpdate, onDelete }: { orders: AdminOrder[]; bu
       {orders.map((order) => <article key={order.orderNumber} className="overflow-hidden rounded-3xl border border-[#DDD4C9] bg-white shadow-[0_16px_45px_rgba(48,42,46,.055)]">
         <header className="border-b border-[#E7DED4] bg-[#FCFAF7] px-5 py-5 sm:px-7">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-            <div className="min-w-0"><div className="flex flex-wrap items-center gap-3"><h2 className="display break-all text-2xl font-semibold sm:text-[1.7rem]">{order.orderNumber}</h2><span className={`rounded-full border px-3 py-1.5 text-[9px] font-bold uppercase tracking-[.12em] ${orderStatusTone[order.status]}`}>{orderStatusLabel(order.status, 'fr')}</span></div><p className="mt-2 flex items-center gap-2 text-xs text-[#7B7074]"><CalendarDays size={14} className="shrink-0 text-[#C4943D]" /><time dateTime={order.createdAt}>{new Date(order.createdAt).toLocaleString('fr-FR', { dateStyle: 'medium', timeStyle: 'short' })}</time></p></div>
+            <div className="min-w-0"><div className="flex flex-wrap items-center gap-3"><h2 className="display break-all text-2xl font-semibold sm:text-[1.7rem]">{order.orderNumber}</h2><span className={`rounded-full border px-3 py-1.5 text-[9px] font-bold uppercase tracking-[.12em] ${orderStatusPalette(order.status).badge}`}>{orderStatusLabel(order.status, 'fr')}</span></div><p className="mt-2 flex items-center gap-2 text-xs text-[#7B7074]"><CalendarDays size={14} className="shrink-0 text-[#C4943D]" /><time dateTime={order.createdAt}>{new Date(order.createdAt).toLocaleString('fr-FR', { dateStyle: 'medium', timeStyle: 'short' })}</time></p></div>
             <div className="flex items-baseline justify-between gap-3 border-t border-[#E7DED4] pt-4 sm:block sm:border-0 sm:pt-0 sm:text-right"><span className="text-[9px] font-bold uppercase tracking-[.14em] text-[#8A7E82]">Total</span><strong className="block text-xl font-semibold text-[#302A2E] sm:mt-1">{formatMoney(Number(order.total), 'fr')}</strong></div>
           </div>
         </header>
@@ -159,8 +149,8 @@ function Orders({ orders, busy, onUpdate, onDelete }: { orders: AdminOrder[]; bu
 
         <div role="group" aria-label="Actions de la commande" className="flex flex-col gap-2 border-t border-[#E7DED4] bg-[#FCFAF7] px-5 py-4 sm:flex-row sm:flex-wrap sm:px-7">
           {order.whatsappUrl && <a href={order.whatsappUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#C4943D] px-5 text-[10px] font-bold uppercase tracking-[.12em] text-[#241F21] transition hover:bg-[#D2A852] sm:w-auto"><MessageCircle size={16} />Contacter sur WhatsApp</a>}
-          {getNextAdminActions(order.status).map((status) => <button key={status} disabled={busy} onClick={() => onUpdate(order, status)} className={`inline-flex min-h-12 w-full items-center justify-center rounded-xl border px-5 text-[10px] font-bold uppercase tracking-[.12em] transition disabled:opacity-50 sm:w-auto ${status === 'CANCELLED' || status === 'RETURNED' ? 'border-[#E2CACA] bg-white text-[#8A3D3D] hover:bg-[#FBF1F1]' : 'border-[#302A2E] bg-[#302A2E] text-white hover:bg-[#443C41]'}`}>{orderStatusLabel(status, 'fr')}</button>)}
-          {order.status === 'CANCELLED' && <button disabled={busy} onClick={() => onDelete(order)} className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border border-[#E2CACA] bg-white px-5 text-[10px] font-bold uppercase tracking-[.12em] text-[#8A3D3D] transition hover:bg-[#FBF1F1] disabled:opacity-50 sm:ml-auto sm:w-auto"><Trash2 size={15} />Supprimer</button>}
+          {getNextAdminActions(order.status).map((status) => <button key={status} disabled={busy} onClick={() => onUpdate(order, status)} className={`inline-flex min-h-12 w-full items-center justify-center rounded-xl border px-5 text-[10px] font-bold uppercase tracking-[.12em] transition disabled:opacity-50 sm:w-auto ${orderStatusPalette(status).action}`}>{orderStatusLabel(status, 'fr')}</button>)}
+          <button disabled={busy} onClick={() => onDelete(order)} className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border border-[#E3C2C2] bg-white px-5 text-[10px] font-bold uppercase tracking-[.12em] text-[#8A3D3D] transition hover:bg-[#FBF0F0] disabled:opacity-50 sm:ml-auto sm:w-auto"><Trash2 size={15} />Supprimer</button>
         </div>
       </article>)}
     </div>

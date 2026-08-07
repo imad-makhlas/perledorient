@@ -151,4 +151,28 @@ describe('order stock reservation API', () => {
     await expect(listAdminOrders(database as unknown as D1Database)).resolves.toEqual([])
     expect(database.sqlite.prepare('SELECT COUNT(*) AS count FROM orders WHERE order_number = ?').get('PDO-20260806-233663')).toEqual({ count: 0 })
   })
+
+  it('deletes an active order and restores its reserved stock', async () => {
+    const database = orderDatabase()
+    const env = { DB: database as unknown as D1Database, WHATSAPP_NUMBER: '212600000000' }
+    const response = await onRequestPost({ request: orderRequest('delete-active'), env, params: {} })
+    const order = await response.json() as { orderNumber: string }
+
+    expect(database.sqlite.prepare('SELECT stock FROM admin_products WHERE id = ?').get('variant-1')).toEqual({ stock: 0 })
+    await expect(deleteAdminOrder(env.DB, order.orderNumber)).resolves.toBe(true)
+    expect(database.sqlite.prepare('SELECT stock FROM admin_products WHERE id = ?').get('variant-1')).toEqual({ stock: 1 })
+    await expect(listAdminOrders(env.DB)).resolves.toEqual([])
+  })
+
+  it('deletes a delivered order without returning the sold piece to stock', async () => {
+    const database = orderDatabase()
+    const env = { DB: database as unknown as D1Database, WHATSAPP_NUMBER: '212600000000' }
+    const response = await onRequestPost({ request: orderRequest('delete-delivered'), env, params: {} })
+    const order = await response.json() as { orderNumber: string }
+    await updateAdminOrderStatus(env.DB, order.orderNumber, 'DELIVERED')
+
+    await expect(deleteAdminOrder(env.DB, order.orderNumber)).resolves.toBe(true)
+    expect(database.sqlite.prepare('SELECT stock FROM admin_products WHERE id = ?').get('variant-1')).toEqual({ stock: 0 })
+    await expect(listAdminOrders(env.DB)).resolves.toEqual([])
+  })
 })

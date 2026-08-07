@@ -83,6 +83,45 @@ export function orderStatusLabel(status: AdminOrderStatus, locale: AdminLocale) 
   return labels[locale][status]
 }
 
+const statusPalettes: Record<AdminOrderStatus, { badge: string; action: string }> = {
+  PENDING_CONFIRMATION: {
+    badge: 'border-[#E5CFA7] bg-[#FBF4E7] text-[#765116]',
+    action: 'border-[#C4943D] bg-[#C4943D] text-[#241F21] hover:bg-[#D2A852]',
+  },
+  CONFIRMED: {
+    badge: 'border-[#BED4E2] bg-[#EEF6FA] text-[#315D76]',
+    action: 'border-[#BED4E2] bg-[#DCEAF4] text-[#294E67] hover:bg-[#CDE0EC]',
+  },
+  PREPARING: {
+    badge: 'border-[#D8C7E2] bg-[#F5F0F8] text-[#654A73]',
+    action: 'border-[#D8C7E2] bg-[#E9E0F1] text-[#5B4269] hover:bg-[#DDD0E8]',
+  },
+  READY_FOR_SHIPMENT: {
+    badge: 'border-[#BDDCD9] bg-[#EDF8F7] text-[#326865]',
+    action: 'border-[#BDDCD9] bg-[#DDF0EF] text-[#2D6260] hover:bg-[#CCE7E5]',
+  },
+  SHIPPED: {
+    badge: 'border-[#C8CFE3] bg-[#F0F2F8] text-[#46537A]',
+    action: 'border-[#C8CFE3] bg-[#E1E5F2] text-[#3E4B73] hover:bg-[#D3D9EA]',
+  },
+  DELIVERED: {
+    badge: 'border-[#BBDAC8] bg-[#EEF8F2] text-[#356B4F]',
+    action: 'border-[#BBDAC8] bg-[#DDEFE5] text-[#2E6348] hover:bg-[#CDE6D8]',
+  },
+  CANCELLED: {
+    badge: 'border-[#E3C2C2] bg-[#FBF0F0] text-[#8A3D3D]',
+    action: 'border-[#E3C2C2] bg-[#F3DDDD] text-[#873B3B] hover:bg-[#ECCFCF]',
+  },
+  RETURNED: {
+    badge: 'border-[#D6CFCA] bg-[#F5F2F0] text-[#665C60]',
+    action: 'border-[#D6CFCA] bg-[#E9E5E2] text-[#5F565A] hover:bg-[#DDD7D3]',
+  },
+}
+
+export function orderStatusPalette(status: AdminOrderStatus) {
+  return statusPalettes[status]
+}
+
 export function buildBasicAuthHeader(email: string, password: string) {
   const raw = `${email}:${password}`
   if (typeof btoa === 'function') return `Basic ${btoa(raw)}`

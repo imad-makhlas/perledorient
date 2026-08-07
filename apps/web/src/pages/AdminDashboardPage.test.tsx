@@ -46,5 +46,6 @@ describe('Admin dashboard mobile entry', () => {
     expect(screen.getByRole('group', { name: 'Actions de la commande' })).toBeInTheDocument()
     expect(screen.getByText('PDO-2026-0001')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /Contacter sur WhatsApp/ })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Supprimer' })).toBeInTheDocument()
   })
 })

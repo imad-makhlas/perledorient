@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { buildBasicAuthHeader, getNextAdminActions, orderStatusLabel, type AdminOrder } from './admin-orders.ts'
+import { buildBasicAuthHeader, getNextAdminActions, orderStatusLabel, orderStatusPalette, type AdminOrder, type AdminOrderStatus } from './admin-orders.ts'
 
 test('shows the next operational actions for each order status', () => {
   assert.deepEqual(getNextAdminActions('PENDING_CONFIRMATION'), ['CONFIRMED', 'CANCELLED'])
@@ -13,6 +13,18 @@ test('shows the next operational actions for each order status', () => {
 test('formats admin status labels in English and French', () => {
   assert.equal(orderStatusLabel('PENDING_CONFIRMATION', 'en'), 'Pending confirmation')
   assert.equal(orderStatusLabel('READY_FOR_SHIPMENT', 'fr'), 'Prête à expédier')
+})
+
+test('gives every order phase a distinct badge and action color', () => {
+  const statuses: AdminOrderStatus[] = ['PENDING_CONFIRMATION', 'CONFIRMED', 'PREPARING', 'READY_FOR_SHIPMENT', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'RETURNED']
+  const palettes = statuses.map((status) => orderStatusPalette(status))
+
+  assert.equal(new Set(palettes.map((palette) => palette.badge)).size, statuses.length)
+  assert.equal(new Set(palettes.map((palette) => palette.action)).size, statuses.length)
+  palettes.forEach((palette) => {
+    assert.match(palette.badge, /border-/)
+    assert.match(palette.action, /bg-/)
+  })
 })
 
 test('builds a basic auth header from admin credentials', () => {
