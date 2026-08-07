@@ -107,6 +107,25 @@ describe('order stock reservation API', () => {
     expect(decodeURIComponent(englishBody.whatsappUrl)).toContain('Layali Necklace')
   })
 
+  it('continues the yearly order sequence across legacy and CMD references', async () => {
+    const database = orderDatabase()
+    const env = { DB: database as unknown as D1Database, WHATSAPP_NUMBER: '212600000000' }
+    const year = new Date().getUTCFullYear()
+    database.sqlite.prepare(`
+      INSERT INTO orders (
+        id, order_number, idempotency_key, customer_name, customer_telephone, city, address,
+        subtotal, delivery_fee, total, payment_method, status, stock_reserved
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run('legacy-order', `PDO-${year}-0007`, 'legacy-sequence', 'Ancien client', '+212600000001', 'Rabat', 'Adresse', 500, 0, 500, 'WHATSAPP', 'DELIVERED', 0)
+
+    const first = await onRequestPost({ request: orderRequest('cmd-sequence-1'), env, params: {} })
+    await expect(first.json()).resolves.toMatchObject({ orderNumber: `PDO-CMD-${year}-0008` })
+
+    database.sqlite.prepare('UPDATE admin_products SET stock = 1 WHERE id = ?').run('variant-1')
+    const second = await onRequestPost({ request: orderRequest('cmd-sequence-2'), env, params: {} })
+    await expect(second.json()).resolves.toMatchObject({ orderNumber: `PDO-CMD-${year}-0009` })
+  })
+
   it('does not disguise a missing stock reservation migration as a customer stock conflict', async () => {
     const database = orderDatabase()
     database.batch = async () => { throw new Error('table orders has no column named stock_reserved') }

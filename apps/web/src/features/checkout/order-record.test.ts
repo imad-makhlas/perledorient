@@ -8,13 +8,13 @@ const customer = {
 
 describe('D1 WhatsApp orders', () => {
   it('generates the next readable yearly order reference', () => {
-    expect(generateOrderNumber([], new Date('2026-08-06T12:00:00Z'))).toBe('PDO-2026-0001')
+    expect(generateOrderNumber([], new Date('2026-08-06T12:00:00Z'))).toBe('PDO-CMD-2026-0001')
     expect(generateOrderNumber([
       'PDO-2025-0099',
       'PDO-2026-0002',
-      'PDO-2026-0012',
+      'PDO-CMD-2026-0012',
       'PDO-20260806-233663',
-    ], new Date('2026-08-06T12:00:00Z'))).toBe('PDO-2026-0013')
+    ], new Date('2026-08-06T12:00:00Z'))).toBe('PDO-CMD-2026-0013')
   })
 
   it('uses catalogue prices, calculates delivery and prepares persisted items', () => {

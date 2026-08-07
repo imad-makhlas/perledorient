@@ -5,6 +5,7 @@ import { ProductEditor } from '../components/admin/ProductEditor'
 import { deleteAdminImage, uploadAdminImage } from '../features/admin/admin-images'
 import { changeAdminOrderStatus, deleteAdminOrder, fetchAdminOrders, getNextAdminActions, orderStatusLabel, orderStatusPalette, type AdminCredentials, type AdminOrder, type AdminOrderStatus } from '../features/admin/admin-orders'
 import { createAdminProduct, deleteAdminProduct, fetchAdminProducts, updateAdminProduct, type AdminProduct, type EditableAdminProduct } from '../features/admin/admin-products'
+import { generateProductSku } from '../features/admin/admin-product-record'
 import { formatMoney } from '../lib/format'
 
 type AdminView = 'overview' | 'catalogue' | 'orders'
@@ -32,6 +33,7 @@ export function AdminDashboardPage() {
     finally { setBusy(false) }
   }
   const visibleProducts = useMemo(() => products.filter((product) => `${product.nameEn} ${product.nameFr} ${product.sku}`.toLowerCase().includes(query.toLowerCase())), [products, query])
+  const nextProductSku = useMemo(() => generateProductSku(products.map((product) => product.sku)), [products])
   const pendingOrders = orders.filter((order) => order.status === 'PENDING_CONFIRMATION').length
 
   const saveProduct = async (draft: EditableAdminProduct, replacedImageUrl?: string) => {
@@ -100,7 +102,7 @@ export function AdminDashboardPage() {
         {view === 'orders' && <Orders orders={orders} busy={busy} onUpdate={updateOrder} onDelete={removeOrder} />}
       </section>
     </div>
-    {editing && <ProductEditor product={editing === 'new' ? null : editing} onClose={() => setEditing(null)} onSave={saveProduct} onUploadImage={(file) => uploadAdminImage(credentials, file)} onDeleteImage={(imageUrl) => deleteAdminImage(credentials, imageUrl)} busy={busy} />}
+    {editing && <ProductEditor product={editing === 'new' ? null : editing} suggestedSku={nextProductSku} onClose={() => setEditing(null)} onSave={saveProduct} onUploadImage={(file) => uploadAdminImage(credentials, file)} onDeleteImage={(imageUrl) => deleteAdminImage(credentials, imageUrl)} busy={busy} />}
   </main>
 }
 
@@ -125,7 +127,7 @@ function Orders({ orders, busy, onUpdate, onDelete }: { orders: AdminOrder[]; bu
       {orders.map((order) => <article key={order.orderNumber} className="overflow-hidden rounded-3xl border border-[#DDD4C9] bg-white shadow-[0_16px_45px_rgba(48,42,46,.055)]">
         <header className="border-b border-[#E7DED4] bg-[#FCFAF7] px-5 py-5 sm:px-7">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-            <div className="min-w-0"><div className="flex flex-wrap items-center gap-3"><h2 className="display break-all text-2xl font-semibold sm:text-[1.7rem]">{order.orderNumber}</h2><span className={`rounded-full border px-3 py-1.5 text-[9px] font-bold uppercase tracking-[.12em] ${orderStatusPalette(order.status).badge}`}>{orderStatusLabel(order.status, 'fr')}</span></div><p className="mt-2 flex items-center gap-2 text-xs text-[#7B7074]"><CalendarDays size={14} className="shrink-0 text-[#C4943D]" /><time dateTime={order.createdAt}>{new Date(order.createdAt).toLocaleString('fr-FR', { dateStyle: 'medium', timeStyle: 'short' })}</time></p></div>
+            <div className="min-w-0"><div className="flex flex-wrap items-center gap-3"><h2 className="display break-all text-2xl font-semibold sm:text-[1.7rem]"><span className="mr-2 text-[10px] font-bold uppercase tracking-[.14em] text-[#8A7E82]">Commande n°</span>{order.orderNumber}</h2><span className={`rounded-full border px-3 py-1.5 text-[9px] font-bold uppercase tracking-[.12em] ${orderStatusPalette(order.status).badge}`}>{orderStatusLabel(order.status, 'fr')}</span></div><p className="mt-2 flex items-center gap-2 text-xs text-[#7B7074]"><CalendarDays size={14} className="shrink-0 text-[#C4943D]" /><time dateTime={order.createdAt}>{new Date(order.createdAt).toLocaleString('fr-FR', { dateStyle: 'medium', timeStyle: 'short' })}</time></p></div>
             <div className="flex items-baseline justify-between gap-3 border-t border-[#E7DED4] pt-4 sm:block sm:border-0 sm:pt-0 sm:text-right"><span className="text-[9px] font-bold uppercase tracking-[.14em] text-[#8A7E82]">Total</span><strong className="block text-xl font-semibold text-[#302A2E] sm:mt-1">{formatMoney(Number(order.total), 'fr')}</strong></div>
           </div>
         </header>
@@ -143,7 +145,7 @@ function Orders({ orders, busy, onUpdate, onDelete }: { orders: AdminOrder[]; bu
 
           <section role="group" aria-label="Articles de la commande" className="min-w-0">
             <div className="flex items-center justify-between gap-3"><p className="text-[9px] font-bold uppercase tracking-[.16em] text-[#A06F22]">Articles de la commande</p><span className="text-xs text-[#7B7074]">{order.items.reduce((total, item) => total + item.quantity, 0)} pièce(s)</span></div>
-            <div className="mt-3 divide-y divide-[#E7DED4] rounded-2xl border border-[#E7DED4]">{order.items.map((item) => <div key={`${order.orderNumber}-${item.sku}`} className="grid min-w-0 gap-2 p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"><div className="min-w-0"><p className="break-words text-sm font-semibold">{item.productName}</p><p className="mt-1 text-xs leading-5 text-[#7B7074]">{item.variantName} <span className="mx-1 text-[#C4943D]">·</span> Qté {item.quantity}<span className="mx-1 text-[#C4943D]">·</span> {item.sku}</p></div><strong className="text-sm sm:text-right">{formatMoney(Number(item.lineTotal), 'fr')}</strong></div>)}</div>
+            <div className="mt-3 divide-y divide-[#E7DED4] rounded-2xl border border-[#E7DED4]">{order.items.map((item) => <div key={`${order.orderNumber}-${item.sku}`} className="grid min-w-0 gap-2 p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"><div className="min-w-0"><p className="break-words text-sm font-semibold">{item.productName}</p><p className="mt-1 text-xs leading-5 text-[#7B7074]">{item.variantName} <span className="mx-1 text-[#C4943D]">·</span> Qté {item.quantity}</p><p className="mt-1 text-[10px] font-semibold uppercase tracking-[.08em] text-[#8A7E82]">Réf. produit : {item.sku}</p></div><strong className="text-sm sm:text-right">{formatMoney(Number(item.lineTotal), 'fr')}</strong></div>)}</div>
           </section>
         </div>
 
