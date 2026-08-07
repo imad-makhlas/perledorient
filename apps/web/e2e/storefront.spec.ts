@@ -326,6 +326,30 @@ test('mobile cart and checkout use comfortable touch targets and fields', async 
   expect(await firstName.evaluate((element) => Number.parseFloat(getComputedStyle(element).fontSize))).toBeGreaterThanOrEqual(16)
 })
 
+test('narrow mobile checkout keeps every field inside the form and gives the phone number a full row', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 800 })
+  await page.goto('/products/layali-necklace')
+  await page.getByRole('region', { name: 'Mobile purchase actions' }).getByRole('button', { name: /add to my selection/i }).click()
+  await page.getByRole('link', { name: /my selection: 1/i }).click()
+  await page.locator('a[href="/checkout"]').click()
+
+  const country = page.getByRole('combobox', { name: 'Country code' })
+  const telephone = page.getByLabel(/telephone/i)
+  const countryBox = await country.boundingBox()
+  const telephoneBox = await telephone.boundingBox()
+  if (!countryBox || !telephoneBox) throw new Error('International phone controls are missing')
+
+  expect(countryBox.y + countryBox.height).toBeLessThanOrEqual(telephoneBox.y)
+  expect(countryBox.width).toBeLessThan(telephoneBox.width)
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320)
+
+  const formControlBoxes = await page.locator('main form input, main form select, main form textarea').evaluateAll((elements) => elements.map((element) => {
+    const box = element.getBoundingClientRect()
+    return { left: box.left, right: box.right }
+  }))
+  expect(formControlBoxes.every((box) => box.left >= 0 && box.right <= 320)).toBe(true)
+})
+
 test('mobile footer is grouped into a concise premium block', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto('/about')
