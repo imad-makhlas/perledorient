@@ -16,13 +16,44 @@ const order = {
   ],
 }
 
-test('builds a complete Perle d Orient WhatsApp message', () => {
-  const message = buildWhatsAppMessage(order)
-  assert.match(message, /Perle d'Orient/)
-  assert.match(message, /PDO-20260722-ABC123/)
-  assert.match(message, /Layali Necklace - Antique gold x 1 - 520 MAD/)
-  assert.match(message, /Total: 910 MAD/)
-  assert.match(message, /Casablanca, 18 Rue Al Massira/)
+test('builds the complete Perle d Orient WhatsApp message in French', () => {
+  const message = buildWhatsAppMessage(order, 'fr')
+  assert.equal(message, [
+    "Bonjour Perle d'Orient, je souhaite confirmer cette commande :",
+    'Référence : PDO-20260722-ABC123',
+    '',
+    'Layali Necklace — Antique gold × 1 — 520 MAD',
+    'Nour Earrings — Pearl × 1 — 390 MAD',
+    '',
+    'Total : 910 MAD',
+    'Nom : Sara Amrani',
+    'Téléphone : +212612345678',
+    'Livraison : Casablanca, 18 Rue Al Massira',
+    'Note : Gift wrapping',
+    '',
+    'Merci de confirmer la disponibilité et les modalités de livraison.',
+  ].join('\n'))
+  assert.doesNotMatch(message, /Hello|Order:|Customer:|Phone:|Delivery:|Please confirm/)
+})
+
+test('builds the complete Perle d Orient WhatsApp message in English', () => {
+  const message = buildWhatsAppMessage(order, 'en')
+  assert.equal(message, [
+    "Hello Perle d'Orient, I would like to confirm this order:",
+    'Reference: PDO-20260722-ABC123',
+    '',
+    'Layali Necklace — Antique gold × 1 — 520 MAD',
+    'Nour Earrings — Pearl × 1 — 390 MAD',
+    '',
+    'Total: 910 MAD',
+    'Name: Sara Amrani',
+    'Phone: +212612345678',
+    'Delivery: Casablanca, 18 Rue Al Massira',
+    'Note: Gift wrapping',
+    '',
+    'Please confirm availability and delivery details.',
+  ].join('\n'))
+  assert.doesNotMatch(message, /Bonjour|Référence|Téléphone|Livraison|Merci de confirmer/)
 })
 
 test('encodes the WhatsApp message and normalizes the phone', () => {

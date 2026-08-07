@@ -12,7 +12,7 @@ test('shows the next operational actions for each order status', () => {
 
 test('formats admin status labels in English and French', () => {
   assert.equal(orderStatusLabel('PENDING_CONFIRMATION', 'en'), 'Pending confirmation')
-  assert.equal(orderStatusLabel('READY_FOR_SHIPMENT', 'fr'), 'Prete a expedier')
+  assert.equal(orderStatusLabel('READY_FOR_SHIPMENT', 'fr'), 'Prête à expédier')
 })
 
 test('builds a basic auth header from admin credentials', () => {

@@ -40,6 +40,7 @@ function orderDatabase() {
     PRAGMA foreign_keys = ON;
     CREATE TABLE admin_products (
       id TEXT PRIMARY KEY, product_id TEXT NOT NULL, slug TEXT NOT NULL, product_name TEXT NOT NULL,
+      name_en TEXT NOT NULL DEFAULT '', name_fr TEXT NOT NULL DEFAULT '',
       variant_name TEXT NOT NULL, sku TEXT NOT NULL, price INTEGER NOT NULL, stock INTEGER NOT NULL,
       active INTEGER NOT NULL, image_url TEXT NOT NULL DEFAULT '', updated_at TEXT
     );
@@ -59,18 +60,19 @@ function orderDatabase() {
   `)
   database.sqlite.exec(readFileSync(new URL('../../../../../migrations/0003_reserve_order_stock.sql', import.meta.url), 'utf8'))
   database.sqlite.prepare(`
-    INSERT INTO admin_products (id, product_id, slug, product_name, variant_name, sku, price, stock, active, image_url)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `).run('variant-1', 'product-1', 'layali', 'Layali Necklace', 'Gold', 'PDO-001-A', 520, 1, 1, '/layali.jpg')
+    INSERT INTO admin_products (id, product_id, slug, product_name, name_en, name_fr, variant_name, sku, price, stock, active, image_url)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `).run('variant-1', 'product-1', 'layali', 'Layali Necklace', 'Layali Necklace', 'Collier Layali', 'Gold', 'PDO-001-A', 520, 1, 1, '/layali.jpg')
   return database
 }
 
-function orderRequest(idempotencyKey: string) {
+function orderRequest(idempotencyKey: string, locale: 'en' | 'fr' = 'en') {
   return new Request('https://shop.test/api/v1/orders', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       idempotencyKey,
+      locale,
       customer: { firstName: 'Sara', lastName: 'Amrani', telephone: '+212612345678', city: 'Casablanca', address: '12 rue des Fleurs', deliveryNotes: '', paymentMethod: 'WHATSAPP', acceptedTerms: true },
       items: [{ variantId: 'variant-1', quantity: 1 }],
     }),
@@ -85,6 +87,24 @@ describe('order stock reservation API', () => {
     expect(response.status).toBe(201)
     const body = await response.json() as { whatsappUrl: string }
     expect(body.whatsappUrl).toContain('wa.me/212631210654')
+  })
+
+  it('builds the WhatsApp message in the language selected by the customer', async () => {
+    const database = orderDatabase()
+    const env = { DB: database as unknown as D1Database, WHATSAPP_NUMBER: '212600000000' }
+
+    const frenchResponse = await onRequestPost({ request: orderRequest('french-message', 'fr'), env, params: {} })
+    const frenchBody = await frenchResponse.json() as { whatsappUrl: string }
+    expect(decodeURIComponent(frenchBody.whatsappUrl)).toContain("Bonjour Perle d'Orient")
+    expect(decodeURIComponent(frenchBody.whatsappUrl)).toContain('Téléphone :')
+    expect(decodeURIComponent(frenchBody.whatsappUrl)).toContain('Collier Layali')
+
+    database.sqlite.prepare('UPDATE admin_products SET stock = 1 WHERE id = ?').run('variant-1')
+    const englishResponse = await onRequestPost({ request: orderRequest('english-message', 'en'), env, params: {} })
+    const englishBody = await englishResponse.json() as { whatsappUrl: string }
+    expect(decodeURIComponent(englishBody.whatsappUrl)).toContain("Hello Perle d'Orient")
+    expect(decodeURIComponent(englishBody.whatsappUrl)).toContain('Phone:')
+    expect(decodeURIComponent(englishBody.whatsappUrl)).toContain('Layali Necklace')
   })
 
   it('does not disguise a missing stock reservation migration as a customer stock conflict', async () => {

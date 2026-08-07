@@ -9,22 +9,43 @@ export type WhatsAppOrder = {
   items: Array<{ name: string; variantName: string; quantity: number; lineTotal: number }>
 }
 
-export function buildWhatsAppMessage(order: WhatsAppOrder) {
-  const lines = order.items.map((item) => `${item.name} - ${item.variantName} x ${item.quantity} - ${item.lineTotal} MAD`)
+export type WhatsAppLocale = 'en' | 'fr'
+
+const whatsappCopy = {
+  fr: {
+    intro: "Bonjour Perle d'Orient, je souhaite confirmer cette commande :",
+    reference: 'Référence', total: 'Total', name: 'Nom', phone: 'Téléphone', delivery: 'Livraison', note: 'Note',
+    closing: 'Merci de confirmer la disponibilité et les modalités de livraison.',
+  },
+  en: {
+    intro: "Hello Perle d'Orient, I would like to confirm this order:",
+    reference: 'Reference', total: 'Total', name: 'Name', phone: 'Phone', delivery: 'Delivery', note: 'Note',
+    closing: 'Please confirm availability and delivery details.',
+  },
+} satisfies Record<WhatsAppLocale, Record<string, string>>
+
+export function buildWhatsAppMessage(order: WhatsAppOrder, locale: WhatsAppLocale) {
+  const copy = whatsappCopy[locale]
+  const separator = locale === 'fr' ? ' :' : ':'
+  const lines = order.items.map((item) => `${item.name} — ${item.variantName} × ${item.quantity} — ${item.lineTotal} MAD`)
+  const customerDetails = [
+    `${copy.total}${separator} ${order.total} MAD`,
+    `${copy.name}${separator} ${order.customerName}`,
+    `${copy.phone}${separator} ${order.telephone}`,
+    `${copy.delivery}${separator} ${order.city}, ${order.address}`,
+    ...(order.notes ? [`${copy.note}${separator} ${order.notes}`] : []),
+  ]
+
   return [
-    "Hello Perle d'Orient, I would like to confirm this selection:",
-    `Order: ${order.orderNumber}`,
+    copy.intro,
+    `${copy.reference}${separator} ${order.orderNumber}`,
     '',
     ...lines,
     '',
-    `Total: ${order.total} MAD`,
-    `Customer: ${order.customerName}`,
-    `Phone: ${order.telephone}`,
-    `Delivery: ${order.city}, ${order.address}`,
-    order.notes ? `Note: ${order.notes}` : '',
+    ...customerDetails,
     '',
-    'Please confirm availability and delivery details.',
-  ].filter(Boolean).join('\n')
+    copy.closing,
+  ].join('\n')
 }
 
 export function buildWhatsAppUrl(phone: string, message: string) {

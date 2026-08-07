@@ -24,7 +24,7 @@ export function CheckoutPage() {
     const result = checkoutSchema.safeParse(form)
     if (!result.success) { setErrors(Object.fromEntries(result.error.issues.map((issue) => [String(issue.path[0]), issue.message]))); return }
     setErrors({}); setSubmitting(true)
-    try { const order = await createOrder(result.data, state.items); sessionStorage.setItem('perle-d-orient-last-order', JSON.stringify({ ...order, customer: result.data, items: state.items })); if (order.whatsappUrl) window.open(order.whatsappUrl, '_blank', 'noopener,noreferrer'); navigate(`/order-confirmation?order=${order.orderNumber}`) } catch { setErrors({ form: 'We could not prepare your WhatsApp order. Please try again.' }); setSubmitting(false) }
+    try { const order = await createOrder(result.data, state.items, locale); sessionStorage.setItem('perle-d-orient-last-order', JSON.stringify({ ...order, customer: result.data, items: state.items })); if (order.whatsappUrl) window.open(order.whatsappUrl, '_blank', 'noopener,noreferrer'); navigate(`/order-confirmation?order=${order.orderNumber}`) } catch { setErrors({ form: 'We could not prepare your WhatsApp order. Please try again.' }); setSubmitting(false) }
   }
   if (!state.items.length) return <main className="container-shell py-20 text-center"><h1 className="display text-5xl font-semibold">Your cart is empty.</h1></main>
   const fields: [keyof CheckoutForm, string, string][] = [['firstName', t('firstName'), 'text'], ['lastName', t('lastName'), 'text'], ['telephone', t('telephone'), 'tel'], ['city', t('city'), 'text']]

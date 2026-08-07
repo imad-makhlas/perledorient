@@ -2,14 +2,15 @@ import type { CartItem } from '../cart/cart'
 import type { CheckoutForm } from './checkout-schema'
 import { generateOrderNumber } from './order-record'
 import { buildWhatsAppMessage, buildWhatsAppUrl } from './whatsapp-order'
+import type { WhatsAppLocale } from './whatsapp-order'
 import { WHATSAPP_NUMBER } from '../../config/contact'
 
 export type CreatedOrder = { orderNumber: string; total: number; deliveryFee: number; whatsappUrl?: string }
 
 class OrderApiError extends Error {}
 
-export async function createOrder(customer: CheckoutForm, items: CartItem[]): Promise<CreatedOrder> {
-  const payload = { customer, items: items.map((item) => ({ variantId: item.variantId, quantity: item.quantity })), idempotencyKey: crypto.randomUUID() }
+export async function createOrder(customer: CheckoutForm, items: CartItem[], locale: WhatsAppLocale): Promise<CreatedOrder> {
+  const payload = { customer, locale, items: items.map((item) => ({ variantId: item.variantId, quantity: item.quantity })), idempotencyKey: crypto.randomUUID() }
   try {
     const response = await fetch('/api/v1/orders', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Idempotency-Key': payload.idempotencyKey }, body: JSON.stringify(payload) })
     if (!response.ok) {
@@ -32,7 +33,7 @@ export async function createOrder(customer: CheckoutForm, items: CartItem[]): Pr
       notes: customer.deliveryNotes,
       total: subtotal + deliveryFee,
       items: items.map((item) => ({ name: item.name, variantName: item.variantName, quantity: item.quantity, lineTotal: item.unitPrice * item.quantity })),
-    })
+    }, locale)
     return { orderNumber, total: subtotal + deliveryFee, deliveryFee, whatsappUrl: buildWhatsAppUrl(WHATSAPP_NUMBER, preparedMessage) }
   }
 }

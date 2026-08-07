@@ -65,13 +65,13 @@ const labels: Record<AdminLocale, Record<AdminOrderStatus, string>> = {
   },
   fr: {
     PENDING_CONFIRMATION: 'En attente',
-    CONFIRMED: 'Confirmee',
-    PREPARING: 'Preparation',
-    READY_FOR_SHIPMENT: 'Prete a expedier',
-    SHIPPED: 'Expediee',
-    DELIVERED: 'Livree',
-    CANCELLED: 'Annulee',
-    RETURNED: 'Retournee',
+    CONFIRMED: 'Confirmée',
+    PREPARING: 'Préparation',
+    READY_FOR_SHIPMENT: 'Prête à expédier',
+    SHIPPED: 'Expédiée',
+    DELIVERED: 'Livrée',
+    CANCELLED: 'Annulée',
+    RETURNED: 'Retournée',
   },
 }
 

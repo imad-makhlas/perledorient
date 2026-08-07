@@ -38,7 +38,7 @@ export function WhatsAppCheckoutPage() {
     setErrors({})
     setSubmitting(true)
     try {
-      const order = await createOrder(result.data, state.items)
+      const order = await createOrder(result.data, state.items, locale)
       sessionStorage.setItem('perle-d-orient-last-order', JSON.stringify({ ...order, customer: result.data, items: state.items }))
       dispatch(clearCart())
       if (order.whatsappUrl) window.open(order.whatsappUrl, '_blank', 'noopener,noreferrer')

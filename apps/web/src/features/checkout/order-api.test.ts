@@ -19,6 +19,6 @@ describe('order API client', () => {
       error: 'Cette pièce vient d’être réservée. Actualisez votre panier.',
     }), { status: 409, headers: { 'Content-Type': 'application/json' } })))
 
-    await expect(createOrder(customer, items)).rejects.toThrow('Cette pièce vient d’être réservée')
+    await expect(createOrder(customer, items, 'fr')).rejects.toThrow('Cette pièce vient d’être réservée')
   })
 })

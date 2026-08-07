@@ -35,6 +35,7 @@ describe('WhatsApp checkout', () => {
     await screen.findByText('Order created')
     const request = JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body))
     expect(request.customer.telephone).toBe('+33612345678')
+    expect(request.locale).toBe('en')
   }, 15_000)
 
   it('clears only this browser cart after its order is created', async () => {

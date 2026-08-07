@@ -4,12 +4,13 @@ import { buildWhatsAppMessage, buildWhatsAppUrl } from '../../../../apps/web/src
 import { WHATSAPP_NUMBER } from '../../../../apps/web/src/config/contact'
 import { json, type PagesContext } from '../admin/_shared'
 
-type RequestBody = { customer?: CheckoutForm; items?: Array<{ variantId: string; quantity: number }>; idempotencyKey?: string }
+type RequestBody = { customer?: CheckoutForm; items?: Array<{ variantId: string; quantity: number }>; idempotencyKey?: string; locale?: 'en' | 'fr' }
 type ExistingOrder = { order_number: string; total: number; delivery_fee: number; whatsapp_url: string | null }
 
 export async function onRequestPost({ request, env }: PagesContext) {
   try {
     const body = await request.json() as RequestBody
+    const locale = body.locale === 'fr' ? 'fr' : 'en'
     const parsedCustomer = checkoutSchema.safeParse(body.customer)
     if (!parsedCustomer.success || !body.idempotencyKey || !Array.isArray(body.items) || !body.items.length) {
       return json({ error: 'Invalid order details' }, { status: 400 })
@@ -26,9 +27,14 @@ export async function onRequestPost({ request, env }: PagesContext) {
     const uniqueIds = [...new Set(body.items.map((item) => item.variantId))]
     const placeholders = uniqueIds.map(() => '?').join(', ')
     const catalogue = (await env.DB.prepare(`
-      SELECT id, product_id, slug, product_name, variant_name, sku, price, stock, active, image_url
+      SELECT id, product_id, slug,
+        CASE
+          WHEN ? = 'fr' THEN COALESCE(NULLIF(name_fr, ''), NULLIF(name_en, ''), product_name)
+          ELSE COALESCE(NULLIF(name_en, ''), product_name)
+        END AS product_name,
+        variant_name, sku, price, stock, active, image_url
       FROM admin_products WHERE id IN (${placeholders})
-    `).bind(...uniqueIds).all<OrderCatalogRow>()).results || []
+    `).bind(locale, ...uniqueIds).all<OrderCatalogRow>()).results || []
     const prepared = prepareOrder(parsedCustomer.data, body.items, catalogue, generateOrderNumber(existingOrderNumbers.map((order) => order.order_number)))
     const whatsappMessage = buildWhatsAppMessage({
       orderNumber: prepared.orderNumber,
@@ -39,7 +45,7 @@ export async function onRequestPost({ request, env }: PagesContext) {
       notes: prepared.notes,
       total: prepared.total,
       items: prepared.items.map((item) => ({ name: item.productName, variantName: item.variantName, quantity: item.quantity, lineTotal: item.lineTotal })),
-    })
+    }, locale)
     const whatsappUrl = buildWhatsAppUrl(env.WHATSAPP_NUMBER || WHATSAPP_NUMBER, whatsappMessage)
     const orderId = crypto.randomUUID()
     const statements = [
