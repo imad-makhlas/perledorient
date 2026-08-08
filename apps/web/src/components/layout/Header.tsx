@@ -28,7 +28,30 @@ export function Header() {
         <span className="hidden sm:block"><Logo tone="light" /></span><span className="sm:hidden"><Logo tone="light" compact /></span>
         <nav className="hidden items-center gap-6 lg:flex lg:gap-9" aria-label="Primary navigation">{links.map(([to, label]) => { const active = isHeaderLinkActive(location.pathname, location.search, to); return <Link key={to} to={to} className={`relative whitespace-nowrap text-[10px] font-semibold uppercase tracking-[.2em] transition-colors hover:text-accent ${active ? 'text-white after:absolute after:-bottom-3 after:left-0 after:h-px after:w-full after:bg-accent' : 'text-white/55'}`}>{label}</Link> })}</nav>
         <div className="flex shrink-0 items-center gap-2 text-ivory sm:gap-3">
-          <button onClick={() => setLocale(locale === 'fr' ? 'ar' : 'fr')} className="border-r border-white/15 pr-2 text-[10px] font-bold uppercase tracking-wider transition-colors hover:text-accent sm:pr-3" aria-label={locale === 'fr' ? 'Afficher le site en arabe' : 'عرض الموقع بالفرنسية'}><span className={locale === 'fr' ? 'text-accent' : ''}>FR</span><span className="mx-1 text-white/35">/</span><span className={locale === 'ar' ? 'text-accent' : ''}>AR</span></button>
+          <div
+            role="group"
+            aria-label={locale === 'fr' ? 'Choisir la langue' : 'اختيار اللغة'}
+            className="grid h-9 w-[78px] shrink-0 grid-cols-2 rounded-full border border-white/20 bg-white/[.06] p-0.5 shadow-inner sm:w-[84px]"
+          >
+            <button
+              type="button"
+              onClick={() => setLocale('fr')}
+              aria-label="Français"
+              aria-pressed={locale === 'fr'}
+              className={`grid min-w-0 place-items-center rounded-full text-[10px] font-bold uppercase tracking-[.08em] transition-all ${locale === 'fr' ? 'bg-accent text-[#241F21] shadow-sm' : 'text-white/70 hover:text-white'}`}
+            >
+              FR
+            </button>
+            <button
+              type="button"
+              onClick={() => setLocale('ar')}
+              aria-label="العربية"
+              aria-pressed={locale === 'ar'}
+              className={`grid min-w-0 place-items-center rounded-full text-[10px] font-bold uppercase tracking-[.08em] transition-all ${locale === 'ar' ? 'bg-accent text-[#241F21] shadow-sm' : 'text-white/70 hover:text-white'}`}
+            >
+              AR
+            </button>
+          </div>
           <Link to="/catalogue" aria-label={t('search')} className="hidden transition-colors hover:text-accent lg:inline-flex"><Search size={19} strokeWidth={1.6} /></Link>
           <Link to="/cart" className="relative transition-colors hover:text-accent" aria-label={`${t('cart')}: ${count}`}><ShoppingBag size={20} strokeWidth={1.6} />{count > 0 && <span className="absolute -right-2 -top-2 grid h-4 min-w-4 place-items-center rounded-full bg-accent px-1 text-[9px] font-bold text-midnight">{count}</span>}</Link>
           <a href={INSTAGRAM_URL} target="_blank" rel="noreferrer" aria-label="Instagram Perle d'Orient" className="hidden transition-colors hover:text-accent lg:inline-flex"><Instagram size={19} strokeWidth={1.6} /></a>

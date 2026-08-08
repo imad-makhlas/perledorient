@@ -24,11 +24,12 @@ describe('Arabic storefront copy', () => {
     expect(screen.queryByText(/Hand-finished|Find your piece|Made slowly/i)).not.toBeInTheDocument()
   })
 
-  it('translates the catalogue heading', () => {
+  it('starts the catalogue with compact controls and no introductory heading', () => {
     renderArabic(<CataloguePage />)
-    expect(screen.getByRole('heading', { name: 'المجموعة' })).toBeInTheDocument()
-    expect(screen.getByText('مجوهرات حرفية مستوحاة من نفحة شرقية')).toBeInTheDocument()
-    expect(screen.queryByText(/The collection|Artisan jewelry/i)).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'المجموعة' })).not.toBeInTheDocument()
+    expect(screen.queryByText('مجوهرات حرفية مستوحاة من نفحة شرقية')).not.toBeInTheDocument()
+    expect(screen.getByLabelText('10 قطع')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('البحث في المجموعة')).toBeInTheDocument()
   })
 
   it('translates the footer and uses the refined signature', () => {
@@ -37,4 +38,13 @@ describe('Arabic storefront copy', () => {
     expect(screen.getByText('© 2026 Perle d’Orient — جميع الحقوق محفوظة.')).toBeInTheDocument()
     expect(screen.queryByText(/Handcrafted jewelry|The atelier|Our story/i)).not.toBeInTheDocument()
   })
+
+  it('keeps the phone number and Instagram handle readable from left to right', () => {
+    renderArabic(<Footer />)
+
+    expect(screen.getByRole('region', { name: "Coordonnées Perle d'Orient" })).toHaveAttribute('dir', 'ltr')
+    expect(screen.getByText('+212 631-210654').closest('p')).toHaveAttribute('dir', 'ltr')
+    expect(screen.getByText('@ma.perle.dorient').closest('a')).toHaveAttribute('dir', 'ltr')
+  })
+
 })
