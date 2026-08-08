@@ -22,8 +22,8 @@ describe('Product page direct WhatsApp order', () => {
     </Routes></CartProvider></I18nProvider></MemoryRouter>)
 
     await userEvent.click(screen.getByRole('button', { name: 'Increase quantity' }))
-    const mobileActions = screen.getByRole('region', { name: 'Mobile purchase actions' })
-    await userEvent.click(within(mobileActions).getByRole('button', { name: 'Order via WhatsApp' }))
+    const mobileActions = screen.getByRole('region', { name: 'Actions d’achat sur mobile' })
+    await userEvent.click(within(mobileActions).getByRole('button', { name: 'Commander via WhatsApp' }))
 
     expect(await screen.findByText('Checkout form')).toBeInTheDocument()
     await waitFor(() => expect(JSON.parse(localStorage.getItem('codavenue-cart') || '{}')).toMatchObject({
