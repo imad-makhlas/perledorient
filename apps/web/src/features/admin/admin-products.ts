@@ -5,10 +5,10 @@ export type AdminProduct = {
   id: string
   productId: string
   slug: string
-  nameEn: string
   nameFr: string
-  descriptionEn: string
+  nameAr: string
   descriptionFr: string
+  descriptionAr: string
   category: string
   material: string
   dimensions: string
@@ -20,6 +20,7 @@ export type AdminProduct = {
   active: boolean
   featured: boolean
   imageUrl: string
+  imageUrls: string[]
 }
 
 export type EditableAdminProduct = Omit<AdminProduct, 'id' | 'productId'>

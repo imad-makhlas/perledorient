@@ -29,7 +29,7 @@ export type PagesEnv = {
 export type PagesContext = { request: Request; env: PagesEnv; params: Record<string, string | string[]> }
 
 export const productColumns = `
-  id, product_id, slug, product_name, name_en, name_fr, description_en, description_fr,
+  id, product_id, slug, product_name, name_en, name_fr, name_ar, description_en, description_fr, description_ar,
   category, material, dimensions, variant_name, sku, price, comparison_price,
   stock, active, featured, image_url
 `
@@ -62,7 +62,22 @@ export function unauthorized() {
 
 export async function listAdminProducts(db: D1Database) {
   const result = await db.prepare(`SELECT ${productColumns} FROM admin_products ORDER BY created_at DESC, name_en ASC`).all<AdminProductRow>()
-  return (result.results || []).map(adminProductFromRow)
+  return (await attachProductImages(db, result.results || [])).map(adminProductFromRow)
+}
+
+type ProductImageRow = { product_row_id: string; image_url: string }
+
+export async function attachProductImages(db: D1Database, rows: AdminProductRow[]) {
+  if (!rows.length) return rows
+  const images = (await db.prepare('SELECT product_row_id, image_url FROM admin_product_images ORDER BY product_row_id, position, created_at').all<ProductImageRow>()).results || []
+  return rows.map((row) => ({ ...row, image_urls: images.filter((image) => image.product_row_id === row.id).map((image) => image.image_url) }))
+}
+
+function imageStatements(db: D1Database, productRowId: string, imageUrls: string[]) {
+  return [
+    db.prepare('DELETE FROM admin_product_images WHERE product_row_id = ?').bind(productRowId),
+    ...imageUrls.map((imageUrl, position) => db.prepare('INSERT INTO admin_product_images (id, product_row_id, image_url, position) VALUES (?, ?, ?, ?)').bind(crypto.randomUUID(), productRowId, imageUrl, position)),
+  ]
 }
 
 export async function createAdminProduct(db: D1Database, input: EditableAdminProduct) {
@@ -75,37 +90,39 @@ export async function createAdminProduct(db: D1Database, input: EditableAdminPro
   const id = crypto.randomUUID()
   await db.prepare(`
     INSERT INTO admin_products (
-      id, product_id, slug, product_name, name_en, name_fr, description_en, description_fr,
+      id, product_id, slug, product_name, name_en, name_fr, name_ar, description_en, description_fr, description_ar,
       category, material, dimensions, variant_name, sku, price, comparison_price,
       stock, active, featured, image_url
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).bind(
-    id, productId, product.slug, product.nameEn, product.nameEn, product.nameFr,
-    product.descriptionEn, product.descriptionFr, product.category, product.material,
+    id, productId, product.slug, product.nameFr, product.nameFr, product.nameFr, product.nameAr,
+    product.descriptionFr, product.descriptionFr, product.descriptionAr, product.category, product.material,
     product.dimensions, product.variantName, product.sku, product.price,
     product.comparisonPrice, product.stock, product.active ? 1 : 0,
     product.featured ? 1 : 0, product.imageUrl,
   ).run()
+  await db.batch(imageStatements(db, id, product.imageUrls))
   const row = await db.prepare(`SELECT ${productColumns} FROM admin_products WHERE id = ?`).bind(id).first<AdminProductRow>()
-  return row ? adminProductFromRow(row) : null
+  return row ? adminProductFromRow((await attachProductImages(db, [row]))[0]) : null
 }
 
 export async function updateAdminProduct(db: D1Database, id: string, input: EditableAdminProduct) {
   const product = normalizeAdminProductInput(input)
   await db.prepare(`
     UPDATE admin_products SET
-      slug = ?, product_name = ?, name_en = ?, name_fr = ?, description_en = ?, description_fr = ?,
+      slug = ?, product_name = ?, name_en = ?, name_fr = ?, name_ar = ?, description_en = ?, description_fr = ?, description_ar = ?,
       category = ?, material = ?, dimensions = ?, variant_name = ?, sku = ?, price = ?,
       comparison_price = ?, stock = ?, active = ?, featured = ?, image_url = ?, updated_at = datetime('now')
     WHERE id = ?
   `).bind(
-    product.slug, product.nameEn, product.nameEn, product.nameFr, product.descriptionEn,
-    product.descriptionFr, product.category, product.material, product.dimensions,
+    product.slug, product.nameFr, product.nameFr, product.nameFr, product.nameAr, product.descriptionFr,
+    product.descriptionFr, product.descriptionAr, product.category, product.material, product.dimensions,
     product.variantName, product.sku, product.price, product.comparisonPrice,
     product.stock, product.active ? 1 : 0, product.featured ? 1 : 0, product.imageUrl, id,
   ).run()
+  await db.batch(imageStatements(db, id, product.imageUrls))
   const row = await db.prepare(`SELECT ${productColumns} FROM admin_products WHERE id = ?`).bind(id).first<AdminProductRow>()
-  return row ? adminProductFromRow(row) : null
+  return row ? adminProductFromRow((await attachProductImages(db, [row]))[0]) : null
 }
 
 export async function deleteAdminProduct(db: D1Database, id: string) {

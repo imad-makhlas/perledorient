@@ -1,20 +1,20 @@
-import { ImagePlus, LoaderCircle, Save, Trash2, X } from 'lucide-react'
+import { ArrowLeft, ArrowRight, ImagePlus, LoaderCircle, Save, Star, Trash2, X } from 'lucide-react'
 import { useState, type ChangeEvent, type FormEvent } from 'react'
 import { validateProductImage } from '../../features/admin/cloudinary-image'
 import type { AdminProduct, EditableAdminProduct } from '../../features/admin/admin-products'
 
 const categories = ['Necklaces', 'Earrings', 'Bracelets', 'Rings', 'Gift Sets']
 const emptyProduct: EditableAdminProduct = {
-  slug: '', nameEn: '', nameFr: '', descriptionEn: '', descriptionFr: '', category: 'Necklaces',
+  slug: '', nameFr: '', nameAr: '', descriptionFr: '', descriptionAr: '', category: 'Necklaces',
   material: '', dimensions: '', variantName: '', sku: '', price: 0, comparisonPrice: null,
-  stock: 0, active: true, featured: false, imageUrl: '',
+  stock: 0, active: true, featured: false, imageUrl: '', imageUrls: [],
 }
 
 type ProductEditorProps = {
   product: AdminProduct | null
   suggestedSku: string
   onClose: () => void
-  onSave: (value: EditableAdminProduct, replacedImageUrl?: string) => void
+  onSave: (value: EditableAdminProduct, removedImageUrls?: string[]) => void
   onUploadImage: (file: File) => Promise<string>
   onDeleteImage: (imageUrl: string) => Promise<void>
   busy: boolean
@@ -22,47 +22,59 @@ type ProductEditorProps = {
 
 export function ProductEditor({ product, suggestedSku, onClose, onSave, onUploadImage, onDeleteImage, busy }: ProductEditorProps) {
   const [draft, setDraft] = useState<EditableAdminProduct>(product ? { ...product } : emptyProduct)
-  const [temporaryImageUrl, setTemporaryImageUrl] = useState('')
+  const [temporaryImageUrls, setTemporaryImageUrls] = useState<string[]>([])
   const [imageBusy, setImageBusy] = useState(false)
   const [imageError, setImageError] = useState('')
-  const initialImageUrl = product?.imageUrl || ''
+  const initialImageUrls = product?.imageUrls || (product?.imageUrl ? [product.imageUrl] : [])
   const set = <K extends keyof EditableAdminProduct>(key: K, value: EditableAdminProduct[K]) => setDraft((current) => ({ ...current, [key]: value }))
 
   const submit = (event: FormEvent) => {
     event.preventDefault()
-    onSave(draft, initialImageUrl && draft.imageUrl !== initialImageUrl ? initialImageUrl : undefined)
+    onSave(draft, initialImageUrls.filter((imageUrl) => !draft.imageUrls.includes(imageUrl)))
   }
   const uploadImage = async (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
+    const files = [...(event.target.files || [])]
     event.target.value = ''
-    if (!file) return
+    if (!files.length) return
+    if (draft.imageUrls.length + files.length > 6) { setImageError('Vous pouvez ajouter au maximum 6 photos.'); return }
     setImageBusy(true); setImageError('')
     try {
-      validateProductImage(file)
-      const nextImageUrl = await onUploadImage(file)
-      const previousTemporaryImage = temporaryImageUrl
-      set('imageUrl', nextImageUrl)
-      setTemporaryImageUrl(nextImageUrl)
-      if (previousTemporaryImage && previousTemporaryImage !== nextImageUrl) await onDeleteImage(previousTemporaryImage).catch(() => undefined)
+      files.forEach(validateProductImage)
+      const nextImageUrls = await Promise.all(files.map(onUploadImage))
+      const allImages = [...draft.imageUrls, ...nextImageUrls]
+      setDraft((current) => ({ ...current, imageUrl: allImages[0] || '', imageUrls: allImages }))
+      setTemporaryImageUrls((current) => [...current, ...nextImageUrls])
     } catch (error) {
       setImageError(error instanceof Error ? error.message : 'Impossible d’envoyer cette photo')
     } finally {
       setImageBusy(false)
     }
   }
-  const removeImage = async () => {
-    const imageToClean = temporaryImageUrl
-    set('imageUrl', ''); setTemporaryImageUrl(''); setImageError('')
-    if (!imageToClean) return
+  const removeImage = async (index: number) => {
+    const imageToClean = draft.imageUrls[index]
+    const nextImages = draft.imageUrls.filter((_, imageIndex) => imageIndex !== index)
+    setDraft((current) => ({ ...current, imageUrl: nextImages[0] || '', imageUrls: nextImages })); setImageError('')
+    if (!temporaryImageUrls.includes(imageToClean)) return
     setImageBusy(true)
-    try { await onDeleteImage(imageToClean) }
+    try { await onDeleteImage(imageToClean); setTemporaryImageUrls((current) => current.filter((url) => url !== imageToClean)) }
     catch (error) { setImageError(error instanceof Error ? error.message : 'Impossible de supprimer cette photo') }
     finally { setImageBusy(false) }
   }
+  const moveImage = (index: number, direction: -1 | 1) => {
+    const target = index + direction
+    if (target < 0 || target >= draft.imageUrls.length) return
+    const nextImages = [...draft.imageUrls]
+    ;[nextImages[index], nextImages[target]] = [nextImages[target], nextImages[index]]
+    setDraft((current) => ({ ...current, imageUrl: nextImages[0], imageUrls: nextImages }))
+  }
+  const makePrimary = (index: number) => {
+    const nextImages = [draft.imageUrls[index], ...draft.imageUrls.filter((_, imageIndex) => imageIndex !== index)]
+    setDraft((current) => ({ ...current, imageUrl: nextImages[0], imageUrls: nextImages }))
+  }
   const cancel = async () => {
-    if (temporaryImageUrl) {
+    if (temporaryImageUrls.length) {
       setImageBusy(true)
-      try { await onDeleteImage(temporaryImageUrl) } catch { /* Cleanup can be retried from Cloudinary. */ }
+      try { await Promise.all(temporaryImageUrls.map(onDeleteImage)) } catch { /* Cleanup can be retried from Cloudinary. */ }
     }
     onClose()
   }
@@ -72,10 +84,10 @@ export function ProductEditor({ product, suggestedSku, onClose, onSave, onUpload
       <header className="flex items-center justify-between border-b border-line px-5 py-4 sm:px-7"><div><p className="eyebrow">Catalogue</p><h2 className="display mt-1 text-3xl font-semibold">{product ? 'Modifier le bijou' : 'Ajouter un bijou'}</h2></div><button type="button" onClick={cancel} disabled={imageBusy} className="grid h-11 w-11 place-items-center rounded-full border border-line disabled:opacity-50" aria-label="Fermer"><X size={18} /></button></header>
       <div className="flex-1 space-y-7 overflow-y-auto p-5 sm:p-7">
         <section><p className="mb-4 text-[10px] font-bold uppercase tracking-[.18em] text-accent">Contenu bilingue</p><div className="grid gap-4 sm:grid-cols-2">
-          <label className="text-xs font-semibold">Nom anglais<input className="field mt-2" value={draft.nameEn} onChange={(event) => set('nameEn', event.target.value)} required /></label>
           <label className="text-xs font-semibold">Nom français<input className="field mt-2" value={draft.nameFr} onChange={(event) => set('nameFr', event.target.value)} required /></label>
-          <label className="text-xs font-semibold">Description anglaise<textarea className="field mt-2 min-h-28" value={draft.descriptionEn} onChange={(event) => set('descriptionEn', event.target.value)} required /></label>
+          <label className="text-xs font-semibold">Nom arabe<input dir="rtl" className="field mt-2 text-right" value={draft.nameAr} onChange={(event) => set('nameAr', event.target.value)} required /></label>
           <label className="text-xs font-semibold">Description française<textarea className="field mt-2 min-h-28" value={draft.descriptionFr} onChange={(event) => set('descriptionFr', event.target.value)} required /></label>
+          <label className="text-xs font-semibold">Description arabe<textarea dir="rtl" className="field mt-2 min-h-28 text-right" value={draft.descriptionAr} onChange={(event) => set('descriptionAr', event.target.value)} required /></label>
         </div></section>
         <section><p className="mb-4 text-[10px] font-bold uppercase tracking-[.18em] text-accent">Informations produit</p><div className="grid gap-4 sm:grid-cols-2">
           <label className="text-xs font-semibold">Lien produit<input className="field mt-2" value={draft.slug} onChange={(event) => set('slug', event.target.value)} placeholder="collier-layali" required /></label>
@@ -89,14 +101,11 @@ export function ProductEditor({ product, suggestedSku, onClose, onSave, onUpload
           <label className="text-xs font-semibold">Stock<input className="field mt-2" type="number" min="0" value={draft.stock} onChange={(event) => set('stock', Number(event.target.value))} required /></label>
         </div></section>
         <section>
-          <div className="mb-4 flex items-end justify-between gap-4"><div><p className="text-[10px] font-bold uppercase tracking-[.18em] text-accent">Photo principale</p><p className="mt-1 text-xs text-[#7B7074]">Une photo lumineuse et verticale mettra mieux le bijou en valeur.</p></div>{draft.imageUrl && <button type="button" onClick={removeImage} disabled={imageBusy} className="inline-flex min-h-10 items-center gap-2 rounded-full border border-red-200 px-4 text-[10px] font-bold uppercase tracking-wider text-red-700 disabled:opacity-50"><Trash2 size={14} />Retirer</button>}</div>
-          <div className="relative overflow-hidden rounded-2xl border border-[#DDD4C9] bg-[#F7F4EF]">
-            {draft.imageUrl ? <img src={draft.imageUrl} alt={temporaryImageUrl ? 'Aperçu de la nouvelle photo' : 'Aperçu de la photo'} className="aspect-[4/3] w-full object-cover sm:aspect-[16/9]" /> : <div className="grid min-h-52 place-items-center px-6 py-10 text-center"><div><span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-white text-[#C4943D] shadow-sm"><ImagePlus size={23} /></span><p className="display mt-4 text-xl font-semibold">Ajouter une belle photo</p><p className="mt-2 text-xs text-[#7B7074]">JPG, PNG, WebP, AVIF ou HEIC · 10 Mo maximum</p></div></div>}
-            {imageBusy && <div className="absolute inset-0 grid place-items-center bg-white/80 backdrop-blur-sm"><div className="text-center"><LoaderCircle className="mx-auto animate-spin text-[#C4943D]" size={28} /><p className="mt-3 text-[10px] font-bold uppercase tracking-[.16em]">Envoi de la photo…</p></div></div>}
-          </div>
+          <div className="mb-4 flex items-end justify-between gap-4"><div><p className="text-[10px] font-bold uppercase tracking-[.18em] text-accent">Galerie du bijou</p><p className="mt-1 text-xs text-[#7B7074]">Jusqu’à 6 photos. La première devient la couverture du catalogue.</p></div><span className="rounded-full border border-[#DDD4C9] px-3 py-1 text-[10px] font-bold">{draft.imageUrls.length}/6</span></div>
+          {draft.imageUrls.length ? <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">{draft.imageUrls.map((imageUrl, index) => <article key={imageUrl} className="overflow-hidden rounded-2xl border border-[#DDD4C9] bg-[#F7F4EF]"><div className="relative aspect-square"><img src={imageUrl} alt={`Photo ${index + 1} du bijou`} className="h-full w-full object-cover" />{index === 0 && <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-[#C4943D] px-2 py-1 text-[8px] font-bold uppercase"><Star size={10} />Principale</span>}</div><div className="grid grid-cols-4 border-t border-[#DDD4C9]"><button type="button" onClick={() => moveImage(index, -1)} disabled={index === 0 || imageBusy} className="grid h-10 place-items-center disabled:opacity-25" aria-label="Déplacer la photo à gauche"><ArrowLeft size={14} /></button><button type="button" onClick={() => moveImage(index, 1)} disabled={index === draft.imageUrls.length - 1 || imageBusy} className="grid h-10 place-items-center disabled:opacity-25" aria-label="Déplacer la photo à droite"><ArrowRight size={14} /></button><button type="button" onClick={() => makePrimary(index)} disabled={index === 0 || imageBusy} className="grid h-10 place-items-center text-[#A06F22] disabled:opacity-25" aria-label="Définir comme photo principale"><Star size={14} /></button><button type="button" onClick={() => removeImage(index)} disabled={imageBusy} className="grid h-10 place-items-center text-red-700 disabled:opacity-50" aria-label="Retirer la photo"><Trash2 size={14} /></button></div></article>)}</div> : <div className="grid min-h-52 place-items-center rounded-2xl border border-[#DDD4C9] bg-[#F7F4EF] px-6 py-10 text-center"><div><span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-white text-[#C4943D] shadow-sm"><ImagePlus size={23} /></span><p className="display mt-4 text-xl font-semibold">Ajouter de belles photos</p><p className="mt-2 text-xs text-[#7B7074]">JPG, PNG, WebP, AVIF ou HEIC · 10 Mo maximum</p></div></div>}
           <label className="mt-3 inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-full bg-[#302A2E] px-5 text-[10px] font-bold uppercase tracking-[.14em] text-white transition hover:bg-[#463D42]">
-            <ImagePlus size={15} />{draft.imageUrl ? 'Remplacer la photo' : 'Choisir une photo'}
-            <input aria-label="Choisir une photo" type="file" accept="image/jpeg,image/png,image/webp,image/avif,image/heic,image/heif" onChange={uploadImage} disabled={imageBusy || busy} className="sr-only" />
+            {imageBusy ? <LoaderCircle className="animate-spin" size={15} /> : <ImagePlus size={15} />}Ajouter des photos
+            <input aria-label="Choisir des photos" multiple type="file" accept="image/jpeg,image/png,image/webp,image/avif,image/heic,image/heif" onChange={uploadImage} disabled={imageBusy || busy || draft.imageUrls.length >= 6} className="sr-only" />
           </label>
           {imageError && <p role="alert" className="mt-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{imageError}</p>}
         </section>

@@ -1,12 +1,12 @@
 import { useI18n } from '../i18n/i18n'
 
 const story = {
-  en: {
-    eyebrow: "The story of Perle d'Orient",
-    title: 'Jewelry shaped by hand, carried by story.',
-    body: "Perle d'Orient was born from a love of oriental detail and the quiet beauty of artisan work. Each piece is imagined in Morocco, finished in small series and created to feel personal.",
-    signaturesLabel: 'Craft signatures',
-    signatures: ['Handcrafted', 'Small series', 'Morocco'],
+  ar: {
+    eyebrow: 'قصة لؤلؤة الشرق',
+    title: 'مجوهرات تصوغها اليد وتحملها الحكاية.',
+    body: 'وُلدت لؤلؤة الشرق من شغف بالتفاصيل الشرقية وجمال العمل الحرفي الهادئ. تُصمم كل قطعة في المغرب وتُنجز ضمن مجموعات محدودة لتصبح قريبة منك وفريدة.',
+    signaturesLabel: 'بصمات حرفية',
+    signatures: ['صنع يدوي', 'مجموعات محدودة', 'المغرب'],
   },
   fr: {
     eyebrow: "L'histoire de Perle d'Orient",

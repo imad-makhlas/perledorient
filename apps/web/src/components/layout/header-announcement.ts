@@ -1,5 +1,5 @@
 const announcementParts = {
-  en: { lead: 'Complimentary delivery from', threshold: '500 MAD', country: 'in Morocco', international: 'International delivery available' },
+  ar: { lead: 'توصيل مجاني ابتداءً من', threshold: '500 MAD', country: 'داخل المغرب', international: 'التوصيل الدولي متاح' },
   fr: { lead: 'Livraison offerte dès', threshold: '500 MAD', country: 'au Maroc', international: 'Livraison internationale disponible' },
 } as const
 

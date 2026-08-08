@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useState, type PropsWithChildren } from 'react'
+import { createContext, useContext, useEffect, useMemo, useState, type PropsWithChildren } from 'react'
 import { copy as perleCopy } from './perle-copy'
 
 export const legacyCopy = {
@@ -34,14 +34,18 @@ export const legacyCopy = {
 
 const copy = perleCopy
 
-type Locale = keyof typeof copy
-type CopyKey = keyof typeof copy.en
-type I18nValue = { locale: Locale; setLocale: (locale: Locale) => void; t: (key: CopyKey) => string }
+export type StoreLocale = keyof typeof copy
+type CopyKey = keyof typeof copy.fr
+type I18nValue = { locale: StoreLocale; setLocale: (locale: StoreLocale) => void; t: (key: CopyKey) => string }
 
 const I18nContext = createContext<I18nValue | null>(null)
 
 export function I18nProvider({ children }: PropsWithChildren) {
-  const [locale, setLocaleState] = useState<Locale>(() => localStorage.getItem('perle-d-orient-locale') === 'fr' ? 'fr' : 'en')
+  const [locale, setLocaleState] = useState<StoreLocale>(() => localStorage.getItem('perle-d-orient-locale') === 'ar' ? 'ar' : 'fr')
+  useEffect(() => {
+    document.documentElement.lang = locale
+    document.documentElement.dir = locale === 'ar' ? 'rtl' : 'ltr'
+  }, [locale])
   const value = useMemo<I18nValue>(() => ({
     locale,
     setLocale: (next) => { localStorage.setItem('perle-d-orient-locale', next); setLocaleState(next) },

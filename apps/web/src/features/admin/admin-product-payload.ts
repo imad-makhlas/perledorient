@@ -3,10 +3,10 @@ import type { AdminProduct, EditableAdminProduct } from './admin-products'
 export function productUpdatePayload(product: AdminProduct | EditableAdminProduct): EditableAdminProduct {
   return {
     slug: product.slug,
-    nameEn: product.nameEn,
     nameFr: product.nameFr,
-    descriptionEn: product.descriptionEn,
+    nameAr: product.nameAr,
     descriptionFr: product.descriptionFr,
+    descriptionAr: product.descriptionAr,
     category: product.category,
     material: product.material,
     dimensions: product.dimensions,
@@ -18,5 +18,6 @@ export function productUpdatePayload(product: AdminProduct | EditableAdminProduc
     active: product.active,
     featured: product.featured,
     imageUrl: product.imageUrl,
+    imageUrls: product.imageUrls,
   }
 }

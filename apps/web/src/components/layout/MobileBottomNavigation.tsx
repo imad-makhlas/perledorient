@@ -33,14 +33,14 @@ export function MobileBottomNavigation() {
   const { locale, t } = useI18n()
 
   return <nav
-    aria-label={locale === 'fr' ? 'Navigation principale mobile' : 'Mobile primary navigation'}
+    aria-label={locale === 'fr' ? 'Navigation principale mobile' : 'التنقل الرئيسي على الهاتف'}
     className="fixed inset-x-0 bottom-0 z-40 border-t border-[#DED4C8] bg-white/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-6px_20px_rgba(47,42,44,0.08)] backdrop-blur-xl lg:hidden"
   >
     <div className="grid grid-cols-4 px-1 py-1">
-      <MobileNavItem to="/" label={locale === 'fr' ? 'Accueil' : 'Home'} icon={House} pathname={location.pathname} />
-      <MobileNavItem to="/catalogue" label="Catalogue" icon={Store} pathname={location.pathname} />
+      <MobileNavItem to="/" label={locale === 'fr' ? 'Accueil' : 'الرئيسية'} icon={House} pathname={location.pathname} />
+      <MobileNavItem to="/catalogue" label={locale === 'fr' ? 'Catalogue' : 'الكتالوج'} icon={Store} pathname={location.pathname} />
       <MobileNavItem to="/about" label={t('storyNav')} icon={ScrollText} pathname={location.pathname} />
-      <MobileNavItem to="/contact" label="Contact" icon={MessagesSquare} pathname={location.pathname} />
+      <MobileNavItem to="/contact" label={locale === 'fr' ? 'Contact' : 'تواصل'} icon={MessagesSquare} pathname={location.pathname} />
     </div>
   </nav>
 }

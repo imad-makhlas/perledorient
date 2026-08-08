@@ -1,11 +1,11 @@
 import { getCountries, getCountryCallingCode, type Country } from 'react-phone-number-input'
-import labelsEn from 'react-phone-number-input/locale/en.json'
+import labelsAr from 'react-phone-number-input/locale/ar.json'
 import labelsFr from 'react-phone-number-input/locale/fr.json'
 
 type InternationalPhoneFieldProps = {
   country: Country
   value: string
-  locale: 'en' | 'fr'
+  locale: 'fr' | 'ar'
   label: string
   error?: string
   onCountryChange: (country: Country) => void
@@ -13,7 +13,7 @@ type InternationalPhoneFieldProps = {
 }
 
 export function InternationalPhoneField({ country, value, locale, label, error, onCountryChange, onChange }: InternationalPhoneFieldProps) {
-  const labels = locale === 'fr' ? labelsFr : labelsEn
+  const labels = locale === 'fr' ? labelsFr : labelsAr
 
   return <div className="text-[10px] font-bold uppercase tracking-widest">
     <label htmlFor="checkout-telephone">{label}</label>

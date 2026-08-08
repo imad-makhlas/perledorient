@@ -8,7 +8,7 @@ export type AdminOrderStatus =
   | 'CANCELLED'
   | 'RETURNED'
 
-export type AdminLocale = 'en' | 'fr'
+export type AdminLocale = 'en' | 'fr' | 'ar'
 
 export type AdminOrderItem = {
   productName: string
@@ -72,6 +72,16 @@ const labels: Record<AdminLocale, Record<AdminOrderStatus, string>> = {
     DELIVERED: 'Livrée',
     CANCELLED: 'Annulée',
     RETURNED: 'Retournée',
+  },
+  ar: {
+    PENDING_CONFIRMATION: 'بانتظار التأكيد',
+    CONFIRMED: 'مؤكدة',
+    PREPARING: 'قيد التحضير',
+    READY_FOR_SHIPMENT: 'جاهزة للشحن',
+    SHIPPED: 'تم الشحن',
+    DELIVERED: 'تم التسليم',
+    CANCELLED: 'ملغاة',
+    RETURNED: 'مرتجعة',
   },
 }
 

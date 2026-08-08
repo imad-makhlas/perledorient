@@ -4,15 +4,15 @@ import { INSTAGRAM_HANDLE, INSTAGRAM_URL } from '../config/social-links'
 import { useI18n } from '../i18n/i18n'
 
 const contact = {
-  en: {
-    eyebrow: 'A personal exchange',
-    title: "Let's find the piece that feels like yours.",
-    body: 'For sizing, materials, gifts or availability, speak directly with us. Every message is answered personally.',
-    panelEyebrow: 'Direct assistance',
-    panelTitle: 'We are here to guide you.',
-    panelBody: 'Send us a message and we will help you choose with care.',
-    whatsapp: 'Write on WhatsApp',
-    instagram: 'Follow on Instagram',
+  ar: {
+    eyebrow: 'تواصل شخصي',
+    title: 'لنجد القطعة التي تشبهك.',
+    body: 'للاستفسار عن المقاس أو الخامة أو الهدية أو التوفر، تواصلي معنا مباشرة. نجيب عن كل رسالة بعناية واهتمام.',
+    panelEyebrow: 'مساعدة مباشرة',
+    panelTitle: 'نحن هنا لمساعدتك.',
+    panelBody: 'أرسلي لنا رسالة وسنساعدك على الاختيار بعناية.',
+    whatsapp: 'اكتبي لنا عبر واتساب',
+    instagram: 'تابعينا على إنستغرام',
   },
   fr: {
     eyebrow: 'Un échange personnel',
