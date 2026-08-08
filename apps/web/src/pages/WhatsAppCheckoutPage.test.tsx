@@ -25,6 +25,8 @@ describe('WhatsApp checkout', () => {
       <Route path="/" element={<div>Accueil Perle d’Orient</div>} />
     </Routes></CartProvider></I18nProvider></MemoryRouter>)
 
+    expect(screen.getByText('Vos coordonnées')).toBeInTheDocument()
+    expect(screen.getByText('Informations de livraison')).toBeInTheDocument()
     await userEvent.type(screen.getByLabelText('Prénom'), 'Sara')
     await userEvent.type(screen.getByLabelText('Nom'), 'Amrani')
     await userEvent.selectOptions(screen.getByLabelText('Country code'), 'FR')
