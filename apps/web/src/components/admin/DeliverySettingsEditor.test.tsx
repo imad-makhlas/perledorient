@@ -5,7 +5,18 @@ import { DEFAULT_DELIVERY_SETTINGS } from '../../features/checkout/delivery-pric
 import { DeliverySettingsEditor } from './DeliverySettingsEditor'
 
 describe('DeliverySettingsEditor', () => {
-  it('edits the Silver delivery rates and submits normalized city lists', async () => {
+  it('presents the four Silver delivery rates without advanced city configuration', () => {
+    render(<DeliverySettingsEditor settings={DEFAULT_DELIVERY_SETTINGS} busy={false} onSave={vi.fn()} />)
+
+    expect(screen.getByLabelText('Tarif ville de ramassage')).toHaveValue(20)
+    expect(screen.getByLabelText('Grandes villes')).toHaveValue(35)
+    expect(screen.getByLabelText('Régions Nord')).toHaveValue(40)
+    expect(screen.getByLabelText('Régions Sud')).toHaveValue(45)
+    expect(screen.queryByText('Répartition des villes')).not.toBeInTheDocument()
+    expect(screen.queryAllByRole('checkbox')).toHaveLength(0)
+  })
+
+  it('edits the Silver delivery rates while preserving the saved configuration', async () => {
     const onSave = vi.fn()
     render(<DeliverySettingsEditor settings={DEFAULT_DELIVERY_SETTINGS} busy={false} onSave={onSave} />)
 
