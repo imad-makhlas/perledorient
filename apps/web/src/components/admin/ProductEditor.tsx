@@ -2,8 +2,9 @@ import { ArrowLeft, ArrowRight, ImagePlus, LoaderCircle, Save, Star, Trash2, X }
 import { useState, type ChangeEvent, type FormEvent } from 'react'
 import { validateProductImage } from '../../features/admin/cloudinary-image'
 import type { AdminProduct, EditableAdminProduct } from '../../features/admin/admin-products'
+import { categoryLabel, type CatalogCategory } from '../../features/catalog/catalog-ui'
 
-const categories = ['Necklaces', 'Earrings', 'Bracelets', 'Rings', 'Gift Sets']
+const categories: CatalogCategory[] = ['Necklaces', 'Earrings', 'Bracelets', 'Rings', 'Gift Sets']
 const emptyProduct: EditableAdminProduct = {
   slug: '', nameFr: '', nameAr: '', descriptionFr: '', descriptionAr: '', category: 'Necklaces',
   material: '', dimensions: '', variantName: '', sku: '', price: 0, comparisonPrice: null,
@@ -74,7 +75,7 @@ export function ProductEditor({ product, suggestedSku, onClose, onSave, onUpload
   const cancel = async () => {
     if (temporaryImageUrls.length) {
       setImageBusy(true)
-      try { await Promise.all(temporaryImageUrls.map(onDeleteImage)) } catch { /* Cleanup can be retried from Cloudinary. */ }
+      try { await Promise.all(temporaryImageUrls.map((imageUrl) => onDeleteImage(imageUrl))) } catch { /* Cleanup can be retried from Cloudinary. */ }
     }
     onClose()
   }
@@ -91,7 +92,7 @@ export function ProductEditor({ product, suggestedSku, onClose, onSave, onUpload
         </div></section>
         <section><p className="mb-4 text-[10px] font-bold uppercase tracking-[.18em] text-accent">Informations produit</p><div className="grid gap-4 sm:grid-cols-2">
           <label className="text-xs font-semibold">Lien produit<input className="field mt-2" value={draft.slug} onChange={(event) => set('slug', event.target.value)} placeholder="collier-layali" required /></label>
-          <label className="text-xs font-semibold">Catégorie<select className="field mt-2" value={draft.category} onChange={(event) => set('category', event.target.value)}>{categories.map((category) => <option key={category}>{category}</option>)}</select></label>
+          <label className="text-xs font-semibold">Catégorie<select className="field mt-2" value={draft.category} onChange={(event) => set('category', event.target.value)}>{categories.map((category) => <option key={category} value={category}>{categoryLabel(category, 'fr')}</option>)}</select></label>
           <label className="text-xs font-semibold">Matière<input className="field mt-2" value={draft.material} onChange={(event) => set('material', event.target.value)} /></label>
           <label className="text-xs font-semibold">Taille / dimensions<input className="field mt-2" value={draft.dimensions} onChange={(event) => set('dimensions', event.target.value)} /></label>
           <label className="text-xs font-semibold">Finition<input className="field mt-2" value={draft.variantName} onChange={(event) => set('variantName', event.target.value)} required /></label>

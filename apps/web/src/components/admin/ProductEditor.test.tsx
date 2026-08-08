@@ -6,12 +6,31 @@ import { ProductEditor } from './ProductEditor'
 
 const product: AdminProduct = {
   id: 'variant-1', productId: 'product-1', slug: 'layali-necklace', nameEn: 'Layali Necklace', nameFr: 'Collier Layali',
-  descriptionEn: 'Handmade necklace', descriptionFr: 'Collier artisanal', category: 'Necklaces', material: 'Brass', dimensions: '45 cm',
+  nameAr: 'قلادة ليالي', descriptionEn: 'Handmade necklace', descriptionFr: 'Collier artisanal', descriptionAr: 'قلادة مصنوعة يدوياً', category: 'Necklaces', material: 'Brass', dimensions: '45 cm',
   variantName: 'Antique gold', sku: 'PDO-001-A', price: 520, comparisonPrice: 650, stock: 3, active: true, featured: true,
   imageUrl: 'https://res.cloudinary.com/perle/image/upload/v1/perle-dorient/products/old.jpg',
+  imageUrls: ['https://res.cloudinary.com/perle/image/upload/v1/perle-dorient/products/old.jpg'],
 }
 
 describe('ProductEditor image workflow', () => {
+  it('shows French category labels while keeping technical category values', () => {
+    render(<ProductEditor
+      product={null}
+      suggestedSku={`PDO-BIJ-${new Date().getFullYear()}-0008`}
+      busy={false}
+      onClose={vi.fn()}
+      onSave={vi.fn()}
+      onUploadImage={vi.fn()}
+      onDeleteImage={vi.fn()}
+    />)
+
+    const category = screen.getByRole('combobox', { name: 'Catégorie' })
+    expect(category).toHaveValue('Necklaces')
+    expect(screen.getByRole('option', { name: 'Colliers' })).toHaveValue('Necklaces')
+    expect(screen.getByRole('option', { name: "Boucles d'oreilles" })).toHaveValue('Earrings')
+    expect(screen.getByRole('option', { name: 'Coffrets cadeaux' })).toHaveValue('Gift Sets')
+  })
+
   it('shows an automatic yearly SKU instead of an editable field for a new product', () => {
     render(<ProductEditor
       product={null}
@@ -27,7 +46,7 @@ describe('ProductEditor image workflow', () => {
     expect(screen.getByText(`PDO-BIJ-${new Date().getFullYear()}-0008`)).toBeInTheDocument()
   })
 
-  it('uploads a selected photo and submits the replacement without deleting the old image early', async () => {
+  it('adds a selected photo without deleting the existing image early', async () => {
     const onSave = vi.fn()
     const onDeleteImage = vi.fn().mockResolvedValue(undefined)
     render(<ProductEditor
@@ -40,15 +59,16 @@ describe('ProductEditor image workflow', () => {
       onDeleteImage={onDeleteImage}
     />)
 
-    fireEvent.change(screen.getByLabelText('Choisir une photo'), {
+    fireEvent.change(screen.getByLabelText('Choisir des photos'), {
       target: { files: [new File(['image'], 'new.jpg', { type: 'image/jpeg' })] },
     })
-    await screen.findByAltText('Aperçu de la nouvelle photo')
+    await screen.findByAltText('Photo 2 du bijou')
     await userEvent.click(screen.getByRole('button', { name: 'Enregistrer' }))
 
     expect(onSave).toHaveBeenCalledWith(expect.objectContaining({
-      imageUrl: 'https://res.cloudinary.com/perle/image/upload/v2/perle-dorient/products/new.jpg',
-    }), product.imageUrl)
+      imageUrl: product.imageUrl,
+      imageUrls: [product.imageUrl, 'https://res.cloudinary.com/perle/image/upload/v2/perle-dorient/products/new.jpg'],
+    }), [])
     expect(onDeleteImage).not.toHaveBeenCalled()
   })
 
@@ -65,10 +85,10 @@ describe('ProductEditor image workflow', () => {
       onDeleteImage={onDeleteImage}
     />)
 
-    fireEvent.change(screen.getByLabelText('Choisir une photo'), {
+    fireEvent.change(screen.getByLabelText('Choisir des photos'), {
       target: { files: [new File(['image'], 'new.jpg', { type: 'image/jpeg' })] },
     })
-    await screen.findByAltText('Aperçu de la nouvelle photo')
+    await screen.findByAltText('Photo 1 du bijou')
     await userEvent.click(screen.getByRole('button', { name: 'Annuler' }))
 
     await waitFor(() => expect(onDeleteImage).toHaveBeenCalledWith('https://res.cloudinary.com/perle/image/upload/v2/perle-dorient/products/new.jpg'))
