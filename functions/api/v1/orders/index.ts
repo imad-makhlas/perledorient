@@ -2,7 +2,7 @@ import { checkoutSchema, type CheckoutForm } from '../../../../apps/web/src/feat
 import { generateOrderNumber, prepareOrder, type OrderCatalogRow } from '../../../../apps/web/src/features/checkout/order-record'
 import { buildWhatsAppMessage, buildWhatsAppUrl } from '../../../../apps/web/src/features/checkout/whatsapp-order'
 import { WHATSAPP_NUMBER } from '../../../../apps/web/src/config/contact'
-import { json, type PagesContext } from '../admin/_shared'
+import { getDeliverySettings, json, type PagesContext } from '../admin/_shared'
 
 type RequestBody = { customer?: CheckoutForm; items?: Array<{ variantId: string; quantity: number }>; idempotencyKey?: string; locale?: 'fr' | 'ar' }
 type ExistingOrder = { order_number: string; total: number; delivery_fee: number; whatsapp_url: string | null }
@@ -36,7 +36,8 @@ export async function onRequestPost({ request, env }: PagesContext) {
         variant_name, sku, price, stock, active, image_url
       FROM admin_products WHERE id IN (${placeholders})
     `).bind(locale, ...uniqueIds).all<OrderCatalogRow>()).results || []
-    const prepared = prepareOrder(parsedCustomer.data, body.items, catalogue, generateOrderNumber(existingOrderNumbers.map((order) => order.order_number)))
+    const deliverySettings = await getDeliverySettings(env.DB)
+    const prepared = prepareOrder(parsedCustomer.data, body.items, catalogue, generateOrderNumber(existingOrderNumbers.map((order) => order.order_number)), deliverySettings)
     const whatsappMessage = buildWhatsAppMessage({
       orderNumber: prepared.orderNumber,
       customerName: prepared.customerName,
@@ -44,6 +45,9 @@ export async function onRequestPost({ request, env }: PagesContext) {
       city: prepared.city,
       address: prepared.address,
       notes: prepared.notes,
+      subtotal: prepared.subtotal,
+      deliveryFee: prepared.deliveryFee,
+      deliveryRequiresQuote: prepared.deliveryRequiresQuote,
       total: prepared.total,
       items: prepared.items.map((item) => ({ name: item.productName, variantName: item.variantName, quantity: item.quantity, lineTotal: item.lineTotal })),
     }, locale)
@@ -72,7 +76,7 @@ export async function onRequestPost({ request, env }: PagesContext) {
       )),
     ]
     await env.DB.batch(statements)
-    return json({ orderNumber: prepared.orderNumber, total: prepared.total, deliveryFee: prepared.deliveryFee, whatsappUrl }, { status: 201 })
+    return json({ orderNumber: prepared.orderNumber, total: prepared.total, deliveryFee: prepared.deliveryFee, deliveryZone: prepared.deliveryZone, deliveryRequiresQuote: prepared.deliveryRequiresQuote, whatsappUrl }, { status: 201 })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unable to create order'
     if (message.includes('stock_reserved')) {

@@ -35,7 +35,7 @@ export function OrderPrintTicket({ order, onClose }: OrderPrintTicketProps) {
         </div>
         {order.notes && <div className="mt-4 rounded-lg border border-[#D8D0C8] bg-[#FAF8F5] p-3 text-[9px]"><p className="ticket-label">Note client</p><p className="mt-1 leading-4">{order.notes}</p></div>}
       </section>
-      <footer className="border-t-2 border-[#241F21] pt-4 text-[9px]"><div className="flex items-end justify-between gap-4"><div><p className="ticket-label">Règlement</p><p className="mt-1 font-semibold">{paymentLabels[order.paymentMethod]}</p></div><div className="text-right"><p className="ticket-label">Total</p><p className="mt-1 text-[16px] font-bold">{formatMoney(Number(order.total), 'fr')}</p></div></div><p className="mt-5 text-center text-[8px] text-[#756B6F]">Merci pour votre confiance.</p></footer>
+      <footer className="border-t-2 border-[#241F21] pt-4 text-[9px]"><div className="grid grid-cols-[1fr_auto] gap-x-5 gap-y-1"><div><p className="ticket-label">Règlement</p><p className="mt-1 font-semibold">{paymentLabels[order.paymentMethod]}</p></div><div className="min-w-[34mm] space-y-1 text-right"><p><span className="text-[#756B6F]">Sous-total</span> <strong className="ml-2">{formatMoney(Number(order.subtotal), 'fr')}</strong></p><p><span className="text-[#756B6F]">Livraison</span> <strong className="ml-2">{Number(order.deliveryFee) === 0 ? 'Offerte' : formatMoney(Number(order.deliveryFee), 'fr')}</strong></p><p className="border-t border-[#D8D0C8] pt-1"><span className="ticket-label">Total</span> <strong className="ml-2 text-[16px]">{formatMoney(Number(order.total), 'fr')}</strong></p></div></div><p className="mt-5 text-center text-[8px] text-[#756B6F]">Merci pour votre confiance.</p></footer>
     </article>
   </div>
 }

@@ -5,6 +5,7 @@ import {
   type AdminProductRow,
 } from '../../../../apps/web/src/features/admin/admin-product-record'
 import type { EditableAdminProduct } from '../../../../apps/web/src/features/admin/admin-products'
+import { DEFAULT_DELIVERY_SETTINGS, type DeliverySettings, type DeliveryZone } from '../../../../apps/web/src/features/checkout/delivery-pricing'
 
 export type D1Result<T> = { results?: T[]; success: boolean; meta?: { changes?: number } }
 export type D1PreparedStatement = {
@@ -190,4 +191,79 @@ export async function deleteAdminOrder(db: D1Database, orderNumber: string) {
     db.prepare('DELETE FROM orders WHERE order_number = ?').bind(orderNumber),
   ])
   return (deleted.meta?.changes || 0) > 0
+}
+
+type DeliverySettingsRow = {
+  pickup_city: string
+  free_threshold: number
+  pickup_fee: number
+  major_city_fee: number
+  north_region_fee: number
+  south_region_fee: number
+  major_cities: string
+  south_cities: string
+  active_zones: string
+}
+
+function parseStringList(value: string, fallback: string[]) {
+  try { const parsed = JSON.parse(value); return Array.isArray(parsed) ? parsed.filter((item): item is string => typeof item === 'string' && item.trim().length > 0) : fallback }
+  catch { return fallback }
+}
+
+function parseActiveZones(value: string): Record<DeliveryZone, boolean> {
+  try { return { ...DEFAULT_DELIVERY_SETTINGS.activeZones, ...JSON.parse(value) } }
+  catch { return DEFAULT_DELIVERY_SETTINGS.activeZones }
+}
+
+function deliverySettingsFromRow(row: DeliverySettingsRow): DeliverySettings {
+  return {
+    pickupCity: row.pickup_city,
+    freeThreshold: row.free_threshold,
+    pickupFee: row.pickup_fee,
+    majorCityFee: row.major_city_fee,
+    northRegionFee: row.north_region_fee,
+    southRegionFee: row.south_region_fee,
+    majorCities: parseStringList(row.major_cities, DEFAULT_DELIVERY_SETTINGS.majorCities),
+    southCities: parseStringList(row.south_cities, DEFAULT_DELIVERY_SETTINGS.southCities),
+    activeZones: parseActiveZones(row.active_zones),
+  }
+}
+
+export async function getDeliverySettings(db: D1Database): Promise<DeliverySettings> {
+  try {
+    const row = await db.prepare('SELECT pickup_city, free_threshold, pickup_fee, major_city_fee, north_region_fee, south_region_fee, major_cities, south_cities, active_zones FROM delivery_settings WHERE id = ?')
+      .bind('default').first<DeliverySettingsRow>()
+    return row ? deliverySettingsFromRow(row) : DEFAULT_DELIVERY_SETTINGS
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('no such table')) return DEFAULT_DELIVERY_SETTINGS
+    throw error
+  }
+}
+
+export async function saveDeliverySettings(db: D1Database, input: DeliverySettings): Promise<DeliverySettings> {
+  const number = (value: number) => Number.isFinite(value) && value >= 0 ? Math.round(value) : 0
+  const settings: DeliverySettings = {
+    pickupCity: input.pickupCity.trim() || DEFAULT_DELIVERY_SETTINGS.pickupCity,
+    freeThreshold: number(input.freeThreshold),
+    pickupFee: number(input.pickupFee),
+    majorCityFee: number(input.majorCityFee),
+    northRegionFee: number(input.northRegionFee),
+    southRegionFee: number(input.southRegionFee),
+    majorCities: input.majorCities.map((city) => city.trim()).filter(Boolean),
+    southCities: input.southCities.map((city) => city.trim()).filter(Boolean),
+    activeZones: { ...DEFAULT_DELIVERY_SETTINGS.activeZones, ...input.activeZones },
+  }
+  await db.prepare(`
+    INSERT INTO delivery_settings (id, pickup_city, free_threshold, pickup_fee, major_city_fee, north_region_fee, south_region_fee, major_cities, south_cities, active_zones, updated_at)
+    VALUES ('default', ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+    ON CONFLICT(id) DO UPDATE SET pickup_city = excluded.pickup_city, free_threshold = excluded.free_threshold,
+      pickup_fee = excluded.pickup_fee, major_city_fee = excluded.major_city_fee, north_region_fee = excluded.north_region_fee,
+      south_region_fee = excluded.south_region_fee, major_cities = excluded.major_cities, south_cities = excluded.south_cities,
+      active_zones = excluded.active_zones, updated_at = datetime('now')
+  `).bind(
+    settings.pickupCity, settings.freeThreshold, settings.pickupFee, settings.majorCityFee,
+    settings.northRegionFee, settings.southRegionFee, JSON.stringify(settings.majorCities),
+    JSON.stringify(settings.southCities), JSON.stringify(settings.activeZones),
+  ).run()
+  return settings
 }

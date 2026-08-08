@@ -14,28 +14,29 @@ describe('WhatsApp checkout', () => {
       productId: 'product-1', variantId: 'variant-1', slug: 'layali', name: 'Layali Necklace', variantName: 'Gold',
       imageUrl: '/layali.jpg', unitPrice: 520, quantity: 1, stockQuantity: 1,
     }] }))
-    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({
-      orderNumber: 'PDO-1', total: 520, deliveryFee: 0, whatsappUrl: 'https://wa.me/212631210654',
-    }), { status: 201, headers: { 'Content-Type': 'application/json' } }))
+    const fetchMock = vi.fn().mockImplementation((url: string) => Promise.resolve(new Response(JSON.stringify(url.includes('/delivery') ? {} : {
+      orderNumber: 'PDO-1', total: 555, deliveryFee: 35, whatsappUrl: 'https://wa.me/212631210654',
+    }), { status: url.includes('/delivery') ? 200 : 201, headers: { 'Content-Type': 'application/json' } })))
     vi.stubGlobal('fetch', fetchMock)
     vi.stubGlobal('open', vi.fn())
 
     render(<MemoryRouter initialEntries={['/checkout']}><I18nProvider><CartProvider><Routes>
       <Route path="/checkout" element={<WhatsAppCheckoutPage />} />
-      <Route path="/order-confirmation" element={<div>Order created</div>} />
+      <Route path="/" element={<div>Accueil Perle d’Orient</div>} />
     </Routes></CartProvider></I18nProvider></MemoryRouter>)
 
-    await userEvent.type(screen.getByLabelText('First name'), 'Sara')
-    await userEvent.type(screen.getByLabelText('Last name'), 'Amrani')
+    await userEvent.type(screen.getByLabelText('Prénom'), 'Sara')
+    await userEvent.type(screen.getByLabelText('Nom'), 'Amrani')
     await userEvent.selectOptions(screen.getByLabelText('Country code'), 'FR')
-    await userEvent.type(screen.getByLabelText('Telephone'), '612345678')
-    await userEvent.type(screen.getByLabelText('Delivery address'), '12 rue des Fleurs')
-    await userEvent.click(screen.getByRole('button', { name: 'Continue to WhatsApp' }))
+    await userEvent.type(screen.getByLabelText('Téléphone'), '612345678')
+    await userEvent.type(screen.getByLabelText('Adresse de livraison'), '12 rue des Fleurs')
+    await userEvent.click(screen.getByRole('button', { name: 'Continuer sur WhatsApp' }))
 
-    await screen.findByText('Order created')
-    const request = JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body))
+    await screen.findByText('Accueil Perle d’Orient')
+    const orderCall = fetchMock.mock.calls.find(([url]) => String(url).includes('/orders'))
+    const request = JSON.parse(String(orderCall?.[1]?.body))
     expect(request.customer.telephone).toBe('+33612345678')
-    expect(request.locale).toBe('en')
+    expect(request.locale).toBe('fr')
   }, 15_000)
 
   it('clears only this browser cart after its order is created', async () => {
@@ -43,23 +44,23 @@ describe('WhatsApp checkout', () => {
       productId: 'product-1', variantId: 'variant-1', slug: 'layali', name: 'Layali Necklace', variantName: 'Gold',
       imageUrl: '/layali.jpg', unitPrice: 520, quantity: 1, stockQuantity: 1,
     }] }))
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify({
-      orderNumber: 'PDO-1', total: 520, deliveryFee: 0, whatsappUrl: 'https://wa.me/212600000000',
-    }), { status: 201, headers: { 'Content-Type': 'application/json' } })))
+    vi.stubGlobal('fetch', vi.fn().mockImplementation((url: string) => Promise.resolve(new Response(JSON.stringify(url.includes('/delivery') ? {} : {
+      orderNumber: 'PDO-1', total: 555, deliveryFee: 35, whatsappUrl: 'https://wa.me/212600000000',
+    }), { status: url.includes('/delivery') ? 200 : 201, headers: { 'Content-Type': 'application/json' } }))))
     vi.stubGlobal('open', vi.fn())
 
     render(<MemoryRouter initialEntries={['/checkout']}><I18nProvider><CartProvider><Routes>
       <Route path="/checkout" element={<WhatsAppCheckoutPage />} />
-      <Route path="/order-confirmation" element={<div>Order created</div>} />
+      <Route path="/" element={<div>Accueil Perle d’Orient</div>} />
     </Routes></CartProvider></I18nProvider></MemoryRouter>)
 
-    await userEvent.type(screen.getByLabelText('First name'), 'Sara')
-    await userEvent.type(screen.getByLabelText('Last name'), 'Amrani')
-    await userEvent.type(screen.getByLabelText('Telephone'), '+212612345678')
-    await userEvent.type(screen.getByLabelText('Delivery address'), '12 rue des Fleurs')
-    await userEvent.click(screen.getByRole('button', { name: 'Continue to WhatsApp' }))
+    await userEvent.type(screen.getByLabelText('Prénom'), 'Sara')
+    await userEvent.type(screen.getByLabelText('Nom'), 'Amrani')
+    await userEvent.type(screen.getByLabelText('Téléphone'), '+212612345678')
+    await userEvent.type(screen.getByLabelText('Adresse de livraison'), '12 rue des Fleurs')
+    await userEvent.click(screen.getByRole('button', { name: 'Continuer sur WhatsApp' }))
 
-    await screen.findByText('Order created')
+    await screen.findByText('Accueil Perle d’Orient')
     await waitFor(() => expect(JSON.parse(localStorage.getItem('codavenue-cart') || '{}')).toEqual({ items: [] }))
   }, 15_000)
 })

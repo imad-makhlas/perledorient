@@ -1,6 +1,6 @@
 const announcementParts = {
-  ar: { lead: 'توصيل مجاني ابتداءً من', threshold: '500 MAD', country: 'داخل المغرب', international: 'التوصيل الدولي متاح' },
-  fr: { lead: 'Livraison offerte dès', threshold: '500 MAD', country: 'au Maroc', international: 'Livraison internationale disponible' },
+  ar: { lead: 'توصيل مجاني ابتداءً من', threshold: '2000 MAD', country: 'داخل المغرب', international: 'التوصيل الدولي متاح' },
+  fr: { lead: 'Livraison offerte dès', threshold: '2000 MAD', country: 'au Maroc', international: 'Livraison internationale disponible' },
 } as const
 
 export function getHeaderAnnouncementParts(locale: keyof typeof announcementParts) {

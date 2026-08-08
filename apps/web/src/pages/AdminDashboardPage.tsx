@@ -1,22 +1,26 @@
 ﻿import { ArrowLeft, CalendarDays, CheckCircle2, Clock3, Edit3, LayoutDashboard, LogOut, MapPin, MessageCircle, Package, Phone, Plus, Search, ShoppingBag, StickyNote, Trash2, UserRound, X } from 'lucide-react'
-import { Printer } from 'lucide-react'
+import { Printer, Truck } from 'lucide-react'
 import { useLayoutEffect, useMemo, useState } from 'react'
 import { AdminLogin } from '../components/admin/AdminLogin'
+import { DeliverySettingsEditor } from '../components/admin/DeliverySettingsEditor'
 import { OrderPrintTicket } from '../components/admin/OrderPrintTicket'
 import { ProductEditor } from '../components/admin/ProductEditor'
 import { deleteAdminImage, uploadAdminImage } from '../features/admin/admin-images'
+import { fetchAdminDeliverySettings, updateAdminDeliverySettings } from '../features/admin/admin-delivery'
 import { changeAdminOrderStatus, deleteAdminOrder, fetchAdminOrders, getNextAdminActions, orderStatusLabel, orderStatusPalette, type AdminCredentials, type AdminOrder, type AdminOrderStatus } from '../features/admin/admin-orders'
 import { createAdminProduct, deleteAdminProduct, fetchAdminProducts, updateAdminProduct, type AdminProduct, type EditableAdminProduct } from '../features/admin/admin-products'
 import { generateProductSku } from '../features/admin/admin-product-record'
+import { DEFAULT_DELIVERY_SETTINGS, type DeliverySettings } from '../features/checkout/delivery-pricing'
 import { categoryLabel, type CatalogCategory } from '../features/catalog/catalog-ui'
 import { formatMoney } from '../lib/format'
 
-type AdminView = 'overview' | 'catalogue' | 'orders'
+type AdminView = 'overview' | 'catalogue' | 'orders' | 'delivery'
 
 export function AdminDashboardPage() {
   const [credentials, setCredentials] = useState<AdminCredentials | null>(null)
   const [products, setProducts] = useState<AdminProduct[]>([])
   const [orders, setOrders] = useState<AdminOrder[]>([])
+  const [deliverySettings, setDeliverySettings] = useState<DeliverySettings>(DEFAULT_DELIVERY_SETTINGS)
   const [view, setView] = useState<AdminView>('overview')
   const [query, setQuery] = useState('')
   const [message, setMessage] = useState('')
@@ -30,8 +34,8 @@ export function AdminDashboardPage() {
   const login = async (next: AdminCredentials) => {
     setBusy(true); setMessage('')
     try {
-      const [nextProducts, nextOrders] = await Promise.all([fetchAdminProducts(next), fetchAdminOrders(next)])
-      setCredentials(next); setProducts(nextProducts); setOrders(nextOrders)
+      const [nextProducts, nextOrders, nextDeliverySettings] = await Promise.all([fetchAdminProducts(next), fetchAdminOrders(next), fetchAdminDeliverySettings(next).catch(() => DEFAULT_DELIVERY_SETTINGS)])
+      setCredentials(next); setProducts(nextProducts); setOrders(nextOrders); setDeliverySettings(nextDeliverySettings)
     } catch (error) { setMessage(error instanceof Error ? error.message : 'Connexion impossible') }
     finally { setBusy(false) }
   }
@@ -90,19 +94,29 @@ export function AdminDashboardPage() {
     catch (error) { setMessage(error instanceof Error ? error.message : 'Suppression impossible') }
     finally { setBusy(false) }
   }
+  const saveDelivery = async (settings: DeliverySettings) => {
+    if (!credentials) return
+    setBusy(true); setMessage('')
+    try {
+      const saved = await updateAdminDeliverySettings(credentials, settings)
+      setDeliverySettings(saved); setMessage('Tarifs de livraison enregistrés.')
+    } catch (error) { setMessage(error instanceof Error ? error.message : 'Enregistrement impossible') }
+    finally { setBusy(false) }
+  }
 
   if (!credentials) return <AdminLogin onLogin={login} message={message} busy={busy} />
 
-  const navigation: Array<[AdminView, string, typeof LayoutDashboard]> = [['overview', 'Accueil', LayoutDashboard], ['catalogue', 'Catalogue', Package], ['orders', 'Commandes', ShoppingBag]]
+  const navigation: Array<[AdminView, string, typeof LayoutDashboard]> = [['overview', 'Accueil', LayoutDashboard], ['catalogue', 'Catalogue', Package], ['orders', 'Commandes', ShoppingBag], ['delivery', 'Livraison', Truck]]
   return <main className="min-h-screen bg-[#F7F4EF] text-[#302A2E]">
     <header className="sticky top-0 z-30 border-b border-white/10 bg-[#302A2E] text-white shadow-lg"><div className="mx-auto flex max-w-[1500px] items-center gap-4 px-4 py-3 sm:px-7"><button onClick={() => window.location.assign('/')} className="grid h-10 w-10 place-items-center rounded-full border border-white/15"><ArrowLeft size={17} /></button><div><p className="text-[9px] font-bold uppercase tracking-[.22em] text-[#C4943D]">Perle d’Orient</p><p className="display text-xl font-semibold">Atelier</p></div><button onClick={() => { setCredentials(null); setProducts([]); setOrders([]) }} className="ml-auto inline-flex items-center gap-2 rounded-full border border-white/15 px-4 py-2 text-[10px] font-bold uppercase tracking-wider"><LogOut size={14} />Déconnexion</button></div></header>
     <div className="mx-auto grid max-w-[1500px] lg:grid-cols-[250px_1fr]">
-      <aside className="border-b border-[#DDD4C9] bg-white p-2 lg:min-h-[calc(100vh-65px)] lg:border-b-0 lg:border-r lg:p-5"><nav className="grid grid-cols-3 gap-1 lg:flex lg:flex-col lg:gap-2">{navigation.map(([key, label, Icon]) => <button key={key} onClick={() => setView(key)} className={`relative flex min-w-0 flex-col items-center justify-center gap-1 rounded-xl px-1 py-2.5 text-[9px] font-bold uppercase tracking-[.08em] transition lg:flex-row lg:justify-start lg:gap-3 lg:px-4 lg:py-3 lg:text-left lg:text-xs lg:tracking-wider ${view === key ? 'bg-[#302A2E] text-white' : 'text-[#6D6266] hover:bg-[#F7F4EF]'}`}><Icon size={17} className={view === key ? 'text-[#C4943D]' : ''} /><span className="truncate">{label}</span>{key === 'orders' && pendingOrders > 0 && <span className="absolute right-2 top-1 rounded-full bg-[#C4943D] px-1.5 py-0.5 text-[8px] text-[#302A2E] lg:static lg:ml-auto lg:px-2 lg:text-[9px]">{pendingOrders}</span>}</button>)}</nav></aside>
+      <aside className="border-b border-[#DDD4C9] bg-white p-2 lg:min-h-[calc(100vh-65px)] lg:border-b-0 lg:border-r lg:p-5"><nav className="grid grid-cols-4 gap-1 lg:flex lg:flex-col lg:gap-2">{navigation.map(([key, label, Icon]) => <button key={key} onClick={() => setView(key)} className={`relative flex min-w-0 flex-col items-center justify-center gap-1 rounded-xl px-1 py-2.5 text-[9px] font-bold uppercase tracking-[.08em] transition lg:flex-row lg:justify-start lg:gap-3 lg:px-4 lg:py-3 lg:text-left lg:text-xs lg:tracking-wider ${view === key ? 'bg-[#302A2E] text-white' : 'text-[#6D6266] hover:bg-[#F7F4EF]'}`}><Icon size={17} className={view === key ? 'text-[#C4943D]' : ''} /><span className="truncate">{label}</span>{key === 'orders' && pendingOrders > 0 && <span className="absolute right-2 top-1 rounded-full bg-[#C4943D] px-1.5 py-0.5 text-[8px] text-[#302A2E] lg:static lg:ml-auto lg:px-2 lg:text-[9px]">{pendingOrders}</span>}</button>)}</nav></aside>
       <section className="min-w-0 p-4 sm:p-7 lg:p-10">
         {message && <div className="mb-6 flex items-center justify-between rounded-xl border border-[#DCC8A1] bg-white px-4 py-3 text-sm"><span>{message}</span><button onClick={() => setMessage('')}><X size={16} /></button></div>}
         {view === 'overview' && <Overview products={products} orders={orders} onAdd={() => { setEditing('new'); setView('catalogue') }} onOrders={() => setView('orders')} />}
         {view === 'catalogue' && <Catalogue products={visibleProducts} total={products.length} query={query} setQuery={setQuery} onAdd={() => setEditing('new')} onEdit={setEditing} onDelete={removeProduct} />}
         {view === 'orders' && <Orders orders={orders} busy={busy} onUpdate={updateOrder} onDelete={removeOrder} />}
+        {view === 'delivery' && <DeliverySettingsEditor settings={deliverySettings} busy={busy} onSave={saveDelivery} />}
       </section>
     </div>
     {editing && <ProductEditor product={editing === 'new' ? null : editing} suggestedSku={nextProductSku} onClose={() => setEditing(null)} onSave={saveProduct} onUploadImage={(file) => uploadAdminImage(credentials, file)} onDeleteImage={(imageUrl) => deleteAdminImage(credentials, imageUrl)} busy={busy} />}

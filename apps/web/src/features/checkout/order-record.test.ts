@@ -3,7 +3,7 @@ import { generateOrderNumber, prepareOrder } from './order-record'
 
 const customer = {
   firstName: 'Sara', lastName: 'Amrani', telephone: '+212612345678', city: 'Casablanca', address: '12 rue des Fleurs',
-  deliveryNotes: 'Call on arrival', paymentMethod: 'WHATSAPP' as const, acceptedTerms: true as const,
+  country: 'MA' as const, deliveryNotes: 'Call on arrival', paymentMethod: 'WHATSAPP' as const, acceptedTerms: true as const,
 }
 
 describe('D1 WhatsApp orders', () => {
@@ -22,8 +22,14 @@ describe('D1 WhatsApp orders', () => {
       id: 'variant-1', product_id: 'product-1', slug: 'layali', product_name: 'Layali Necklace', variant_name: 'Gold', sku: 'PDO-001-A', price: 220, stock: 4, active: 1, image_url: '/layali.jpg',
     }], 'PDO-20260805-123456')
 
-    expect(order).toMatchObject({ orderNumber: 'PDO-20260805-123456', subtotal: 440, deliveryFee: 30, total: 470, status: 'PENDING_CONFIRMATION' })
+    expect(order).toMatchObject({ orderNumber: 'PDO-20260805-123456', subtotal: 440, deliveryFee: 35, total: 475, deliveryZone: 'MAJOR_CITIES', status: 'PENDING_CONFIRMATION' })
     expect(order.items).toEqual([{ productId: 'product-1', variantId: 'variant-1', productName: 'Layali Necklace', variantName: 'Gold', sku: 'PDO-001-A', quantity: 2, unitPrice: 220, lineTotal: 440, imageUrl: '/layali.jpg' }])
+  })
+
+  it('offers delivery from 2,000 MAD and keeps international delivery for a quote', () => {
+    const row = { id: 'variant-1', product_id: 'product-1', slug: 'layali', product_name: 'Layali', variant_name: 'Gold', sku: 'PDO-001-A', price: 2_000, stock: 2, active: 1, image_url: '' }
+    expect(prepareOrder({ ...customer, city: 'Fès' }, [{ variantId: 'variant-1', quantity: 1 }], [row], 'PDO-1')).toMatchObject({ deliveryFee: 0, deliveryZone: 'PICKUP_CITY', deliveryRequiresQuote: false })
+    expect(prepareOrder({ ...customer, country: 'INTERNATIONAL', city: 'Paris' }, [{ variantId: 'variant-1', quantity: 1 }], [row], 'PDO-2')).toMatchObject({ deliveryFee: 0, deliveryZone: 'INTERNATIONAL', deliveryRequiresQuote: true })
   })
 
   it('rejects unavailable products and excessive quantities', () => {

@@ -5,6 +5,7 @@ export const paymentMethodSchema = z.literal('WHATSAPP')
 export const checkoutSchema = z.object({
   firstName: z.string().trim().min(2).max(60),
   lastName: z.string().trim().min(2).max(60),
+  country: z.enum(['MA', 'INTERNATIONAL']).optional(),
   telephone: z.string().trim().regex(/^\+?[0-9\s-]{9,18}$/),
   city: z.string().trim().min(2).max(80),
   address: z.string().trim().min(8).max(240),

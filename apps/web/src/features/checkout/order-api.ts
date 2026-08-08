@@ -4,8 +4,9 @@ import { generateOrderNumber } from './order-record'
 import { buildWhatsAppMessage, buildWhatsAppUrl } from './whatsapp-order'
 import type { WhatsAppLocale } from './whatsapp-order'
 import { WHATSAPP_NUMBER } from '../../config/contact'
+import { calculateDeliveryFee, DEFAULT_DELIVERY_SETTINGS } from './delivery-pricing'
 
-export type CreatedOrder = { orderNumber: string; total: number; deliveryFee: number; whatsappUrl?: string }
+export type CreatedOrder = { orderNumber: string; total: number; deliveryFee: number; deliveryZone?: string; deliveryRequiresQuote?: boolean; whatsappUrl?: string }
 
 class OrderApiError extends Error {}
 
@@ -22,7 +23,8 @@ export async function createOrder(customer: CheckoutForm, items: CartItem[], loc
   } catch (error) {
     if (!import.meta.env.DEV || error instanceof OrderApiError) throw error
     const subtotal = items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0)
-    const deliveryFee = subtotal >= 500 ? 0 : customer.city.toLowerCase() === 'casablanca' ? 30 : 45
+    const delivery = calculateDeliveryFee(subtotal, customer.city, customer.country || 'MA', DEFAULT_DELIVERY_SETTINGS)
+    const deliveryFee = delivery.fee
     const orderNumber = generateOrderNumber([])
     const preparedMessage = buildWhatsAppMessage({
       orderNumber,
@@ -31,9 +33,12 @@ export async function createOrder(customer: CheckoutForm, items: CartItem[], loc
       city: customer.city,
       address: customer.address,
       notes: customer.deliveryNotes,
+      subtotal,
+      deliveryFee,
+      deliveryRequiresQuote: delivery.requiresQuote,
       total: subtotal + deliveryFee,
       items: items.map((item) => ({ name: item.name, variantName: item.variantName, quantity: item.quantity, lineTotal: item.unitPrice * item.quantity })),
     }, locale)
-    return { orderNumber, total: subtotal + deliveryFee, deliveryFee, whatsappUrl: buildWhatsAppUrl(WHATSAPP_NUMBER, preparedMessage) }
+    return { orderNumber, total: subtotal + deliveryFee, deliveryFee, deliveryZone: delivery.zone, deliveryRequiresQuote: delivery.requiresQuote, whatsappUrl: buildWhatsAppUrl(WHATSAPP_NUMBER, preparedMessage) }
   }
 }

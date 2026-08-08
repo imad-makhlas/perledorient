@@ -1,4 +1,5 @@
 import type { CheckoutForm } from './checkout-schema'
+import { calculateDeliveryFee, DEFAULT_DELIVERY_SETTINGS, type DeliverySettings } from './delivery-pricing'
 
 export type OrderCatalogRow = {
   id: string
@@ -39,7 +40,7 @@ export function generateOrderNumber(existingOrderNumbers: string[], date = new D
   return `${prefix}${String(nextSequence).padStart(4, '0')}`
 }
 
-export function prepareOrder(customer: CheckoutForm, requestedItems: Array<{ variantId: string; quantity: number }>, catalogue: OrderCatalogRow[], orderNumber: string) {
+export function prepareOrder(customer: CheckoutForm, requestedItems: Array<{ variantId: string; quantity: number }>, catalogue: OrderCatalogRow[], orderNumber: string, deliverySettings: DeliverySettings = DEFAULT_DELIVERY_SETTINGS) {
   if (!requestedItems.length) throw new Error('The order is empty')
   const items = requestedItems.map((requested): PreparedOrderItem => {
     const product = catalogue.find((row) => row.id === requested.variantId && row.active === 1)
@@ -58,7 +59,7 @@ export function prepareOrder(customer: CheckoutForm, requestedItems: Array<{ var
     }
   })
   const subtotal = items.reduce((sum, item) => sum + item.lineTotal, 0)
-  const deliveryFee = subtotal >= 500 ? 0 : customer.city.trim().toLowerCase() === 'casablanca' ? 30 : 45
+  const delivery = calculateDeliveryFee(subtotal, customer.city, customer.country || 'MA', deliverySettings)
   return {
     orderNumber,
     customerName: `${customer.firstName.trim()} ${customer.lastName.trim()}`,
@@ -67,8 +68,10 @@ export function prepareOrder(customer: CheckoutForm, requestedItems: Array<{ var
     address: customer.address.trim(),
     notes: customer.deliveryNotes?.trim() || '',
     subtotal,
-    deliveryFee,
-    total: subtotal + deliveryFee,
+    deliveryFee: delivery.fee,
+    deliveryZone: delivery.zone,
+    deliveryRequiresQuote: delivery.requiresQuote,
+    total: subtotal + delivery.fee,
     paymentMethod: 'WHATSAPP' as const,
     status: 'PENDING_CONFIRMATION' as const,
     items,
