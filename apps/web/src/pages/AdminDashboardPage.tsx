@@ -119,7 +119,7 @@ function Catalogue({ products, total, query, setQuery, onAdd, onEdit, onDelete }
 function Orders({ orders, busy, onUpdate, onDelete }: { orders: AdminOrder[]; busy: boolean; onUpdate: (order: AdminOrder, status: AdminOrderStatus) => void; onDelete: (order: AdminOrder) => void }) {
   return <div>
     <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-      <div><p className="eyebrow">Suivi WhatsApp</p><h1 className="display mt-2 text-4xl font-semibold sm:text-5xl">Commandes</h1><p className="mt-2 max-w-2xl text-sm leading-6 text-[#7B7074]">Consultez les coordonnÃ©es, vÃ©rifiez les piÃ¨ces et mettez Ã  jour chaque demande depuis un seul espace.</p></div>
+      <div><p className="eyebrow">Suivi WhatsApp</p><h1 className="display mt-2 text-4xl font-semibold sm:text-5xl">Commandes</h1><p className="mt-2 max-w-2xl text-sm leading-6 text-[#7B7074]">Consultez les coordonnées, vérifiez les pièces et mettez à jour chaque demande depuis un seul espace.</p></div>
       <div className="w-fit rounded-full border border-[#DDD4C9] bg-white px-4 py-2 text-[10px] font-bold uppercase tracking-[.14em] text-[#6D6266]"><strong className="mr-2 text-sm text-[#302A2E]">{orders.length}</strong>{orders.length > 1 ? 'commandes' : 'commande'}</div>
     </div>
     <div className="mt-7 grid gap-5">
