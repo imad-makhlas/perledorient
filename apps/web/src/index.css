@@ -90,4 +90,14 @@ img { display: block; max-width: 100%; }
   .catalog-sort-menu { right: 0; }
   .catalog-clear { position: static; display: block; margin: .8rem 0 1rem; }
 }
+.ticket-label { color: #8A6A31; font-size: 7px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+@media print {
+  @page { size: A6 portrait; margin: 0; }
+  html, body { width: 105mm; min-width: 105mm; background: #fff !important; }
+  body * { visibility: hidden !important; }
+  .order-print-overlay, .order-print-overlay * { visibility: visible !important; }
+  .order-print-overlay { position: absolute !important; inset: 0 !important; width: 105mm !important; min-height: 148mm !important; overflow: visible !important; background: #fff !important; padding: 0 !important; }
+  .order-print-controls { display: none !important; }
+  .order-print-ticket { width: 105mm !important; min-height: 148mm !important; max-width: none !important; box-shadow: none !important; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+}
 

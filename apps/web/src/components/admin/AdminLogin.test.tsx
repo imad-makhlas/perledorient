@@ -7,5 +7,7 @@ describe('AdminLogin', () => {
     render(<AdminLogin onLogin={vi.fn()} message="" busy={false} />)
 
     expect(screen.getByRole('textbox', { name: 'Adresse administrateur' })).toHaveValue('')
+    expect(screen.getByRole('heading', { name: 'Atelier privé' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: "Ouvrir l’atelier" })).toBeInTheDocument()
   })
 })

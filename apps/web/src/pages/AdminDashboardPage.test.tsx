@@ -47,6 +47,8 @@ describe('Admin dashboard mobile entry', () => {
     expect(screen.getByRole('heading', { name: 'Commande n° PDO-2026-0001' })).toBeInTheDocument()
     expect(screen.getByText('Réf. produit : PDO-BIJ-2026-0001')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /Contacter sur WhatsApp/ })).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'Imprimer le ticket' }))
+    expect(screen.getByRole('dialog', { name: 'Ticket de la commande PDO-2026-0001' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Supprimer' })).toBeInTheDocument()
   })
 })
