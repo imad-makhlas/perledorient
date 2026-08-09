@@ -30,10 +30,10 @@ export const products: Product[] = seed.map((item, index) => {
   const [slug, name, category, image, price, comparisonPrice, material, finish, dimensions] = item
   const stock = index === 7 ? 0 : index === 5 ? 3 : 7 + index
   return {
-    id: `jewel-${index + 1}`, slug, name, brand: "Perle d'Orient", category, material, dimensions, image, images: [image], price,
+    id: `jewel-${index + 1}`, slug, name, brand: 'Casa de Perla', category, material, dimensions, image, images: [image], price,
     comparisonPrice: comparisonPrice || undefined, stock, featured: index < 4, isNew: index === 1 || index === 4 || index === 8,
     shortDescription: 'A handcrafted piece shaped by oriental motifs and finished in small series.',
-    description: `${name} is handcrafted in small series for Perle d'Orient. Its warm finish and delicate proportions bring an oriental accent to everyday dressing and special occasions.`,
+    description: `${name} est façonné en petite série pour Casa de Perla. Sa finition chaleureuse et ses proportions délicates apportent une touche orientale au quotidien comme aux occasions spéciales.`,
     specifications: { Material: material, Finish: finish, Dimensions: dimensions, Craft: 'Hand-finished in small series', Care: 'Keep dry and store separately in its pouch' },
     variants: [{ id: `jewel-variant-${index + 1}-a`, name: finish, sku: `PDO-${String(index + 1).padStart(3, '0')}-A`, options: { Finish: finish }, price, stock, image }],
   }

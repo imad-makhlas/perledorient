@@ -21,7 +21,7 @@ export function OrderPrintTicket({ order, onClose }: OrderPrintTicketProps) {
     </div>
     <article className="order-print-ticket mx-auto flex min-h-[148mm] w-full max-w-[105mm] flex-col bg-white p-[9mm] text-[#241F21] shadow-2xl">
       <header className="flex items-start justify-between gap-5 border-b-2 border-[#241F21] pb-4">
-        <div><p className="text-[18px] font-bold leading-none">Perle d'<span className="text-[#A87524]">Orient</span></p><p className="mt-1 text-[7px] font-bold uppercase tracking-[.24em] text-[#756B6F]">Bijoux artisanaux</p></div>
+        <div><p className="text-[18px] font-bold leading-none">Casa de <span className="text-[#A87524]">Perla</span></p><p className="mt-1 text-[7px] font-bold uppercase tracking-[.24em] text-[#756B6F]">Bijoux artisanaux</p></div>
         <div className="text-right"><h1 className="text-[8px] font-bold uppercase tracking-[.18em] text-[#A87524]">Bon de préparation</h1><p className="mt-1 text-[10px] font-bold">{order.orderNumber}</p><p className="mt-1 text-[8px] text-[#756B6F]">{createdAt}</p></div>
       </header>
       <section className="grid grid-cols-2 gap-4 border-b border-[#D8D0C8] py-4 text-[9px] leading-4">

@@ -40,7 +40,7 @@ function orderDatabase() {
     PRAGMA foreign_keys = ON;
     CREATE TABLE admin_products (
       id TEXT PRIMARY KEY, product_id TEXT NOT NULL, slug TEXT NOT NULL, product_name TEXT NOT NULL,
-      name_en TEXT NOT NULL DEFAULT '', name_fr TEXT NOT NULL DEFAULT '',
+      name_en TEXT NOT NULL DEFAULT '', name_fr TEXT NOT NULL DEFAULT '', name_ar TEXT NOT NULL DEFAULT '',
       variant_name TEXT NOT NULL, sku TEXT NOT NULL, price INTEGER NOT NULL, stock INTEGER NOT NULL,
       active INTEGER NOT NULL, image_url TEXT NOT NULL DEFAULT '', updated_at TEXT
     );
@@ -66,14 +66,14 @@ function orderDatabase() {
   return database
 }
 
-function orderRequest(idempotencyKey: string, locale: 'en' | 'fr' = 'en') {
+function orderRequest(idempotencyKey: string, locale: 'ar' | 'fr' = 'fr') {
   return new Request('https://shop.test/api/v1/orders', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       idempotencyKey,
       locale,
-      customer: { firstName: 'Sara', lastName: 'Amrani', telephone: '+212612345678', city: 'Casablanca', address: '12 rue des Fleurs', deliveryNotes: '', paymentMethod: 'WHATSAPP', acceptedTerms: true },
+      customer: { firstName: 'Sara', lastName: 'Amrani', telephone: '+212612345678', country: 'MA', city: 'Casablanca', address: '12 rue des Fleurs', deliveryNotes: '', paymentMethod: 'WHATSAPP', acceptedTerms: true },
       items: [{ variantId: 'variant-1', quantity: 1 }],
     }),
   })
@@ -95,16 +95,15 @@ describe('order stock reservation API', () => {
 
     const frenchResponse = await onRequestPost({ request: orderRequest('french-message', 'fr'), env, params: {} })
     const frenchBody = await frenchResponse.json() as { whatsappUrl: string }
-    expect(decodeURIComponent(frenchBody.whatsappUrl)).toContain("Bonjour Perle d'Orient")
+    expect(decodeURIComponent(frenchBody.whatsappUrl)).toContain('Bonjour Casa de Perla')
     expect(decodeURIComponent(frenchBody.whatsappUrl)).toContain('Téléphone :')
     expect(decodeURIComponent(frenchBody.whatsappUrl)).toContain('Collier Layali')
 
     database.sqlite.prepare('UPDATE admin_products SET stock = 1 WHERE id = ?').run('variant-1')
-    const englishResponse = await onRequestPost({ request: orderRequest('english-message', 'en'), env, params: {} })
-    const englishBody = await englishResponse.json() as { whatsappUrl: string }
-    expect(decodeURIComponent(englishBody.whatsappUrl)).toContain("Hello Perle d'Orient")
-    expect(decodeURIComponent(englishBody.whatsappUrl)).toContain('Phone:')
-    expect(decodeURIComponent(englishBody.whatsappUrl)).toContain('Layali Necklace')
+    const arabicResponse = await onRequestPost({ request: orderRequest('arabic-message', 'ar'), env, params: {} })
+    const arabicBody = await arabicResponse.json() as { whatsappUrl: string }
+    expect(decodeURIComponent(arabicBody.whatsappUrl)).toContain('مرحباً Casa de Perla')
+    expect(decodeURIComponent(arabicBody.whatsappUrl)).toContain('الهاتف:')
   })
 
   it('continues the yearly order sequence across legacy and CMD references', async () => {
@@ -119,11 +118,11 @@ describe('order stock reservation API', () => {
     `).run('legacy-order', `PDO-${year}-0007`, 'legacy-sequence', 'Ancien client', '+212600000001', 'Rabat', 'Adresse', 500, 0, 500, 'WHATSAPP', 'DELIVERED', 0)
 
     const first = await onRequestPost({ request: orderRequest('cmd-sequence-1'), env, params: {} })
-    await expect(first.json()).resolves.toMatchObject({ orderNumber: `PDO-CMD-${year}-0008` })
+    await expect(first.json()).resolves.toMatchObject({ orderNumber: `CDP-CMD-${year}-0001` })
 
     database.sqlite.prepare('UPDATE admin_products SET stock = 1 WHERE id = ?').run('variant-1')
     const second = await onRequestPost({ request: orderRequest('cmd-sequence-2'), env, params: {} })
-    await expect(second.json()).resolves.toMatchObject({ orderNumber: `PDO-CMD-${year}-0009` })
+    await expect(second.json()).resolves.toMatchObject({ orderNumber: `CDP-CMD-${year}-0002` })
   })
 
   it('does not disguise a missing stock reservation migration as a customer stock conflict', async () => {

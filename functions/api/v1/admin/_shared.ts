@@ -40,7 +40,7 @@ export function json(data: unknown, init: ResponseInit = {}) {
 }
 
 export function requireAdmin(request: Request, env: PagesEnv): Response | null {
-  const expectedEmail = env.ADMIN_EMAIL || 'atelier@perledorient.com'
+  const expectedEmail = env.ADMIN_EMAIL || 'atelier@gmail.com'
   const expectedPassword = env.ADMIN_PASSWORD
   if (!expectedPassword) return json({ error: 'Admin password is not configured' }, { status: 500 })
   const [scheme, value] = (request.headers.get('Authorization') || '').split(' ')
@@ -58,7 +58,7 @@ export function requireAdmin(request: Request, env: PagesEnv): Response | null {
 }
 
 export function unauthorized() {
-  return json({ error: 'Invalid admin credentials' }, { status: 401, headers: { 'WWW-Authenticate': 'Basic realm="Perle dOrient Atelier"' } })
+  return json({ error: 'Invalid admin credentials' }, { status: 401, headers: { 'WWW-Authenticate': 'Basic realm="Casa de Perla Atelier"' } })
 }
 
 export async function listAdminProducts(db: D1Database) {
@@ -83,7 +83,7 @@ function imageStatements(db: D1Database, productRowId: string, imageUrls: string
 
 export async function createAdminProduct(db: D1Database, input: EditableAdminProduct) {
   const year = new Date().getUTCFullYear()
-  const prefix = `PDO-BIJ-${year}-%`
+  const prefix = `CDP-BIJ-${year}-%`
   const existing = await db.prepare('SELECT sku FROM admin_products WHERE sku LIKE ?').bind(prefix).all<{ sku: string }>()
   const sku = generateProductSku((existing.results || []).map((row) => row.sku), year)
   const product = normalizeAdminProductInput({ ...input, sku })

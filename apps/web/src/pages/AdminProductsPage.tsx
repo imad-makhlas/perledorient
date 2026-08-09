@@ -12,7 +12,7 @@ const credentialsKey = 'perle-d-orient-owner-credentials'
 
 export function AdminProductsPage() {
   const [credentials, setCredentials] = useState<AdminCredentials>(() => {
-    try { return JSON.parse(localStorage.getItem(credentialsKey) || '{"email":"atelier@perledorient.com","password":""}') as AdminCredentials } catch { return { email: 'atelier@perledorient.com', password: '' } }
+    try { return JSON.parse(localStorage.getItem(credentialsKey) || '{"email":"atelier@gmail.com","password":""}') as AdminCredentials } catch { return { email: 'atelier@gmail.com', password: '' } }
   })
   const [products, setProducts] = useState<AdminProduct[]>([])
   const [message, setMessage] = useState('')
@@ -35,7 +35,7 @@ export function AdminProductsPage() {
   }
 
   return <main className="container-shell py-12 lg:py-16">
-    <div className="flex flex-col gap-5 border-b border-line pb-8 lg:flex-row lg:items-end lg:justify-between"><div><p className="eyebrow">Perle d'Orient Atelier</p><h1 className="display mt-2 text-5xl font-semibold">Jewelry catalogue</h1><p className="mt-3 text-sm text-muted">Update photos, prices, stock and availability from your single owner account.</p></div><Link to="/admin/orders" className="text-xs font-bold uppercase tracking-widest text-burgundy">View WhatsApp orders</Link></div>
+    <div className="flex flex-col gap-5 border-b border-line pb-8 lg:flex-row lg:items-end lg:justify-between"><div><p className="eyebrow">Casa de Perla Atelier</p><h1 className="display mt-2 text-5xl font-semibold">Jewelry catalogue</h1><p className="mt-3 text-sm text-muted">Update photos, prices, stock and availability from your single owner account.</p></div><Link to="/admin/orders" className="text-xs font-bold uppercase tracking-widest text-burgundy">View WhatsApp orders</Link></div>
     <section className="mt-8 grid gap-3 border border-line bg-white p-5 sm:grid-cols-[1fr_1fr_auto]"><input className="field" type="email" value={credentials.email} onChange={(event) => setCredentials({ ...credentials, email: event.target.value })} placeholder="Owner email" /><input className="field" type="password" value={credentials.password} onChange={(event) => setCredentials({ ...credentials, password: event.target.value })} placeholder="Password" /><button onClick={load} className="button-primary"><LogIn size={16} />Open atelier</button></section>
     {message && <p className="mt-5 border border-champagne bg-white px-4 py-3 text-sm text-burgundy">{message}</p>}
     {!products.length ? <div className="mt-14 grid place-items-center py-16 text-center text-muted"><Package size={34} strokeWidth={1.2} /><p className="mt-4 text-sm">Sign in to manage your pieces.</p></div> : <div className="mt-8 grid gap-6">{products.map((product) => <article key={product.id} className="grid gap-6 border border-line bg-white p-5 shadow-soft lg:grid-cols-[170px_1fr_auto]">

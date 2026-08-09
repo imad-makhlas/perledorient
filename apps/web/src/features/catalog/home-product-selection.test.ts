@@ -3,7 +3,7 @@ import type { Product } from './catalog'
 import { selectHomeProducts } from './home-product-selection'
 
 const product = (id: string, featured: boolean): Product => ({
-  id, slug: id, name: id, brand: "Perle d'Orient", category: 'Necklaces', image: `/${id}.jpg`,
+  id, slug: id, name: id, brand: 'Casa de Perla', category: 'Necklaces', image: `/${id}.jpg`,
   price: 500, stock: 2, featured, isNew: false, shortDescription: '', description: '', images: [`/${id}.jpg`],
   variants: [{ id: `${id}-variant`, name: 'Doré', sku: id, options: {}, price: 500, stock: 2 }], specifications: {},
 })

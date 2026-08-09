@@ -6,10 +6,10 @@ import { useI18n } from '../i18n/i18n'
 
 const homeCopy = {
   fr: {
-    signatures: ['Fait main', 'Petites séries', 'Maroc et international'], imageAlt: "Collection de bijoux artisanaux Perle d’Orient", imageCaption: 'Créés lentement. Portés longtemps.', categoryTitle: 'Trouvez votre pièce.', categoriesLabel: 'Sélection de bijoux', featuredBody: 'Façonnée à la main en petite série, chaque pièce porte de subtiles variations qui la rendent unique.', deliveryDetail: '48 à 72 h dans les grandes villes', paymentDetail: 'Confirmation sur WhatsApp', supportDetail: 'Un conseil humain et direct',
+    signatures: ['Fait main', 'Petites séries', 'Maroc et international'], imageAlt: 'Collection de bijoux artisanaux Casa de Perla', imageCaption: 'Créés lentement. Portés longtemps.', categoryTitle: 'Trouvez votre pièce.', categoriesLabel: 'Sélection de bijoux', featuredBody: 'Façonnée à la main en petite série, chaque pièce porte de subtiles variations qui la rendent unique.', deliveryDetail: '48 à 72 h dans les grandes villes', paymentDetail: 'Confirmation sur WhatsApp', supportDetail: 'Un conseil humain et direct',
   },
   ar: {
-    signatures: ['صنع يدوي', 'مجموعات محدودة', 'المغرب ودولياً'], imageAlt: 'مجموعة مجوهرات لؤلؤة الشرق المصنوعة يدوياً', imageCaption: 'صُنعت بعناية. لترافقك دائماً.', categoryTitle: 'اختاري قطعتك.', categoriesLabel: 'تشكيلة من المجوهرات', featuredBody: 'تُنجز كل قطعة يدوياً ضمن مجموعات محدودة، وتحمل تفاصيل دقيقة تجعلها خاصة بك.', deliveryDetail: 'من 48 إلى 72 ساعة في المدن الكبرى', paymentDetail: 'التأكيد عبر واتساب', supportDetail: 'مساعدة شخصية ومباشرة',
+    signatures: ['صنع يدوي', 'مجموعات محدودة', 'المغرب ودولياً'], imageAlt: 'مجموعة مجوهرات Casa de Perla المصنوعة يدوياً', imageCaption: 'صُنعت بعناية. لترافقك دائماً.', categoryTitle: 'اختاري قطعتك.', categoriesLabel: 'تشكيلة من المجوهرات', featuredBody: 'تُنجز كل قطعة يدوياً ضمن مجموعات محدودة، وتحمل تفاصيل دقيقة تجعلها خاصة بك.', deliveryDetail: 'من 48 إلى 72 ساعة في المدن الكبرى', paymentDetail: 'التأكيد عبر واتساب', supportDetail: 'مساعدة شخصية ومباشرة',
   },
 } as const
 
@@ -49,7 +49,7 @@ export function HomePage() {
     <section className="overflow-hidden border-b border-line bg-white">
       <div className="container-shell grid items-center md:grid-cols-[46%_54%]">
         <div className="relative flex items-center py-8 md:pr-10 lg:py-14 lg:pr-16">
-          <span className="absolute left-0 top-7 display text-[5rem] font-semibold leading-none text-burgundy/[.04] lg:text-[8rem]">PO</span>
+          <span className="absolute left-0 top-7 display text-[5rem] font-semibold leading-none text-burgundy/[.04] lg:text-[8rem]">CP</span>
           <div className="relative max-w-xl">
             <p className="editorial-rule">{t('heroEyebrow')}</p>
             <h1 className="display mt-4 text-[2.35rem] font-semibold leading-[.98] text-ink sm:text-5xl lg:mt-5 lg:text-[3.5rem]">{t('heroTitle')}</h1>
@@ -61,7 +61,7 @@ export function HomePage() {
         <div className="relative pb-6 md:py-7 md:pl-8 lg:pl-10">
           <div className="image-frame h-[230px] sm:h-[280px] md:h-[350px] lg:h-[410px]">
             <img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=1800&q=92" alt={page.imageAlt} className="h-full w-full object-cover object-center" />
-            <div className="absolute bottom-0 left-0 bg-ivory px-6 py-5 sm:px-8"><p className="text-[9px] font-bold uppercase tracking-[.24em] text-accent">Perle d'Orient</p><p className="display mt-1 text-2xl font-semibold text-ink">{page.imageCaption}</p></div>
+            <div className="absolute bottom-0 left-0 bg-ivory px-6 py-5 sm:px-8"><p className="text-[9px] font-bold uppercase tracking-[.24em] text-accent">Casa de Perla</p><p className="display mt-1 text-2xl font-semibold text-ink">{page.imageCaption}</p></div>
           </div>
         </div>
       </div>

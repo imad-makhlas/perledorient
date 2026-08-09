@@ -9,7 +9,7 @@ afterEach(() => vi.unstubAllGlobals())
 describe('homepage product showcase', () => {
   it('keeps the original vertical card design while using live product photos and links', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify([{
-      id: 'real-1', slug: 'collier-reel', name: 'Collier Réel', brand: "Perle d'Orient", category: 'Necklaces',
+      id: 'real-1', slug: 'collier-reel', name: 'Collier Réel', brand: 'Casa de Perla', category: 'Necklaces',
       image: 'https://cdn.example.com/collier.jpg', images: ['https://cdn.example.com/collier.jpg'], price: 520,
       stock: 2, featured: true, isNew: false, shortDescription: '', description: '', variants: [], specifications: {},
     }]), { status: 200, headers: { 'Content-Type': 'application/json' } })))

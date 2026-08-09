@@ -6,6 +6,6 @@ const cataloguePage = readFileSync(new URL('../../pages/CataloguePage.tsx', impo
 
 test('opens the boutique directly on filters and product cards', () => {
   assert.doesNotMatch(cataloguePage, /<header className="border-b border-line/)
-  assert.doesNotMatch(cataloguePage, /Perle d'Orient<\/p><h1/)
+  assert.doesNotMatch(cataloguePage, /Casa de Perla<\/p><h1/)
   assert.match(cataloguePage, /<main className="min-h-screen bg-white">\s*<div className="container-shell/)
 })

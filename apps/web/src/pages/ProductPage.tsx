@@ -39,7 +39,7 @@ export function ProductPage() {
   const share = async () => {
     const url = window.location.href
     const title = product.name
-    const text = `${product.name} - Perle d'Orient`
+    const text = `${product.name} - Casa de Perla`
     if (navigator.share) {
       await navigator.share({ title, text, url })
       return

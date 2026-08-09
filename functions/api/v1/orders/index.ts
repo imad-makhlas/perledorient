@@ -21,10 +21,9 @@ export async function onRequestPost({ request, env }: PagesContext) {
     if (existing) return json({ orderNumber: existing.order_number, total: existing.total, deliveryFee: existing.delivery_fee, whatsappUrl: existing.whatsapp_url })
 
     const year = new Date().getUTCFullYear()
-    const orderPrefix = `PDO-CMD-${year}-%`
-    const legacyOrderPrefix = `PDO-${year}-%`
-    const existingOrderNumbers = (await env.DB.prepare('SELECT order_number FROM orders WHERE order_number LIKE ? OR order_number LIKE ?')
-      .bind(orderPrefix, legacyOrderPrefix).all<{ order_number: string }>()).results || []
+    const orderPrefix = `CDP-CMD-${year}-%`
+    const existingOrderNumbers = (await env.DB.prepare('SELECT order_number FROM orders WHERE order_number LIKE ?')
+      .bind(orderPrefix).all<{ order_number: string }>()).results || []
     const uniqueIds = [...new Set(body.items.map((item) => item.variantId))]
     const placeholders = uniqueIds.map(() => '?').join(', ')
     const catalogue = (await env.DB.prepare(`

@@ -16,10 +16,10 @@ const order = {
   ],
 }
 
-test('builds the complete Perle d Orient WhatsApp message in French', () => {
+test('builds the complete Casa de Perla WhatsApp message in French', () => {
   const message = buildWhatsAppMessage(order, 'fr')
   assert.equal(message, [
-    "Bonjour Perle d'Orient, je souhaite confirmer cette commande :",
+    'Bonjour Casa de Perla, je souhaite confirmer cette commande :',
     'Référence : PDO-20260722-ABC123',
     '',
     'Layali Necklace — Antique gold × 1 — 520 MAD',
@@ -36,22 +36,22 @@ test('builds the complete Perle d Orient WhatsApp message in French', () => {
   assert.doesNotMatch(message, /Hello|Order:|Customer:|Phone:|Delivery:|Please confirm/)
 })
 
-test('builds the complete Perle d Orient WhatsApp message in English', () => {
-  const message = buildWhatsAppMessage(order, 'en')
+test('builds the complete Casa de Perla WhatsApp message in Arabic', () => {
+  const message = buildWhatsAppMessage(order, 'ar')
   assert.equal(message, [
-    "Hello Perle d'Orient, I would like to confirm this order:",
-    'Reference: PDO-20260722-ABC123',
+    'مرحباً Casa de Perla، أود تأكيد هذا الطلب:',
+    'المرجع: PDO-20260722-ABC123',
     '',
     'Layali Necklace — Antique gold × 1 — 520 MAD',
     'Nour Earrings — Pearl × 1 — 390 MAD',
     '',
-    'Total: 910 MAD',
-    'Name: Sara Amrani',
-    'Phone: +212612345678',
-    'Delivery: Casablanca, 18 Rue Al Massira',
-    'Note: Gift wrapping',
+    'المجموع: 910 MAD',
+    'الاسم: Sara Amrani',
+    'الهاتف: +212612345678',
+    'التوصيل: Casablanca، 18 Rue Al Massira',
+    'ملاحظة: Gift wrapping',
     '',
-    'Please confirm availability and delivery details.',
+    'يرجى تأكيد التوفر وتفاصيل التوصيل.',
   ].join('\n'))
   assert.doesNotMatch(message, /Bonjour|Référence|Téléphone|Livraison|Merci de confirmer/)
 })

@@ -22,6 +22,6 @@ export function BrandContentPage() {
   const { pathname } = useLocation()
   const { locale } = useI18n()
   const localizedContent = content[locale]
-  const [title, body] = localizedContent[pathname] ?? ["Perle d'Orient", locale === 'fr' ? "Bijoux artisanaux inspirés d’un souffle oriental." : 'مجوهرات حرفية مستوحاة من نفحة شرقية.']
+  const [title, body] = localizedContent[pathname] ?? ['Casa de Perla', locale === 'fr' ? "Bijoux artisanaux inspirés d’un souffle oriental." : 'مجوهرات حرفية مستوحاة من نفحة شرقية.']
   return <main className="container-shell grid min-h-[58vh] place-items-center py-20"><article className="max-w-2xl text-center"><p className="eyebrow">{locale === 'fr' ? "L’atelier" : 'المشغل'}</p><h1 className="display mt-4 text-5xl font-semibold sm:text-6xl">{title}</h1><p className="mt-6 text-base leading-8 text-muted">{body}</p><a href={WHATSAPP_URL} target="_blank" rel="noreferrer" className="button-primary button-accent mt-8"><MessageCircle size={16} />{locale === 'fr' ? 'Écrire sur WhatsApp' : 'اكتبي لنا عبر واتساب'}</a></article></main>
 }

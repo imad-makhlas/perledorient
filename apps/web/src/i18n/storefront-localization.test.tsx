@@ -20,7 +20,7 @@ describe('Arabic storefront copy', () => {
     renderArabic(<HomePage />)
     expect(screen.getByText('صُنعت بعناية. لترافقك دائماً.')).toBeInTheDocument()
     expect(screen.getByText('اختاري قطعتك.')).toBeInTheDocument()
-    expect(screen.getByText('تُنجز كل قطعة يدوياً ضمن مجموعات محدودة، وتحمل تفاصيل دقيقة تجعلها خاصة بك.')).toBeInTheDocument()
+    expect(screen.getByText('اكتشفي مجوهرات حرفية مستوحاة من دفء الشرق وتفاصيله وشاعريته. تُنجز كل قطعة من Casa de Perla ضمن مجموعات محدودة.')).toBeInTheDocument()
     expect(screen.queryByText(/Hand-finished|Find your piece|Made slowly/i)).not.toBeInTheDocument()
   })
 
@@ -35,16 +35,16 @@ describe('Arabic storefront copy', () => {
   it('translates the footer and uses the refined signature', () => {
     renderArabic(<Footer />)
     expect(screen.getByRole('heading', { name: 'المجوهرات' })).toBeInTheDocument()
-    expect(screen.getByText('© 2026 Perle d’Orient — جميع الحقوق محفوظة.')).toBeInTheDocument()
+    expect(screen.getByText('© 2026 Casa de Perla — إبداعات حرفية مستوحاة من الشرق. جميع الحقوق محفوظة.')).toBeInTheDocument()
     expect(screen.queryByText(/Handcrafted jewelry|The atelier|Our story/i)).not.toBeInTheDocument()
   })
 
   it('keeps the phone number and Instagram handle readable from left to right', () => {
     renderArabic(<Footer />)
 
-    expect(screen.getByRole('region', { name: "Coordonnées Perle d'Orient" })).toHaveAttribute('dir', 'ltr')
+    expect(screen.getByRole('region', { name: 'Coordonnées Casa de Perla' })).toHaveAttribute('dir', 'ltr')
     expect(screen.getByText('+212 631-210654').closest('p')).toHaveAttribute('dir', 'ltr')
-    expect(screen.getByText('@ma.perle.dorient').closest('a')).toHaveAttribute('dir', 'ltr')
+    expect(screen.getByText('@casadeperla.jewelry').closest('a')).toHaveAttribute('dir', 'ltr')
   })
 
 })

@@ -54,7 +54,7 @@ export function Header() {
           </div>
           <Link to="/catalogue" aria-label={t('search')} className="hidden transition-colors hover:text-accent lg:inline-flex"><Search size={19} strokeWidth={1.6} /></Link>
           <Link to="/cart" className="relative transition-colors hover:text-accent" aria-label={`${t('cart')}: ${count}`}><ShoppingBag size={20} strokeWidth={1.6} />{count > 0 && <span className="absolute -right-2 -top-2 grid h-4 min-w-4 place-items-center rounded-full bg-accent px-1 text-[9px] font-bold text-midnight">{count}</span>}</Link>
-          <a href={INSTAGRAM_URL} target="_blank" rel="noreferrer" aria-label="Instagram Perle d'Orient" className="hidden transition-colors hover:text-accent lg:inline-flex"><Instagram size={19} strokeWidth={1.6} /></a>
+          <a href={INSTAGRAM_URL} target="_blank" rel="noreferrer" aria-label="Instagram Casa de Perla" className="hidden transition-colors hover:text-accent lg:inline-flex"><Instagram size={19} strokeWidth={1.6} /></a>
         </div>
       </div>
     </header>

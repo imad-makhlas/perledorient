@@ -4,11 +4,11 @@ import { filterProducts, type ProductSummary } from './catalog.ts'
 
 const products: ProductSummary[] = [
   {
-    id: '1', slug: 'layali-necklace', name: 'Layali Necklace', brand: "Perle d'Orient", category: 'Necklaces', material: 'Gold-plated brass',
+    id: '1', slug: 'layali-necklace', name: 'Layali Necklace', brand: 'Casa de Perla', category: 'Necklaces', material: 'Gold-plated brass',
     image: '/necklace.jpg', price: 520, comparisonPrice: 650, stock: 5, featured: true, isNew: false,
   },
   {
-    id: '2', slug: 'nour-earrings', name: 'Nour Earrings', brand: "Perle d'Orient", category: 'Earrings', material: 'Freshwater pearl',
+    id: '2', slug: 'nour-earrings', name: 'Nour Earrings', brand: 'Casa de Perla', category: 'Earrings', material: 'Freshwater pearl',
     image: '/earrings.jpg', price: 390, stock: 0, featured: false, isNew: true,
   },
 ]

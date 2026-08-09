@@ -9,7 +9,7 @@ export function AdminLogin({ onLogin, message, busy }: { onLogin: (credentials: 
   return <main className="min-h-screen bg-[#F7F4EF] px-4 py-10 sm:grid sm:place-items-center">
     <section className="mx-auto w-full max-w-md overflow-hidden rounded-[28px] border border-[#DDD4C9] bg-white shadow-[0_32px_90px_rgba(34,29,31,.12)]">
       <div className="border-b border-[#E7DED4] bg-[#302A2E] px-7 py-8 text-white">
-        <p className="text-[10px] font-bold uppercase tracking-[.24em] text-[#C4943D]">Perle d’Orient</p>
+        <p className="text-[10px] font-bold uppercase tracking-[.24em] text-[#C4943D]">Casa de Perla</p>
         <h1 className="display mt-3 text-4xl font-semibold">Atelier privé</h1>
         <p className="mt-3 text-sm leading-6 text-white/60">Gérez vos bijoux et vos commandes depuis un seul espace.</p>
       </div>

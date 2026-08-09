@@ -22,7 +22,7 @@ describe('WhatsApp checkout', () => {
 
     render(<MemoryRouter initialEntries={['/checkout']}><I18nProvider><CartProvider><Routes>
       <Route path="/checkout" element={<WhatsAppCheckoutPage />} />
-      <Route path="/" element={<div>Accueil Perle d’Orient</div>} />
+      <Route path="/" element={<div>Accueil Casa de Perla</div>} />
     </Routes></CartProvider></I18nProvider></MemoryRouter>)
 
     expect(screen.getByText('Vos coordonnées')).toBeInTheDocument()
@@ -34,7 +34,7 @@ describe('WhatsApp checkout', () => {
     await userEvent.type(screen.getByLabelText('Adresse de livraison'), '12 rue des Fleurs')
     await userEvent.click(screen.getByRole('button', { name: 'Continuer sur WhatsApp' }))
 
-    await screen.findByText('Accueil Perle d’Orient')
+    await screen.findByText('Accueil Casa de Perla')
     const orderCall = fetchMock.mock.calls.find(([url]) => String(url).includes('/orders'))
     const request = JSON.parse(String(orderCall?.[1]?.body))
     expect(request.customer.telephone).toBe('+33612345678')
@@ -53,7 +53,7 @@ describe('WhatsApp checkout', () => {
 
     render(<MemoryRouter initialEntries={['/checkout']}><I18nProvider><CartProvider><Routes>
       <Route path="/checkout" element={<WhatsAppCheckoutPage />} />
-      <Route path="/" element={<div>Accueil Perle d’Orient</div>} />
+      <Route path="/" element={<div>Accueil Casa de Perla</div>} />
     </Routes></CartProvider></I18nProvider></MemoryRouter>)
 
     await userEvent.type(screen.getByLabelText('Prénom'), 'Sara')
@@ -62,7 +62,7 @@ describe('WhatsApp checkout', () => {
     await userEvent.type(screen.getByLabelText('Adresse de livraison'), '12 rue des Fleurs')
     await userEvent.click(screen.getByRole('button', { name: 'Continuer sur WhatsApp' }))
 
-    await screen.findByText('Accueil Perle d’Orient')
+    await screen.findByText('Accueil Casa de Perla')
     await waitFor(() => expect(JSON.parse(localStorage.getItem('codavenue-cart') || '{}')).toEqual({ items: [] }))
   }, 15_000)
 })

@@ -10,7 +10,7 @@ describe('admin delivery API client', () => {
       .mockResolvedValueOnce(new Response(JSON.stringify(DEFAULT_DELIVERY_SETTINGS), { status: 200 }))
       .mockResolvedValueOnce(new Response(JSON.stringify({ ...DEFAULT_DELIVERY_SETTINGS, freeThreshold: 2_500 }), { status: 200 }))
     vi.stubGlobal('fetch', fetchMock)
-    const credentials = { email: 'atelier@perledorient.com', password: 'secret' }
+    const credentials = { email: 'atelier@gmail.com', password: 'secret' }
 
     await expect(fetchAdminDeliverySettings(credentials)).resolves.toEqual(DEFAULT_DELIVERY_SETTINGS)
     await expect(updateAdminDeliverySettings(credentials, { ...DEFAULT_DELIVERY_SETTINGS, freeThreshold: 2_500 })).resolves.toMatchObject({ freeThreshold: 2_500 })

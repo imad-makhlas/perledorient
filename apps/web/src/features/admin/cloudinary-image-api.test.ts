@@ -3,13 +3,13 @@ import { onRequestDelete, onRequestPost } from '../../../../../functions/api/v1/
 
 const env = {
   DB: {} as never,
-  ADMIN_EMAIL: 'atelier@perledorient.com',
+  ADMIN_EMAIL: 'atelier@gmail.com',
   ADMIN_PASSWORD: 'secret',
   CLOUDINARY_CLOUD_NAME: 'perle',
   CLOUDINARY_API_KEY: 'key',
   CLOUDINARY_API_SECRET: 'cloud-secret',
 }
-const authorization = `Basic ${btoa('atelier@perledorient.com:secret')}`
+const authorization = `Basic ${btoa('atelier@gmail.com:secret')}`
 
 afterEach(() => vi.unstubAllGlobals())
 

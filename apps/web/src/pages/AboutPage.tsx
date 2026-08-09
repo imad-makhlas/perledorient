@@ -2,16 +2,16 @@ import { useI18n } from '../i18n/i18n'
 
 const story = {
   ar: {
-    eyebrow: 'قصة لؤلؤة الشرق',
+    eyebrow: 'قصة Casa de Perla',
     title: 'مجوهرات تصوغها اليد وتحملها الحكاية.',
-    body: 'وُلدت لؤلؤة الشرق من شغف بالتفاصيل الشرقية وجمال العمل الحرفي الهادئ. تُصمم كل قطعة في المغرب وتُنجز ضمن مجموعات محدودة لتصبح قريبة منك وفريدة.',
+    body: 'وُلدت Casa de Perla من شغف بالتفاصيل الشرقية وجمال العمل الحرفي الهادئ. تُصمم كل قطعة في المغرب وتُنجز ضمن مجموعات محدودة لتصبح قريبة منك وفريدة.',
     signaturesLabel: 'بصمات حرفية',
     signatures: ['صنع يدوي', 'مجموعات محدودة', 'المغرب'],
   },
   fr: {
-    eyebrow: "L'histoire de Perle d'Orient",
+    eyebrow: "L'histoire de Casa de Perla",
     title: 'Des bijoux façonnés à la main, portés par une histoire.',
-    body: "Perle d'Orient est née d'un amour pour les détails orientaux et la beauté sincère du travail artisanal. Chaque pièce est imaginée au Maroc, façonnée en petite série et créée pour devenir personnelle.",
+    body: "Casa de Perla est née d'un amour pour les détails orientaux et la beauté sincère du travail artisanal. Chaque pièce est imaginée au Maroc, façonnée en petite série et créée pour devenir personnelle.",
     signaturesLabel: 'Signatures artisanales',
     signatures: ['Fait main', 'Petites séries', 'Maroc'],
   },
@@ -28,7 +28,7 @@ export function AboutPage() {
       <div className="relative order-2 mx-auto w-full max-w-[520px] lg:order-1 lg:mx-0">
         <div className="absolute -left-3 -top-3 h-full w-full border border-accent/55" aria-hidden="true" />
         <div className="relative aspect-[16/11] overflow-hidden bg-ivory sm:aspect-[4/5] sm:max-h-[560px]">
-          <img src={STORY_IMAGE} alt="Perle d'Orient artisan jewelry" className="h-full w-full object-cover" />
+          <img src={STORY_IMAGE} alt="Bijoux artisanaux Casa de Perla" className="h-full w-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-burgundy/25 via-transparent to-transparent" aria-hidden="true" />
         </div>
       </div>

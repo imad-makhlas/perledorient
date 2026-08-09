@@ -27,12 +27,16 @@ describe('admin product creation', () => {
     database.sqlite.exec(`
       CREATE TABLE admin_products (
         id TEXT PRIMARY KEY, product_id TEXT NOT NULL, slug TEXT NOT NULL UNIQUE,
-        product_name TEXT NOT NULL, name_en TEXT NOT NULL, name_fr TEXT NOT NULL,
-        description_en TEXT NOT NULL, description_fr TEXT NOT NULL, category TEXT NOT NULL,
+        product_name TEXT NOT NULL, name_en TEXT NOT NULL, name_fr TEXT NOT NULL, name_ar TEXT NOT NULL DEFAULT '',
+        description_en TEXT NOT NULL, description_fr TEXT NOT NULL, description_ar TEXT NOT NULL DEFAULT '', category TEXT NOT NULL,
         material TEXT NOT NULL DEFAULT '', dimensions TEXT NOT NULL DEFAULT '', variant_name TEXT NOT NULL,
         sku TEXT NOT NULL UNIQUE, price INTEGER NOT NULL, comparison_price INTEGER,
         stock INTEGER NOT NULL, active INTEGER NOT NULL, featured INTEGER NOT NULL,
         image_url TEXT NOT NULL DEFAULT '', created_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+      CREATE TABLE admin_product_images (
+        id TEXT PRIMARY KEY, product_row_id TEXT NOT NULL, image_url TEXT NOT NULL,
+        position INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL DEFAULT (datetime('now'))
       );
     `)
     const year = new Date().getUTCFullYear()
@@ -41,15 +45,15 @@ describe('admin product creation', () => {
         id, product_id, slug, product_name, name_en, name_fr, description_en, description_fr,
         category, variant_name, sku, price, stock, active, featured
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).run('existing', 'product-existing', 'existing', 'Existing', 'Existing', 'Existant', 'Description', 'Description', 'Necklaces', 'Gold', `PDO-BIJ-${year}-0007`, 500, 2, 1, 0)
+    `).run('existing', 'product-existing', 'existing', 'Existing', 'Existing', 'Existant', 'Description', 'Description', 'Necklaces', 'Gold', `CDP-BIJ-${year}-0007`, 500, 2, 1, 0)
 
     const created = await createAdminProduct(database as unknown as D1Database, {
-      slug: 'nour', nameEn: 'Nour Earrings', nameFr: 'Boucles Nour',
-      descriptionEn: 'Handmade earrings', descriptionFr: 'Boucles artisanales', category: 'Earrings',
+      slug: 'nour', nameFr: 'Boucles Nour', nameAr: 'أقراط نور',
+      descriptionFr: 'Boucles artisanales', descriptionAr: 'أقراط مصنوعة يدوياً', category: 'Earrings',
       material: 'Brass', dimensions: '3 cm', variantName: 'Gold', sku: 'MANUAL-SKU',
-      price: 390, comparisonPrice: null, stock: 4, active: true, featured: false, imageUrl: '/nour.jpg',
+      price: 390, comparisonPrice: null, stock: 4, active: true, featured: false, imageUrl: '/nour.jpg', imageUrls: ['/nour.jpg'],
     })
 
-    expect(created?.sku).toBe(`PDO-BIJ-${year}-0008`)
+    expect(created?.sku).toBe(`CDP-BIJ-${year}-0008`)
   })
 })

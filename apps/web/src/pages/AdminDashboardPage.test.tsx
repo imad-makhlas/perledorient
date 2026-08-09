@@ -14,7 +14,7 @@ describe('Admin dashboard mobile entry', () => {
       .mockResolvedValueOnce(new Response(JSON.stringify([]), { status: 200, headers: { 'Content-Type': 'application/json' } })))
 
     render(<AdminDashboardPage />)
-    await userEvent.type(screen.getByLabelText('Adresse administrateur'), 'atelier@perledorient.com')
+    await userEvent.type(screen.getByLabelText('Adresse administrateur'), 'atelier@gmail.com')
     await userEvent.type(screen.getByLabelText('Mot de passe'), 'secret')
     await userEvent.click(screen.getByRole('button', { name: /Ouvrir/ }))
 
@@ -35,7 +35,7 @@ describe('Admin dashboard mobile entry', () => {
       }]), { status: 200, headers: { 'Content-Type': 'application/json' } })))
 
     render(<AdminDashboardPage />)
-    await userEvent.type(screen.getByLabelText('Adresse administrateur'), 'atelier@perledorient.com')
+    await userEvent.type(screen.getByLabelText('Adresse administrateur'), 'atelier@gmail.com')
     await userEvent.type(screen.getByLabelText('Mot de passe'), 'secret')
     await userEvent.click(screen.getByRole('button', { name: /Ouvrir/ }))
     await screen.findByRole('heading', { name: /Vue d/ })

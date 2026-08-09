@@ -16,12 +16,12 @@ export type WhatsAppLocale = 'fr' | 'ar'
 
 const whatsappCopy = {
   fr: {
-    intro: "Bonjour Perle d'Orient, je souhaite confirmer cette commande :",
+    intro: 'Bonjour Casa de Perla, je souhaite confirmer cette commande :',
     reference: 'Référence', subtotal: 'Sous-total', deliveryFee: 'Frais de livraison', quote: 'à confirmer sur WhatsApp', total: 'Total', name: 'Nom', phone: 'Téléphone', delivery: 'Livraison', note: 'Note',
     closing: 'Merci de confirmer la disponibilité et les modalités de livraison.',
   },
   ar: {
-    intro: 'مرحباً لؤلؤة الشرق، أود تأكيد هذا الطلب:',
+    intro: 'مرحباً Casa de Perla، أود تأكيد هذا الطلب:',
     reference: 'المرجع', subtotal: 'المجموع الفرعي', deliveryFee: 'رسوم التوصيل', quote: 'يتم تأكيدها عبر واتساب', total: 'المجموع', name: 'الاسم', phone: 'الهاتف', delivery: 'التوصيل', note: 'ملاحظة',
     closing: 'يرجى تأكيد التوفر وتفاصيل التوصيل.',
   },

@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { deleteAdminImage, uploadAdminImage } from './admin-images'
 
-const credentials = { email: 'atelier@perledorient.com', password: 'secret' }
+const credentials = { email: 'atelier@gmail.com', password: 'secret' }
 
 afterEach(() => vi.unstubAllGlobals())
 

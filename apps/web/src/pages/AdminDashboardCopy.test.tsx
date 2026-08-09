@@ -6,7 +6,7 @@ import { AdminDashboardPage } from './AdminDashboardPage'
 afterEach(() => vi.unstubAllGlobals())
 
 async function signIn() {
-  await userEvent.type(screen.getByLabelText('Adresse administrateur'), 'atelier@perledorient.com')
+  await userEvent.type(screen.getByLabelText('Adresse administrateur'), 'atelier@gmail.com')
   await userEvent.type(screen.getByLabelText('Mot de passe'), 'secret')
   await userEvent.click(screen.getByRole('button', { name: /Ouvrir/ }))
 }

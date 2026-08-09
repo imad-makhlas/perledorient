@@ -3,13 +3,14 @@ import { adminProductFromRow, catalogProductFromRow, generateProductSku, normali
 
 describe('admin product D1 records', () => {
   it('generates the next centralized yearly SKU', () => {
-    expect(generateProductSku([], 2026)).toBe('PDO-BIJ-2026-0001')
+    expect(generateProductSku([], 2026)).toBe('CDP-BIJ-2026-0001')
     expect(generateProductSku([
       'PDO-BIJ-2025-0099',
-      'PDO-BIJ-2026-0002',
-      'PDO-BIJ-2026-0012',
+      'PDO-BIJ-2026-0099',
+      'CDP-BIJ-2026-0002',
+      'CDP-BIJ-2026-0012',
       'LEGACY-001',
-    ], 2026)).toBe('PDO-BIJ-2026-0013')
+    ], 2026)).toBe('CDP-BIJ-2026-0013')
   })
 
   it('maps D1 rows to the admin UI contract', () => {
@@ -20,8 +21,10 @@ describe('admin product D1 records', () => {
       product_name: 'Layali Necklace',
       name_en: 'Layali Necklace',
       name_fr: 'Collier Layali',
+      name_ar: 'قلادة ليالي',
       description_en: 'An oriental necklace.',
       description_fr: 'Un collier oriental.',
+      description_ar: 'قلادة مستوحاة من الشرق.',
       category: 'Necklaces',
       material: 'Gold-plated brass',
       dimensions: '42-48 cm',
@@ -37,10 +40,10 @@ describe('admin product D1 records', () => {
       id: 'jewel-variant-1-a',
       productId: 'jewel-1',
       slug: 'layali-necklace',
-      nameEn: 'Layali Necklace',
       nameFr: 'Collier Layali',
-      descriptionEn: 'An oriental necklace.',
+      nameAr: 'قلادة ليالي',
       descriptionFr: 'Un collier oriental.',
+      descriptionAr: 'قلادة مستوحاة من الشرق.',
       category: 'Necklaces',
       material: 'Gold-plated brass',
       dimensions: '42-48 cm',
@@ -52,16 +55,17 @@ describe('admin product D1 records', () => {
       active: true,
       featured: true,
       imageUrl: '/assets/products/layali.jpg',
+      imageUrls: ['/assets/products/layali.jpg'],
     })
   })
 
   it('normalizes and validates bilingual product inputs', () => {
     expect(normalizeAdminProductInput({
       slug: ' nour-pearl-earrings ',
-      nameEn: '  Nour Pearl Earrings ',
       nameFr: ' Boucles Nour ',
-      descriptionEn: ' Handmade pearl earrings. ',
+      nameAr: ' أقراط نور ',
       descriptionFr: ' Boucles artisanales en perles. ',
+      descriptionAr: ' أقراط مصنوعة يدوياً من اللؤلؤ. ',
       category: ' Earrings ',
       material: ' Freshwater pearl ',
       dimensions: ' 3.2 cm ',
@@ -73,12 +77,13 @@ describe('admin product D1 records', () => {
       active: false,
       featured: true,
       imageUrl: ' /assets/products/nour.jpg ',
+      imageUrls: [' /assets/products/nour.jpg '],
     })).toEqual({
       slug: 'nour-pearl-earrings',
-      nameEn: 'Nour Pearl Earrings',
       nameFr: 'Boucles Nour',
-      descriptionEn: 'Handmade pearl earrings.',
+      nameAr: 'أقراط نور',
       descriptionFr: 'Boucles artisanales en perles.',
+      descriptionAr: 'أقراط مصنوعة يدوياً من اللؤلؤ.',
       category: 'Earrings',
       material: 'Freshwater pearl',
       dimensions: '3.2 cm',
@@ -90,9 +95,10 @@ describe('admin product D1 records', () => {
       active: false,
       featured: true,
       imageUrl: '/assets/products/nour.jpg',
+      imageUrls: ['/assets/products/nour.jpg'],
     })
 
-    expect(() => normalizeAdminProductInput({ slug: '', nameEn: '', nameFr: '', descriptionEn: '', descriptionFr: '', category: '', material: '', dimensions: '', variantName: 'Gold', sku: '', price: 1, comparisonPrice: null, stock: 1, active: true, featured: false, imageUrl: '' })).toThrow()
+    expect(() => normalizeAdminProductInput({ slug: '', nameFr: '', nameAr: '', descriptionFr: '', descriptionAr: '', category: '', material: '', dimensions: '', variantName: 'Gold', sku: '', price: 1, comparisonPrice: null, stock: 1, active: true, featured: false, imageUrl: '', imageUrls: [] })).toThrow()
   })
 
   it('maps a D1 row to the selected storefront locale', () => {

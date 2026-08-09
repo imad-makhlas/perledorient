@@ -27,7 +27,7 @@ export type AdminProductRow = {
 }
 
 export function generateProductSku(existingSkus: string[], year = new Date().getUTCFullYear()) {
-  const prefix = `PDO-BIJ-${year}-`
+  const prefix = `CDP-BIJ-${year}-`
   const highest = existingSkus.reduce((maximum, sku) => {
     if (!sku.startsWith(prefix)) return maximum
     const sequence = Number(sku.slice(prefix.length))
@@ -99,7 +99,7 @@ export function catalogProductFromRow(row: AdminProductRow, locale: 'fr' | 'ar')
     id: row.product_id,
     slug: row.slug,
     name,
-    brand: "Perle d'Orient",
+    brand: 'Casa de Perla',
     category: row.category,
     material: row.material,
     dimensions: row.dimensions,

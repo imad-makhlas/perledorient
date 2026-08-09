@@ -28,12 +28,10 @@ export type PreparedOrderItem = {
 
 export function generateOrderNumber(existingOrderNumbers: string[], date = new Date()) {
   const year = date.getUTCFullYear()
-  const prefix = `PDO-CMD-${year}-`
-  const legacyPrefix = `PDO-${year}-`
+  const prefix = `CDP-CMD-${year}-`
   const nextSequence = existingOrderNumbers.reduce((highest, orderNumber) => {
-    const matchingPrefix = orderNumber.startsWith(prefix) ? prefix : orderNumber.startsWith(legacyPrefix) ? legacyPrefix : ''
-    if (!matchingPrefix) return highest
-    const sequence = Number(orderNumber.slice(matchingPrefix.length))
+    if (!orderNumber.startsWith(prefix)) return highest
+    const sequence = Number(orderNumber.slice(prefix.length))
     return Number.isInteger(sequence) && sequence > highest ? sequence : highest
   }, 0) + 1
 

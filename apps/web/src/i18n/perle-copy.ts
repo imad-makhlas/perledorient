@@ -1,7 +1,7 @@
 export const copy = {
   ar: {
     shop: 'المتجر', categories: 'المجوهرات', newArrivals: 'وصل حديثاً', bestSellers: 'المفضلة', necklaces: 'القلائد', earrings: 'الأقراط', bracelets: 'الأساور', rings: 'الخواتم', storyNav: 'قصتنا',
-    search: 'بحث', cart: 'مختاراتي', account: 'الحساب', heroEyebrow: 'مصنوع بحب', heroTitle: 'نفحة شرقية، صُنعت يدوياً.', heroBody: 'اكتشفي مجوهرات حرفية مستوحاة من دفء الشرق وتفاصيله وشاعريته. تُنجز كل قطعة من لؤلؤة الشرق ضمن مجموعات محدودة.',
+    search: 'بحث', cart: 'مختاراتي', account: 'الحساب', heroEyebrow: 'مصنوع بحب', heroTitle: 'نفحة شرقية، صُنعت يدوياً.', heroBody: 'اكتشفي مجوهرات حرفية مستوحاة من دفء الشرق وتفاصيله وشاعريته. تُنجز كل قطعة من Casa de Perla ضمن مجموعات محدودة.',
     explore: 'اكتشفي المجوهرات', story: 'تعرّفي على الحرفية', featured: 'قطع مميزة', discover: 'مجوهرات صُممت لتترك أثراً.', addToCart: 'أضيفي إلى مختاراتي', outOfStock: 'غير متوفر', lowStock: 'بقيت قطع قليلة', inStock: 'متوفر', viewAll: 'شاهدي كل المجوهرات',
     newsletterTitle: 'هل تحتاجين إلى نصيحة شخصية؟', newsletterBody: 'تواصلي معنا عبر واتساب للاستفسار عن المقاسات والخامات والهدايا والتوفر.', subscribe: 'تواصلي عبر واتساب', trustDelivery: 'التوصيل داخل المغرب ودولياً', trustPayment: 'الطلب عبر واتساب', trustSupport: 'مساعدة مباشرة وشخصية',
     catalogue: 'المجموعة', results: 'قطع', filters: 'التصفية', availability: 'المتوفر فقط', allCategories: 'كل المجوهرات', subtotal: 'مجموع المختارات', delivery: 'التوصيل', total: 'المجموع التقديري', checkout: 'الطلب عبر واتساب', continueShopping: 'متابعة التصفح', emptyCart: 'مختاراتك بانتظار أول قطعة.',
@@ -9,7 +9,7 @@ export const copy = {
   },
   fr: {
     shop: 'Boutique', categories: 'Bijoux', newArrivals: 'Nouveautés', bestSellers: 'Coups de cœur', necklaces: 'Colliers', earrings: "Boucles d'oreilles", bracelets: 'Bracelets', rings: 'Bagues', storyNav: 'Notre histoire',
-    search: 'Rechercher', cart: 'Ma sélection', account: 'Compte', heroEyebrow: 'Façonné avec âme', heroTitle: "Un souffle d'Orient, façonné à la main.", heroBody: "Découvrez des bijoux artisanaux inspirés par la chaleur, les détails et la poésie de l'Orient. Chaque pièce Perle d'Orient est réalisée en petite série.",
+    search: 'Rechercher', cart: 'Ma sélection', account: 'Compte', heroEyebrow: 'Façonné avec âme', heroTitle: "Un souffle d'Orient, façonné à la main.", heroBody: "Découvrez des bijoux artisanaux inspirés par la chaleur, les détails et la poésie de l'Orient. Chaque pièce Casa de Perla est réalisée en petite série.",
     explore: 'Découvrir les bijoux', story: "Rencontrer l'artisane", featured: 'Pièces signature', discover: 'Des bijoux créés pour laisser une empreinte.', addToCart: 'Ajouter à ma sélection', outOfStock: 'Indisponible', lowStock: 'Plus que quelques pièces', inStock: 'Disponible', viewAll: 'Voir tous les bijoux',
     newsletterTitle: "Besoin d'un conseil personnalisé ?", newsletterBody: 'Écrivez-nous sur WhatsApp pour les tailles, matières, cadeaux et disponibilités.', subscribe: 'Discuter sur WhatsApp', trustDelivery: 'Livraison au Maroc et à l’international', trustPayment: 'Commande via WhatsApp', trustSupport: "Conseil direct de l'artisane",
     catalogue: 'La collection', results: 'pièces', filters: 'Filtres', availability: 'Disponibles uniquement', allCategories: 'Tous les bijoux', subtotal: 'Total de la sélection', delivery: 'Livraison', total: 'Total estimé', checkout: 'Commander sur WhatsApp', continueShopping: 'Continuer à découvrir', emptyCart: 'Votre sélection attend sa première pièce.',

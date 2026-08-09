@@ -102,7 +102,7 @@ test('mobile header hides search and Instagram while desktop keeps them', async 
   await page.goto('/')
   const header = page.locator('header')
   const search = header.getByRole('link', { name: 'Search', exact: true })
-  const instagram = header.getByRole('link', { name: "Instagram Perle d'Orient", exact: true })
+  const instagram = header.getByRole('link', { name: 'Instagram Casa de Perla', exact: true })
 
   await expect(search).toBeHidden()
   await expect(instagram).toBeHidden()
@@ -141,7 +141,7 @@ test('header uses a transparent wrapper around its floating charcoal-plum shell'
   await expect(header.getByRole('button', { name: 'Change language' })).toBeVisible()
   await expect(header.getByRole('link', { name: /My selection:/i })).toBeVisible()
   await expect(header.getByRole('link', { name: 'Search' })).toBeVisible()
-  await expect(header.getByRole('link', { name: "Instagram Perle d'Orient" })).toBeVisible()
+  await expect(header.getByRole('link', { name: 'Instagram Casa de Perla' })).toBeVisible()
 })
 
 test('delivery announcement uses a compact premium hierarchy on desktop and mobile', async ({ page }) => {
@@ -165,7 +165,7 @@ test('our story presents a concise bilingual artisan narrative', async ({ page }
   await page.goto('/about')
 
   await expect(page.getByRole('heading', { name: 'Jewelry shaped by hand, carried by story.' })).toBeVisible()
-  await expect(page.getByRole('img', { name: "Perle d'Orient artisan jewelry" })).toBeVisible()
+  await expect(page.getByRole('img', { name: 'Bijoux artisanaux Casa de Perla' })).toBeVisible()
   await expect(page.getByRole('list', { name: 'Craft signatures' }).getByRole('listitem')).toHaveCount(3)
 
   await page.getByRole('button', { name: 'Change language' }).click()
@@ -177,7 +177,7 @@ test('contact offers direct bilingual WhatsApp and Instagram paths', async ({ pa
 
   await expect(page.getByRole('heading', { name: "Let's find the piece that feels like yours." })).toBeVisible()
   await expect(page.getByRole('link', { name: 'Write on WhatsApp' })).toHaveAttribute('href', /^https:\/\/wa\.me\//)
-  await expect(page.getByRole('link', { name: 'Follow on Instagram' })).toHaveAttribute('href', 'https://instagram.com/ma.perle.dorient')
+  await expect(page.getByRole('link', { name: 'Follow on Instagram' })).toHaveAttribute('href', 'https://instagram.com/casadeperla.jewelry')
   await expect(page.getByRole('link', { name: 'WhatsApp support' })).toBeHidden()
 
   await page.getByRole('button', { name: 'Change language' }).click()
@@ -298,7 +298,7 @@ test('mobile story leads with readable copy and a compact editorial image', asyn
   await page.goto('/about')
 
   const heading = page.getByRole('heading', { name: 'Jewelry shaped by hand, carried by story.' })
-  const image = page.getByRole('img', { name: "Perle d'Orient artisan jewelry" })
+  const image = page.getByRole('img', { name: 'Bijoux artisanaux Casa de Perla' })
   const headingBox = await heading.boundingBox()
   const imageBox = await image.boundingBox()
   if (!headingBox || !imageBox) throw new Error('Story layout is missing its main content')

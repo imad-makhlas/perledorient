@@ -21,7 +21,7 @@ const statusIcon: Record<AdminOrderStatus, typeof Clock3> = {
 export function AdminOrdersPage() {
   const { locale } = useI18n()
   const [credentials, setCredentials] = useState<AdminCredentials>(() => {
-    try { return JSON.parse(localStorage.getItem(credentialsKey) || '{"email":"atelier@perledorient.ma","password":""}') as AdminCredentials } catch { return { email: 'atelier@perledorient.ma', password: '' } }
+    try { return JSON.parse(localStorage.getItem(credentialsKey) || '{"email":"atelier@gmail.com","password":""}') as AdminCredentials } catch { return { email: 'atelier@gmail.com', password: '' } }
   })
   const [orders, setOrders] = useState<AdminOrder[]>([])
   const [filter, setFilter] = useState<AdminOrderStatus | 'ALL'>('ALL')
@@ -60,7 +60,7 @@ export function AdminOrdersPage() {
     <section className="border-b border-accent/20 bg-pearl">
       <div className="container-shell grid gap-6 py-8 lg:grid-cols-[1fr_420px] lg:items-end">
         <div>
-          <p className="eyebrow">Perle d'Orient Atelier</p>
+          <p className="eyebrow">Casa de Perla Atelier</p>
           <h1 className="display mt-3 text-4xl font-semibold text-ink md:text-5xl">Order operations</h1>
           <p className="mt-3 max-w-2xl text-sm leading-7 text-ink/70">Confirm COD and WhatsApp orders, move parcels through fulfilment, and keep reserved stock aligned with the real order status.</p>
         </div>
