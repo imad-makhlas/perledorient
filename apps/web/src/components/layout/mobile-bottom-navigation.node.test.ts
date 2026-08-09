@@ -17,7 +17,9 @@ test('maps storefront routes to the correct bottom destination', () => {
 test('renders four labelled links and hides the bar on desktop', () => {
   assert.match(component, /lg:hidden/)
   assert.match(component, /aria-current/)
-  assert.match(component, /min-h-\[44px\]/)
+  assert.match(component, /min-h-\[58px\]/)
+  assert.match(component, /left-3 right-3 bottom-2/)
+  assert.match(component, /rounded-\[20px\]/)
   assert.match(component, /to="\/"/)
   assert.match(component, /to="\/catalogue"/)
   assert.match(component, /to="\/about"/)
