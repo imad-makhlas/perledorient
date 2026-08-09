@@ -74,6 +74,8 @@ img { display: block; max-width: 100%; }
 [dir='rtl'] .catalog-sort-copy strong { font-size: .78rem; letter-spacing: 0; text-transform: none; }
 [dir='rtl'] .catalog-sort-menu-option { font-size: .76rem; letter-spacing: 0; text-transform: none; }
 [dir='rtl'] .catalog-clear { font-size: .72rem; letter-spacing: 0; text-transform: none; }
+/* Arabic letterforms must remain connected. Latin display tracking creates visible gaps. */
+html[lang='ar'] body * { letter-spacing: normal !important; text-transform: none !important; }
 @media (max-width: 1023px) {
   .catalog-toolbar-head { align-items: flex-start; }
   .catalog-toolbar-head { margin-bottom: 1rem; }
