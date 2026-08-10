@@ -48,18 +48,18 @@ export function HomePage() {
   return <main>
     <section className="overflow-hidden border-b border-line bg-white">
       <div className="container-shell grid items-center md:grid-cols-[46%_54%]">
-        <div className="relative flex items-center py-8 md:pr-10 lg:py-14 lg:pr-16">
-          <span className="absolute left-0 top-7 display text-[5rem] font-semibold leading-none text-burgundy/[.04] lg:text-[8rem]">CP</span>
+        <div className="relative flex items-center py-8 md:pr-10 lg:py-12 lg:pr-12 xl:py-14 xl:pr-16">
+          <span className="absolute left-0 top-7 display text-[5rem] font-semibold leading-none text-burgundy/[.04] lg:text-[6.5rem] xl:text-[8rem]">CP</span>
           <div className="relative max-w-xl">
             <p className="editorial-rule">{t('heroEyebrow')}</p>
-            <h1 className="display mt-4 text-[2.35rem] font-semibold leading-[.98] text-ink sm:text-5xl lg:mt-5 lg:text-[3.5rem]">{t('heroTitle')}</h1>
+            <h1 className="display mt-4 text-[2.35rem] font-semibold leading-[.98] text-ink sm:text-5xl lg:mt-5 lg:text-[clamp(2.75rem,4vw,3.5rem)]">{t('heroTitle')}</h1>
             <p className="mt-4 max-w-md text-[15px] leading-7 text-ink/60 sm:mt-5">{t('heroBody')}</p>
             <div className="mt-6 flex flex-wrap items-center gap-5"><Link to="/catalogue" className="button-primary button-accent">{t('explore')}<ArrowRight size={15} /></Link><Link to="/about" className="border-b border-burgundy pb-1 text-[10px] font-bold uppercase tracking-[.16em] text-burgundy">{t('story')}</Link></div>
             <div className="mt-7 flex flex-wrap items-center gap-3 border-t border-line pt-4 text-[9px] font-bold uppercase tracking-[.14em] text-ink/45"><span>{page.signatures[0]}</span><span className="h-px w-5 bg-accent" /><span>{page.signatures[1]}</span><span className="h-px w-5 bg-accent" /><span>{page.signatures[2]}</span></div>
           </div>
         </div>
-        <div className="relative pb-6 md:py-7 md:pl-8 lg:pl-10">
-          <div className="image-frame h-[230px] sm:h-[280px] md:h-[350px] lg:h-[410px]">
+        <div className="relative pb-6 md:py-7 md:pl-8 xl:pl-10">
+          <div className="image-frame h-[230px] sm:h-[280px] md:h-[350px] lg:h-[clamp(350px,31vw,410px)]">
             <img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=1800&q=92" alt={page.imageAlt} className="h-full w-full object-cover object-center" />
             <div className="absolute bottom-0 left-0 bg-ivory px-6 py-5 sm:px-8"><p className="text-[9px] font-bold uppercase tracking-[.24em] text-accent">Casa de Perla</p><p className="display mt-1 text-2xl font-semibold text-ink">{page.imageCaption}</p></div>
           </div>
