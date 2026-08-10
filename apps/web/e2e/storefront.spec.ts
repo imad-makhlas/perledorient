@@ -213,15 +213,23 @@ test('navigation starts every destination page at the top', async ({ page }) => 
 })
 
 test('catalogue presents one concise introduction and one compact control region', async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 })
+  await page.setViewportSize({ width: 320, height: 800 })
   await page.goto('/catalogue')
 
-  await expect(page.getByRole('heading', { name: 'The collection' })).toBeVisible()
-  await expect(page.getByText('The collection', { exact: true })).toHaveCount(1)
-  const controls = page.getByRole('region', { name: 'Catalogue controls' })
+  const controls = page.locator('.catalog-toolbar')
   await expect(controls).toBeVisible()
   await expect(controls.getByRole('button', { pressed: true })).toHaveCount(1)
-  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390)
+  await expect(controls.getByRole('button', { name: /Earrings|Boucles d'oreilles/i })).toHaveCount(0)
+  await expect(controls.getByRole('button', { name: /Rings|Bagues/i })).toHaveCount(0)
+  await expect(controls.getByRole('button', { name: /Gift sets|Coffrets cadeaux/i })).toHaveCount(0)
+  await expect(controls.getByText(/In stock only|Disponibles/i)).toHaveCount(0)
+  const allJewelry = controls.getByRole('button', { name: /All jewelry|Tous les bijoux/i })
+  const sorting = controls.getByRole('button', { name: /Sort by.*(Favorites|Featured)|Classer par.*Nos favoris/i })
+  const allBox = await allJewelry.boundingBox()
+  const sortBox = await sorting.boundingBox()
+  if (!allBox || !sortBox) throw new Error('Compact catalogue controls are missing')
+  expect(Math.abs(allBox.y - sortBox.y)).toBeLessThanOrEqual(2)
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320)
 })
 
 test('mobile catalogue gives every product a full-width premium card and tablet keeps two columns', async ({ page }) => {
@@ -247,19 +255,48 @@ test('mobile catalogue gives every product a full-width premium card and tablet 
   expect(tabletCards.every((card) => card.width >= 330)).toBe(true)
 })
 
-test('mobile homepage uses a swipeable editorial category rail', async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 })
+test('mobile homepage starts with a compact banner and a two-column product grid', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 800 })
   await page.goto('/')
 
-  const rail = page.getByRole('region', { name: 'Jewelry categories' })
-  await expect(rail).toBeVisible()
-  const measurements = await rail.evaluate((element) => ({
-    clientWidth: element.clientWidth,
-    scrollWidth: element.scrollWidth,
-    firstCardWidth: element.querySelector('a')?.getBoundingClientRect().width ?? 0,
+  await expect(page.getByTestId('home-hero')).toBeHidden()
+  await expect(page.locator('section[aria-label="Comment commander"]')).toBeHidden()
+  const mobileBanner = page.getByTestId('mobile-home-banner')
+  await expect(mobileBanner).toBeVisible()
+  const bannerBox = await mobileBanner.boundingBox()
+  if (!bannerBox) throw new Error('Mobile homepage banner is missing')
+  expect(bannerBox.height).toBeLessThanOrEqual(190)
+  const bannerCardBox = await mobileBanner.locator('.image-frame > div').boundingBox()
+  const categoryEyebrowBox = await page.getByTestId('mobile-home-products').locator('xpath=..').locator('.editorial-rule').boundingBox()
+  if (!bannerCardBox || !categoryEyebrowBox) throw new Error('Mobile homepage sections cannot be measured')
+  const bannerToProductsGap = categoryEyebrowBox.y - (bannerCardBox.y + bannerCardBox.height)
+  expect(bannerToProductsGap).toBeGreaterThanOrEqual(12)
+  expect(bannerToProductsGap).toBeLessThanOrEqual(24)
+
+  const mobileProducts = page.getByTestId('mobile-home-products')
+  await expect(mobileProducts).toBeVisible()
+  const cards = mobileProducts.locator(':scope > a')
+  expect(await cards.count()).toBeGreaterThan(2)
+  const boxes = await cards.evaluateAll((elements) => elements.slice(0, 3).map((element) => {
+    const box = element.getBoundingClientRect()
+    return { x: box.x, top: box.top, width: box.width, height: box.height }
   }))
-  expect(measurements.scrollWidth).toBeGreaterThan(measurements.clientWidth)
-  expect(measurements.firstCardWidth).toBeGreaterThanOrEqual(240)
+  expect(boxes.slice(0, 2).every((box) => box.width >= 130)).toBe(true)
+  expect(Math.abs(boxes[0].top - boxes[1].top)).toBeLessThan(2)
+  expect(boxes[1].x).toBeGreaterThan(boxes[0].x + boxes[0].width)
+  expect(boxes[2].top).toBeGreaterThan(boxes[0].top + boxes[0].height)
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320)
+})
+
+test('desktop homepage preserves the editorial hero and ordering guide', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto('/')
+
+  await expect(page.getByTestId('home-hero')).toBeVisible()
+  await expect(page.getByTestId('desktop-home-products')).toBeVisible()
+  await expect(page.getByTestId('mobile-home-products')).toBeHidden()
+  await expect(page.getByTestId('mobile-home-banner')).toBeHidden()
+  await expect(page.locator('section[aria-label="Comment commander"]')).toBeVisible()
 })
 
 test('mobile chrome stays compact and never lets WhatsApp overlap the bottom navigation', async ({ page }) => {
@@ -280,17 +317,32 @@ test('mobile chrome stays compact and never lets WhatsApp overlap the bottom nav
 })
 
 test('mobile product page exposes a dedicated purchase action above navigation', async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 })
-  await page.goto('/products/layali-necklace')
+  for (const width of [320, 390]) {
+    await page.setViewportSize({ width, height: 844 })
+    await page.goto('/products/layali-necklace')
 
-  const purchaseBar = page.getByRole('region', { name: 'Mobile purchase actions' })
-  const mobileNav = page.getByRole('navigation', { name: 'Mobile primary navigation' })
-  await expect(purchaseBar).toBeVisible()
-  await expect(purchaseBar.getByRole('button', { name: /add to my selection/i })).toBeVisible()
-  const purchaseBox = await purchaseBar.boundingBox()
-  const navBox = await mobileNav.boundingBox()
-  if (!purchaseBox || !navBox) throw new Error('Mobile purchase controls are missing a measured region')
-  expect(purchaseBox.y + purchaseBox.height).toBeLessThanOrEqual(navBox.y + 1)
+    const purchaseBar = page.getByRole('region', { name: /Actions d’achat sur mobile|Mobile purchase actions/i })
+    const mobileNav = page.getByRole('navigation', { name: /Navigation principale mobile|Mobile primary navigation/i })
+    await expect(purchaseBar).toBeVisible()
+    await expect(purchaseBar.getByRole('button')).toHaveCount(2)
+    await expect(purchaseBar.getByText(/MAD/)).toHaveCount(0)
+    await expect(purchaseBar.getByText('Layali Necklace')).toHaveCount(0)
+    const purchaseBox = await purchaseBar.boundingBox()
+    const navBox = await mobileNav.boundingBox()
+    if (!purchaseBox || !navBox) throw new Error('Mobile purchase controls are missing a measured region')
+    expect(purchaseBox.y + purchaseBox.height).toBeLessThanOrEqual(navBox.y - 4)
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width)
+
+    const titleSize = await page.locator('main h1').evaluate((element) => Number.parseFloat(getComputedStyle(element).fontSize))
+    expect(titleSize).toBeGreaterThanOrEqual(28)
+    expect(titleSize).toBeLessThanOrEqual(30)
+    await expect(page.locator('main aside').getByRole('button', { name: 'Commander via WhatsApp' })).toBeHidden()
+    await expect(page.locator('main aside').getByRole('button', { name: /Ajouter à ma sélection|Add to my selection/i })).toBeHidden()
+    await expect(page.locator('main details').first()).not.toHaveAttribute('open', '')
+  }
+
+  await page.goto('/catalogue')
+  await expect(page.getByRole('region', { name: /Actions d’achat sur mobile|Mobile purchase actions/i })).toHaveCount(0)
 })
 
 test('mobile story leads with readable copy and a compact editorial image', async ({ page }) => {

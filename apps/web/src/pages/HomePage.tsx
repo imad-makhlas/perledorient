@@ -1,5 +1,6 @@
 import { ArrowRight, Gem, Headphones, MapPin, MessageCircle, PackageCheck, ShieldCheck } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import type { Product } from '../features/catalog/catalog'
 import { useCatalogProducts } from '../features/catalog/catalog-api'
 import { selectHomeProducts } from '../features/catalog/home-product-selection'
 import { useI18n } from '../i18n/i18n'
@@ -39,6 +40,17 @@ const orderingStepColors = [
   'bg-[#302B2D] text-[#E2BB72]',
 ] as const
 
+function EditorialProductCard({ product, index, mobile = false }: { product: Product; index: number; mobile?: boolean }) {
+  return <Link to={`/products/${product.slug}`} className={`group relative block aspect-[4/5] overflow-hidden bg-burgundy ${mobile ? 'w-full rounded-[6px]' : ''}`}>
+    <img src={product.image} alt={product.name} className="h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.025]" />
+    <div className="absolute inset-0 bg-gradient-to-t from-burgundy/95 via-burgundy/10 to-black/5" />
+    <div className={`absolute inset-x-0 bottom-0 flex items-end justify-between text-white ${mobile ? 'gap-2 p-3' : 'p-5'}`}>
+      <div><p className={`${mobile ? 'text-[7px]' : 'text-[8px]'} font-bold uppercase tracking-[.24em] text-champagne`}>0{index + 1}</p><p className={`display font-semibold ${mobile ? 'mt-1.5 text-[.82rem] leading-[1.12]' : 'mt-2 text-xl'}`}>{product.name}</p></div>
+      <span className={`grid shrink-0 place-items-center border border-white/45 transition duration-300 group-hover:border-champagne group-hover:bg-champagne group-hover:text-burgundy ${mobile ? 'h-8 w-8' : 'h-10 w-10'}`}><ArrowRight size={mobile ? 12 : 14} aria-hidden="true" /></span>
+    </div>
+  </Link>
+}
+
 export function HomePage() {
   const { locale, t } = useI18n()
   const products = useCatalogProducts(locale)
@@ -46,7 +58,19 @@ export function HomePage() {
   const page = homeCopy[locale]
   const ordering = orderingCopy[locale]
   return <main>
-    <section className="overflow-hidden border-b border-line bg-white">
+    <section data-testid="mobile-home-banner" className="container-shell py-3 sm:hidden">
+      <div className="image-frame">
+        <div className="overflow-hidden rounded-[6px] border border-line bg-white shadow-[0_10px_24px_rgba(48,43,45,.08)]">
+          <img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=900&q=90" alt={page.imageAlt} className="h-24 w-full object-cover object-center" />
+          <div className="px-4 py-2">
+            <p className="text-[7px] font-bold uppercase tracking-[.24em] text-accent">Casa de Perla</p>
+            <p className="display mt-1 text-[15px] font-semibold leading-tight text-ink">{page.imageCaption}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section data-testid="home-hero" className="hidden overflow-hidden border-b border-line bg-white sm:block">
       <div className="container-shell grid items-center md:grid-cols-[46%_54%]">
         <div className="relative flex items-center py-8 md:pr-10 lg:py-12 lg:pr-12 xl:py-14 xl:pr-16">
           <span className="absolute left-0 top-7 display text-[5rem] font-semibold leading-none text-burgundy/[.04] lg:text-[6.5rem] xl:text-[8rem]">CP</span>
@@ -67,13 +91,14 @@ export function HomePage() {
       </div>
     </section>
 
-    <section className="container-shell py-12 lg:py-20">
+    <section className="container-shell pb-8 pt-2 sm:py-12 lg:py-20">
       <div className="mb-9 flex items-end justify-between"><div><p className="editorial-rule">{t('categories')}</p><h2 className="display mt-4 text-4xl font-semibold sm:text-5xl">{page.categoryTitle}</h2></div><Link to="/catalogue" className="hidden items-center gap-2 border-b border-ink pb-2 text-[10px] font-bold uppercase tracking-[.18em] md:flex">{t('viewAll')}<ArrowRight size={14} /></Link></div>
-      <div role="region" aria-label={page.categoriesLabel} className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 scrollbar-none sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 md:grid-cols-3 lg:grid-cols-5 lg:gap-4">{homeProducts.map((product, index) => <Link key={product.id} to={`/products/${product.slug}`} className="group relative aspect-[4/5] w-[76vw] max-w-[290px] shrink-0 snap-start overflow-hidden bg-burgundy sm:w-auto sm:max-w-none"><img src={product.image} alt={product.name} className="h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.025]" /><div className="absolute inset-0 bg-gradient-to-t from-burgundy/95 via-burgundy/10 to-black/5" /><div className="absolute inset-x-0 bottom-0 flex items-end justify-between p-5 text-white"><div><p className="text-[8px] font-bold uppercase tracking-[.24em] text-champagne">0{index + 1}</p><p className="display mt-2 text-xl font-semibold">{product.name}</p></div><span className="grid h-10 w-10 shrink-0 place-items-center border border-white/45 transition duration-300 group-hover:border-champagne group-hover:bg-champagne group-hover:text-burgundy"><ArrowRight size={14} /></span></div></Link>)}</div>
+      <div data-testid="mobile-home-products" role="region" aria-label={page.categoriesLabel} className="grid grid-cols-2 gap-3 sm:hidden">{homeProducts.map((product, index) => <EditorialProductCard key={product.id} product={product} index={index} mobile />)}</div>
+      <div data-testid="desktop-home-products" className="hidden sm:grid sm:grid-cols-2 sm:gap-4 md:grid-cols-3 lg:grid-cols-5">{homeProducts.map((product, index) => <EditorialProductCard key={product.id} product={product} index={index} />)}</div>
       <div className="mt-8 text-center md:hidden"><Link to="/catalogue" className="button-primary">{t('viewAll')}<ArrowRight size={15} /></Link></div>
     </section>
 
-    <section className="border-y border-[#DED4C8] bg-[#F3EFE7] py-12 lg:py-16" aria-label={ordering.aria}>
+    <section className="hidden border-y border-[#DED4C8] bg-[#F3EFE7] py-12 sm:block lg:py-16" aria-label={ordering.aria}>
       <div className="container-shell">
         <div className="mx-auto max-w-2xl text-center"><p className="text-[9px] font-bold uppercase tracking-[.24em] text-[#98702F]">{ordering.eyebrow}</p><h2 className="display mt-4 text-4xl font-semibold text-[#302B2D] sm:text-5xl">{ordering.title}</h2><p className="mx-auto mt-4 max-w-xl text-[15px] leading-7 text-[#766C68]">{ordering.intro}</p></div>
         <ol className="relative mx-auto mt-10 grid max-w-6xl gap-8 md:grid-cols-3 md:gap-0 lg:mt-12">

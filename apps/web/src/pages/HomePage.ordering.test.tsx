@@ -2,6 +2,7 @@ import { render, screen, within } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { I18nProvider } from '../i18n/i18n'
+import { CartProvider } from '../features/cart/cart-context'
 import { HomePage } from './HomePage'
 
 afterEach(() => vi.unstubAllGlobals())
@@ -9,7 +10,7 @@ afterEach(() => vi.unstubAllGlobals())
 describe('homepage ordering guide', () => {
   it('explains the WhatsApp order journey in three clear steps without an atelier image', () => {
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('offline')))
-    render(<MemoryRouter><I18nProvider><HomePage /></I18nProvider></MemoryRouter>)
+    render(<MemoryRouter><I18nProvider><CartProvider><HomePage /></CartProvider></I18nProvider></MemoryRouter>)
 
     expect(screen.getByRole('heading', { name: 'Comment commander ?' })).toBeInTheDocument()
     expect(screen.getByText('Choisissez votre bijou')).toBeInTheDocument()
@@ -18,6 +19,8 @@ describe('homepage ordering guide', () => {
     expect(screen.getByText('Votre commande, préparée personnellement en quelques étapes.')).toBeInTheDocument()
     const guide = screen.getByLabelText('Comment commander')
     expect(guide).toHaveClass('bg-[#F3EFE7]')
+    expect(guide).toHaveClass('hidden', 'sm:block')
+    expect(screen.getByTestId('home-hero')).toHaveClass('hidden', 'sm:block')
     expect(within(guide).getByText('01')).toBeInTheDocument()
     expect(within(guide).getByText('02')).toBeInTheDocument()
     expect(within(guide).getByText('03')).toBeInTheDocument()

@@ -18,7 +18,7 @@ afterEach(() => vi.unstubAllGlobals())
 describe('Arabic storefront copy', () => {
   it('translates the remaining homepage editorial copy', () => {
     renderArabic(<HomePage />)
-    expect(screen.getByText('صُنعت بعناية. لترافقك دائماً.')).toBeInTheDocument()
+    expect(screen.getAllByText('صُنعت بعناية. لترافقك دائماً.')).toHaveLength(2)
     expect(screen.getByText('اختاري قطعتك.')).toBeInTheDocument()
     expect(screen.getByText('اكتشفي مجوهرات حرفية مستوحاة من دفء الشرق وتفاصيله وشاعريته. تُنجز كل قطعة من Casa de Perla ضمن مجموعات محدودة.')).toBeInTheDocument()
     expect(screen.queryByText(/Hand-finished|Find your piece|Made slowly/i)).not.toBeInTheDocument()
