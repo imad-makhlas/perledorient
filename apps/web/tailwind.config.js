@@ -6,14 +6,14 @@ export default {
       colors: {
         ivory: '#FFF9F0',
         canvas: '#FFFFFF',
-        ink: '#2C2023',
+        ink: '#2F2A2C',
         midnight: '#40101F',
         burgundy: '#681F32',
         accent: '#B8893D',
         champagne: '#DEC69A',
         surface: '#FFFFFF',
-        muted: '#75676A',
-        line: '#E9DDD2',
+        muted: '#746A6D',
+        line: '#E4D9CD',
         pearl: '#FFF9F0',
       },
       fontFamily: {
@@ -21,9 +21,9 @@ export default {
         sans: ['Inter', 'system-ui', 'sans-serif'],
       },
       boxShadow: {
-        soft: '0 12px 40px rgba(15, 35, 71, 0.08)',
-        lift: '0 20px 60px rgba(15, 35, 71, 0.13)',
-        luxe: '0 26px 80px rgba(9, 22, 45, 0.16)',
+        soft: '0 12px 36px rgba(47, 42, 44, 0.08)',
+        lift: '0 20px 60px rgba(47, 42, 44, 0.12)',
+        luxe: '0 28px 80px rgba(47, 42, 44, 0.16)',
       },
       maxWidth: {
         shell: '1440px',

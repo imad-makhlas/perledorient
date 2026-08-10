@@ -24,7 +24,7 @@ export function Header() {
       </div>
     </div>
     <header className="sticky top-0 z-40 bg-transparent py-2 backdrop-blur-md lg:py-3">
-      <div className="container-shell flex h-[58px] items-center justify-between gap-4 rounded-[20px] bg-[#302A2E] px-4 text-ivory shadow-[0_14px_36px_rgba(64,16,31,0.16)] sm:h-[62px] sm:px-5 lg:h-[68px] lg:gap-6 lg:rounded-[22px] lg:px-7">
+      <div className="container-shell flex h-[58px] items-center justify-between gap-4 rounded-[6px] bg-[#302A2E] px-4 text-ivory shadow-[0_14px_36px_rgba(64,16,31,0.16)] sm:h-[62px] sm:px-5 lg:h-[68px] lg:gap-6 lg:rounded-[6px] lg:px-7">
         <span className="hidden sm:block"><Logo tone="light" /></span><span className="sm:hidden"><Logo tone="light" compact /></span>
         <nav className="hidden items-center gap-6 lg:flex lg:gap-9" aria-label="Primary navigation">{links.map(([to, label]) => { const active = isHeaderLinkActive(location.pathname, location.search, to); return <Link key={to} to={to} className={`relative whitespace-nowrap text-[10px] font-semibold uppercase tracking-[.2em] transition-colors hover:text-accent ${active ? 'text-white after:absolute after:-bottom-3 after:left-0 after:h-px after:w-full after:bg-accent' : 'text-white/55'}`}>{label}</Link> })}</nav>
         <div className="flex shrink-0 items-center gap-2 text-ivory sm:gap-3">

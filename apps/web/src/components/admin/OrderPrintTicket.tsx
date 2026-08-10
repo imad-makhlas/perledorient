@@ -15,9 +15,9 @@ export function OrderPrintTicket({ order, onClose }: OrderPrintTicketProps) {
   const createdAt = new Date(order.createdAt).toLocaleString('fr-FR', { dateStyle: 'medium', timeStyle: 'short' })
 
   return <div className="order-print-overlay fixed inset-0 z-50 overflow-y-auto bg-[#211D1F]/70 p-3 backdrop-blur-sm sm:p-6" role="dialog" aria-modal="true" aria-label={`Ticket de la commande ${order.orderNumber}`}>
-    <div className="order-print-controls mx-auto mb-3 flex w-full max-w-[105mm] items-center justify-between gap-3 rounded-2xl bg-white p-3 shadow-xl">
-      <button type="button" onClick={onClose} className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-[#DDD4C9] px-4 text-[10px] font-bold uppercase tracking-[.1em]" aria-label="Fermer le ticket"><X size={15} />Fermer</button>
-      <button type="button" onClick={() => window.print()} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#C4943D] px-4 text-[10px] font-bold uppercase tracking-[.1em] text-[#241F21]" aria-label="Imprimer maintenant"><Printer size={15} />Imprimer</button>
+    <div className="order-print-controls mx-auto mb-3 flex w-full max-w-[105mm] items-center justify-between gap-3 rounded-[6px] bg-white p-3 shadow-xl">
+      <button type="button" onClick={onClose} className="inline-flex min-h-11 items-center gap-2 rounded-[6px] border border-[#DDD4C9] px-4 text-[10px] font-bold uppercase tracking-[.1em]" aria-label="Fermer le ticket"><X size={15} />Fermer</button>
+      <button type="button" onClick={() => window.print()} className="inline-flex min-h-11 items-center gap-2 rounded-[6px] bg-[#C4943D] px-4 text-[10px] font-bold uppercase tracking-[.1em] text-[#241F21]" aria-label="Imprimer maintenant"><Printer size={15} />Imprimer</button>
     </div>
     <article className="order-print-ticket mx-auto flex min-h-[148mm] w-full max-w-[105mm] flex-col bg-white p-[9mm] text-[#241F21] shadow-2xl">
       <header className="flex items-start justify-between gap-5 border-b-2 border-[#241F21] pb-4">
@@ -33,7 +33,7 @@ export function OrderPrintTicket({ order, onClose }: OrderPrintTicketProps) {
         <div className="mt-2 divide-y divide-[#E5DED7] border-y border-[#D8D0C8]">
           {order.items.map((item) => <div key={`${order.orderNumber}-${item.sku}`} className="grid grid-cols-[1fr_auto] gap-3 py-3 text-[9px]"><div><p className="font-bold">{item.productName}</p><p className="mt-0.5 text-[#756B6F]">{item.variantName} · Qté {item.quantity}</p><p className="mt-1 font-mono text-[8px] font-bold tracking-[.04em]">{item.sku}</p></div><strong>{formatMoney(Number(item.lineTotal), 'fr')}</strong></div>)}
         </div>
-        {order.notes && <div className="mt-4 rounded-lg border border-[#D8D0C8] bg-[#FAF8F5] p-3 text-[9px]"><p className="ticket-label">Note client</p><p className="mt-1 leading-4">{order.notes}</p></div>}
+        {order.notes && <div className="mt-4 rounded-[6px] border border-[#D8D0C8] bg-[#FAF8F5] p-3 text-[9px]"><p className="ticket-label">Note client</p><p className="mt-1 leading-4">{order.notes}</p></div>}
       </section>
       <footer className="border-t-2 border-[#241F21] pt-4 text-[9px]"><div className="grid grid-cols-[1fr_auto] gap-x-5 gap-y-1"><div><p className="ticket-label">Règlement</p><p className="mt-1 font-semibold">{paymentLabels[order.paymentMethod]}</p></div><div className="min-w-[34mm] space-y-1 text-right"><p><span className="text-[#756B6F]">Sous-total</span> <strong className="ml-2">{formatMoney(Number(order.subtotal), 'fr')}</strong></p><p><span className="text-[#756B6F]">Livraison</span> <strong className="ml-2">{Number(order.deliveryFee) === 0 ? 'Offerte' : formatMoney(Number(order.deliveryFee), 'fr')}</strong></p><p className="border-t border-[#D8D0C8] pt-1"><span className="ticket-label">Total</span> <strong className="ml-2 text-[16px]">{formatMoney(Number(order.total), 'fr')}</strong></p></div></div><p className="mt-5 text-center text-[8px] text-[#756B6F]">Merci pour votre confiance.</p></footer>
     </article>

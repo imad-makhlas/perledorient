@@ -39,7 +39,7 @@ export function ContactPage() {
         <p className="mt-7 max-w-xl text-base leading-8 text-muted sm:text-lg sm:leading-9">{copy.body}</p>
       </article>
 
-      <aside className="relative overflow-hidden rounded-[24px] bg-[#302A2E] p-6 text-ivory shadow-[0_24px_70px_rgba(64,16,31,.16)] sm:rounded-[28px] sm:p-10 lg:p-12">
+      <aside className="relative overflow-hidden rounded-[6px] bg-[#302A2E] p-6 text-ivory shadow-[0_24px_70px_rgba(64,16,31,.16)] sm:rounded-[6px] sm:p-10 lg:p-12">
         <div className="absolute -right-16 -top-16 h-44 w-44 rounded-full border border-accent/30" aria-hidden="true" />
         <div className="absolute -right-7 -top-7 h-28 w-28 rounded-full border border-accent/20" aria-hidden="true" />
         <p className="text-[9px] font-bold uppercase tracking-[.24em] text-champagne">{copy.panelEyebrow}</p>

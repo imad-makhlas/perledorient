@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
@@ -9,6 +9,27 @@ import { WhatsAppCheckoutPage } from './WhatsAppCheckoutPage'
 afterEach(() => vi.unstubAllGlobals())
 
 describe('WhatsApp checkout', () => {
+  it('suggests Moroccan cities while preserving an explicit free-entry option', async () => {
+    localStorage.setItem('codavenue-cart', JSON.stringify({ items: [{
+      productId: 'product-1', variantId: 'variant-1', slug: 'layali', name: 'Layali Necklace', variantName: 'Gold',
+      imageUrl: '/layali.jpg', unitPrice: 520, quantity: 1, stockQuantity: 1,
+    }] }))
+    vi.stubGlobal('fetch', vi.fn().mockReturnValue(new Promise(() => undefined)))
+
+    render(<MemoryRouter initialEntries={['/checkout']}><I18nProvider><CartProvider><WhatsAppCheckoutPage /></CartProvider></I18nProvider></MemoryRouter>)
+
+    const city = screen.getByLabelText('Ville')
+    fireEvent.focus(city)
+    expect(screen.getByRole('listbox', { name: 'Villes disponibles' })).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: 'Casablanca' })).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: 'Ifrane' })).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('option', { name: 'Autre ville' }))
+    expect(city).toHaveValue('')
+    expect(city).toHaveAttribute('aria-expanded', 'false')
+    expect(screen.getByText('Saisissez librement votre ville.')).toBeInTheDocument()
+  })
+
   it('combines the selected international calling code with the national number', async () => {
     localStorage.setItem('codavenue-cart', JSON.stringify({ items: [{
       productId: 'product-1', variantId: 'variant-1', slug: 'layali', name: 'Layali Necklace', variantName: 'Gold',

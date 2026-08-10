@@ -39,11 +39,12 @@ describe('Arabic storefront copy', () => {
     expect(screen.queryByText(/Handcrafted jewelry|The atelier|Our story/i)).not.toBeInTheDocument()
   })
 
-  it('keeps the phone number and Instagram handle readable from left to right', () => {
+  it('keeps the phone number clickable and contact details readable from left to right', () => {
     renderArabic(<Footer />)
 
     expect(screen.getByRole('region', { name: 'Coordonnées Casa de Perla' })).toHaveAttribute('dir', 'ltr')
-    expect(screen.getByText('+212 631-210654').closest('p')).toHaveAttribute('dir', 'ltr')
+    expect(screen.getByRole('link', { name: '+212 631-210654' })).toHaveAttribute('href', 'tel:+212631210654')
+    expect(screen.getByText('+212 631-210654').closest('a')).toHaveAttribute('dir', 'ltr')
     expect(screen.getByText('@casadeperla.jewelry').closest('a')).toHaveAttribute('dir', 'ltr')
   })
 
