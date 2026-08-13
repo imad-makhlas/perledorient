@@ -13,4 +13,9 @@ describe('home product selection', () => {
     const products = [product('regular-1', false), product('featured-1', true), product('regular-2', false), product('featured-2', true), product('regular-3', false), product('regular-4', false)]
     expect(selectHomeProducts(products).map((item) => item.id)).toEqual(['featured-1', 'featured-2', 'regular-1', 'regular-2', 'regular-3'])
   })
+
+  it('keeps several featured products in the homepage selection', () => {
+    const products = [product('featured-1', true), product('featured-2', true), product('featured-3', true), product('regular-1', false)]
+    expect(selectHomeProducts(products).map((item) => item.id)).toEqual(['featured-1', 'featured-2', 'featured-3', 'regular-1'])
+  })
 })

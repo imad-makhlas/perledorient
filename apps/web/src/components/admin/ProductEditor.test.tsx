@@ -28,6 +28,21 @@ describe('ProductEditor image workflow', () => {
     expect(screen.queryByRole('textbox', { name: 'Taille / dimensions' })).not.toBeInTheDocument()
   })
 
+  it('explains that several products can be featured together', () => {
+    render(<ProductEditor
+      product={product}
+      suggestedSku={`CDP-BIJ-${new Date().getFullYear()}-0008`}
+      busy={false}
+      onClose={vi.fn()}
+      onSave={vi.fn()}
+      onUploadImage={vi.fn()}
+      onDeleteImage={vi.fn()}
+    />)
+
+    expect(screen.getByText(/plusieurs bijoux peuvent être mis en avant/i)).toBeInTheDocument()
+    expect(screen.getByRole('checkbox', { name: /Mettre en avant/i })).toBeChecked()
+  })
+
   it('shows French category labels while keeping technical category values', () => {
     render(<ProductEditor
       product={null}

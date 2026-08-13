@@ -86,7 +86,7 @@ describe('order stock reservation API', () => {
 
     expect(response.status).toBe(201)
     const body = await response.json() as { whatsappUrl: string }
-    expect(body.whatsappUrl).toContain('wa.me/212631210654')
+    expect(body.whatsappUrl).toContain('wa.me/212691127813')
   })
 
   it('builds the WhatsApp message in the language selected by the customer', async () => {

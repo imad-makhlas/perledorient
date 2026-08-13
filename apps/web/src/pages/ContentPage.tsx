@@ -2,7 +2,7 @@ import { useLocation } from 'react-router-dom'
 
 const content: Record<string, [string, string]> = {
   '/about': ['About CODAvenue', 'We created CODAvenue to make exceptional everyday objects easier to discover. Our edit crosses categories but follows one standard: considered design, dependable quality, and service that feels personal.'],
-  '/contact': ['Speak with our concierge', 'Our customer care team is available Monday through Saturday. Call +212 631-210654 or reach us through WhatsApp.'],
+  '/contact': ['Speak with our concierge', 'Our customer care team is available Monday through Saturday. Call +212 691 127 813 or reach us through WhatsApp.'],
   '/delivery': ['Delivery policy', 'Orders are confirmed by telephone and typically delivered within 2–4 business days. Casablanca delivery is 30 MAD, other Moroccan cities are 45 MAD, and orders from 500 MAD receive complimentary delivery in Morocco. International delivery fees and timing are confirmed through WhatsApp according to destination.'],
   '/returns': ['Return policy', 'Unused items in their original condition may be requested for return within 7 days of delivery. Contact our concierge before returning an item.'],
   '/tracking': ['Track an order', 'For your privacy, order tracking requires both your order number and the telephone number used at checkout. The secure tracking service becomes available with the API.'],
