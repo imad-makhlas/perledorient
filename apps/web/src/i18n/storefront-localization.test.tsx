@@ -43,8 +43,8 @@ describe('Arabic storefront copy', () => {
     renderArabic(<Footer />)
 
     expect(screen.getByRole('region', { name: 'Coordonnées Casa de Perla' })).toHaveAttribute('dir', 'ltr')
-    expect(screen.getByRole('link', { name: '+212 691 127 813' })).toHaveAttribute('href', 'tel:+212691127813')
-    expect(screen.getByText('+212 691 127 813').closest('a')).toHaveAttribute('dir', 'ltr')
+    expect(screen.getByRole('link', { name: '+212 631 210 654' })).toHaveAttribute('href', 'tel:+212631210654')
+    expect(screen.getByText('+212 631 210 654').closest('a')).toHaveAttribute('dir', 'ltr')
     expect(screen.getByText('@casadeperla.jewelry').closest('a')).toHaveAttribute('dir', 'ltr')
   })
 

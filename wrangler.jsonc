@@ -3,9 +3,6 @@
   "name": "perle-dorient",
   "compatibility_date": "2026-08-05",
   "pages_build_output_dir": "apps/web/dist",
-  "vars": {
-    "WHATSAPP_NUMBER": "212691127813"
-  },
   "d1_databases": [
     {
       "binding": "DB",
