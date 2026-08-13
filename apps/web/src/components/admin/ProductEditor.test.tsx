@@ -13,6 +13,21 @@ const product: AdminProduct = {
 }
 
 describe('ProductEditor image workflow', () => {
+  it('does not expose material or dimensions in the product form', () => {
+    render(<ProductEditor
+      product={product}
+      suggestedSku={`CDP-BIJ-${new Date().getFullYear()}-0008`}
+      busy={false}
+      onClose={vi.fn()}
+      onSave={vi.fn()}
+      onUploadImage={vi.fn()}
+      onDeleteImage={vi.fn()}
+    />)
+
+    expect(screen.queryByRole('textbox', { name: 'Matière' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('textbox', { name: 'Taille / dimensions' })).not.toBeInTheDocument()
+  })
+
   it('shows French category labels while keeping technical category values', () => {
     render(<ProductEditor
       product={null}

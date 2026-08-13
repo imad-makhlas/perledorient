@@ -37,6 +37,9 @@ img { display: block; max-width: 100%; }
 .button-secondary:hover { border-color: rgba(184,137,61,.62); background: var(--color-soft); color: var(--color-ink); box-shadow: 0 8px 22px rgba(47,42,44,.07); }
 .button-accent { border-color: var(--color-accent); background: var(--color-accent); color: #241F21; }
 .button-accent:hover { border-color: #C4984D; background: #C4984D; color: #241F21; box-shadow: 0 12px 28px rgba(184,137,61,.2); transform: translateY(-1px); }
+.product-order-button { border: 1px solid rgba(184,137,61,.48); background: #FFF9F0; color: #5A2635; box-shadow: 0 6px 18px rgba(90,38,53,.055); }
+.product-order-button svg { color: var(--color-accent); }
+.product-order-button:disabled { border-color: #E3DAD1; background: #F3EFEB; color: #95898B; box-shadow: none; }
 .field { width: 100%; min-width: 0; max-width: 100%; min-height: 54px; border: 1px solid var(--color-line); border-radius: var(--radius-control); background: rgba(255,255,255,.96); padding: .85rem 1rem; color: var(--color-ink); font-size: 1rem; box-shadow: inset 0 1px 0 rgba(255,255,255,.65); transition: border-color .2s ease, box-shadow .2s ease, background .2s ease; }
 .field:hover { border-color: #D6C7B8; }
 .field:focus { border-color: var(--color-accent); background: var(--color-canvas); outline: 3px solid rgba(184,137,61,.12); box-shadow: 0 0 0 1px rgba(184,137,61,.08); }
@@ -51,6 +54,9 @@ img { display: block; max-width: 100%; }
 @keyframes storefront-page-enter {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
+}
+@media (hover: hover) and (pointer: fine) {
+  .product-order-button:hover { border-color: rgba(184,137,61,.78); background: #FDF1DD; color: #481B29; box-shadow: 0 9px 24px rgba(90,38,53,.09); }
 }
 @media (prefers-reduced-motion: reduce) {
   .storefront-page-transition { animation: none; }
