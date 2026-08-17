@@ -16,6 +16,17 @@ describe('App routing', () => {
     expect(app).toMatch(/<Route path="\*" element=\{<Navigate to="\/" replace\s*\/>\}\s*\/>/)
   })
 
+  it('does not render a floating WhatsApp support shortcut', () => {
+    expect(app).not.toContain('WhatsApp support')
+    expect(app).not.toContain('showFloatingWhatsApp')
+    expect(app).not.toContain('bg-[#25D366]')
+  })
+
+  it('keeps each announcement copy viewport-wide for a seamless ticker loop', () => {
+    expect(styles).toMatch(/\.announcement-ticker-group\s*\{[^}]*width:\s*100vw/)
+    expect(styles).toMatch(/@keyframes announcement-scroll\s*\{[^}]*translateX\(-50%\)/)
+  })
+
   it('animates public page changes while respecting reduced motion', () => {
     expect(app).toMatch(/key=\{pathname\}/)
     expect(app).toMatch(/storefront-page-transition/)

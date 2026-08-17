@@ -31,4 +31,25 @@ describe('Header language selector', () => {
     expect(arabicButton).toHaveAttribute('aria-pressed', 'true')
     expect(document.documentElement).toHaveAttribute('dir', 'rtl')
   })
+
+  it('renders a continuous delivery ticker without repeating the announcement for assistive technology', () => {
+    render(
+      <MemoryRouter>
+        <I18nProvider>
+          <CartProvider>
+            <Header />
+          </CartProvider>
+        </I18nProvider>
+      </MemoryRouter>,
+    )
+
+    const announcement = screen.getByRole('region', { name: 'Informations de livraison' })
+    const track = announcement.querySelector('[data-announcement-track]')
+    const groups = announcement.querySelectorAll('[data-announcement-group]')
+
+    expect(track).toHaveClass('announcement-ticker-track')
+    expect(groups).toHaveLength(2)
+    expect(groups[0]).not.toHaveAttribute('aria-hidden')
+    expect(groups[1]).toHaveAttribute('aria-hidden', 'true')
+  })
 })

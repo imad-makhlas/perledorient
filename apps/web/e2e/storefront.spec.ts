@@ -255,23 +255,18 @@ test('mobile catalogue gives every product a full-width premium card and tablet 
   expect(tabletCards.every((card) => card.width >= 330)).toBe(true)
 })
 
-test('mobile homepage starts with a compact banner and a two-column product grid', async ({ page }) => {
+test('mobile homepage starts with an image-only hero and a two-column product grid', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 800 })
   await page.goto('/')
 
-  await expect(page.getByTestId('home-hero')).toBeHidden()
-  await expect(page.locator('section[aria-label="Comment commander"]')).toBeHidden()
-  const mobileBanner = page.getByTestId('mobile-home-banner')
-  await expect(mobileBanner).toBeVisible()
-  const bannerBox = await mobileBanner.boundingBox()
-  if (!bannerBox) throw new Error('Mobile homepage banner is missing')
-  expect(bannerBox.height).toBeLessThanOrEqual(190)
-  const bannerCardBox = await mobileBanner.locator('.image-frame > div').boundingBox()
-  const categoryEyebrowBox = await page.getByTestId('mobile-home-products').locator('xpath=..').locator('.editorial-rule').boundingBox()
-  if (!bannerCardBox || !categoryEyebrowBox) throw new Error('Mobile homepage sections cannot be measured')
-  const bannerToProductsGap = categoryEyebrowBox.y - (bannerCardBox.y + bannerCardBox.height)
-  expect(bannerToProductsGap).toBeGreaterThanOrEqual(12)
-  expect(bannerToProductsGap).toBeLessThanOrEqual(24)
+  const hero = page.getByTestId('home-hero')
+  await expect(hero).toBeVisible()
+  await expect(page.locator('section[aria-label="Comment commander"]')).toHaveCount(0)
+  await expect(hero.getByRole('link')).toHaveAttribute('href', '/catalogue')
+  await expect(hero.getByRole('heading')).toHaveCount(0)
+  const heroBox = await hero.boundingBox()
+  if (!heroBox) throw new Error('Mobile homepage hero is missing')
+  expect(heroBox.height).toBeLessThanOrEqual(222)
 
   const mobileProducts = page.getByTestId('mobile-home-products')
   await expect(mobileProducts).toBeVisible()
@@ -288,18 +283,18 @@ test('mobile homepage starts with a compact banner and a two-column product grid
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320)
 })
 
-test('desktop homepage preserves the editorial hero and ordering guide', async ({ page }) => {
+test('desktop homepage presents an image-only hero and premium product gallery', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 })
   await page.goto('/')
 
   await expect(page.getByTestId('home-hero')).toBeVisible()
   await expect(page.getByTestId('desktop-home-products')).toBeVisible()
   await expect(page.getByTestId('mobile-home-products')).toBeHidden()
-  await expect(page.getByTestId('mobile-home-banner')).toBeHidden()
-  await expect(page.locator('section[aria-label="Comment commander"]')).toBeVisible()
+  await expect(page.getByTestId('home-hero').getByRole('heading')).toHaveCount(0)
+  await expect(page.locator('section[aria-label="Comment commander"]')).toHaveCount(0)
 })
 
-test('mobile chrome stays compact and never lets WhatsApp overlap the bottom navigation', async ({ page }) => {
+test('mobile chrome stays compact without a floating WhatsApp shortcut', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto('/')
 
@@ -308,11 +303,10 @@ test('mobile chrome stays compact and never lets WhatsApp overlap the bottom nav
   const whatsapp = page.getByRole('link', { name: 'WhatsApp support' })
   const shellBox = await headerShell.boundingBox()
   const navBox = await mobileNav.boundingBox()
-  const whatsappBox = await whatsapp.boundingBox()
-  if (!shellBox || !navBox || !whatsappBox) throw new Error('Mobile chrome is missing a measured element')
+  if (!shellBox || !navBox) throw new Error('Mobile chrome is missing a measured element')
 
   expect(shellBox.height).toBeLessThanOrEqual(60)
-  expect(whatsappBox.y + whatsappBox.height).toBeLessThanOrEqual(navBox.y - 8)
+  await expect(whatsapp).toHaveCount(0)
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390)
 })
 

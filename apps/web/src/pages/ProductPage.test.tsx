@@ -48,4 +48,15 @@ describe('Product page direct WhatsApp order', () => {
     expect(actions).not.toHaveTextContent('Layali Necklace')
     expect(actions).not.toHaveTextContent('MAD')
   })
+
+  it('shows payment and delivery assurances beside the purchase controls', () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('Offline catalogue')))
+    renderProductPage()
+
+    const assurances = screen.getByRole('region', { name: 'Paiement et livraison' })
+    expect(within(assurances).getByText('Paiement à la livraison ou virement bancaire')).toBeInTheDocument()
+    expect(within(assurances).getByText('Commande confirmée personnellement')).toBeInTheDocument()
+    expect(within(assurances).getByText('Livraison estimée sous 2 à 4 jours ouvrés')).toBeInTheDocument()
+    expect(within(assurances).getByText('Retours sous 7 jours')).toBeInTheDocument()
+  })
 })

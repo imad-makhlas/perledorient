@@ -12,15 +12,26 @@ export function Header() {
   const { locale, setLocale, t } = useI18n()
   const location = useLocation()
   const announcement = getHeaderAnnouncementParts(locale)
+  const announcementGroup = (hidden = false) => (
+    <span
+      data-announcement-group
+      aria-hidden={hidden || undefined}
+      dir={locale === 'ar' ? 'rtl' : 'ltr'}
+      className="announcement-ticker-group"
+    >
+      <Truck size={13} strokeWidth={1.6} className="shrink-0 text-accent" aria-hidden="true" />
+      <span>{announcement.lead} <strong className="font-bold text-accent">{announcement.threshold}</strong> {announcement.country}</span>
+      <span className="h-1 w-1 shrink-0 rounded-full bg-accent" aria-hidden="true" />
+      <span>{announcement.international}</span>
+    </span>
+  )
   const links = [['/', locale === 'fr' ? 'Accueil' : 'الرئيسية'], ['/catalogue', locale === 'fr' ? 'Catalogue' : 'الكتالوج'], ['/about', t('storyNav')], ['/contact', locale === 'fr' ? 'Contact' : 'تواصل معنا']]
 
   return <>
-    <div role="region" aria-label={locale === 'fr' ? 'Informations de livraison' : 'معلومات التوصيل'} className="border-b border-accent/25 bg-black px-3 text-white">
-      <div className="mx-auto flex min-h-[30px] max-w-5xl flex-wrap items-center justify-center gap-x-2.5 gap-y-0 text-center text-[7px] font-semibold uppercase leading-4 tracking-[.1em] sm:flex-nowrap sm:text-[9px] sm:tracking-[.14em]">
-        <Truck size={13} strokeWidth={1.6} className="shrink-0 text-accent" aria-hidden="true" />
-        <span>{announcement.lead} <strong className="font-bold text-accent">{announcement.threshold}</strong> {announcement.country}</span>
-        <span className="h-1 w-1 shrink-0 rounded-full bg-accent" aria-hidden="true" />
-        <span>{announcement.international}</span>
+    <div role="region" aria-label={locale === 'fr' ? 'Informations de livraison' : 'معلومات التوصيل'} className="announcement-ticker border-b border-accent/25 bg-black text-white">
+      <div data-announcement-track className="announcement-ticker-track">
+        {announcementGroup()}
+        {announcementGroup(true)}
       </div>
     </div>
     <header className="sticky top-0 z-40 bg-transparent py-2 backdrop-blur-md lg:py-3">
