@@ -1,4 +1,4 @@
-import { ArrowRight, Banknote, Landmark, MessageCircle, PackageCheck } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import type { Product } from '../features/catalog/catalog'
 import { useCatalogProducts } from '../features/catalog/catalog-api'
@@ -7,14 +7,12 @@ import { useI18n } from '../i18n/i18n'
 
 const homeCopy = {
   fr: {
-    signatures: ['Fait main', 'Petites séries', 'Maroc et international'], imageAlt: 'Collection de bijoux artisanaux Casa de Perla', imageCaption: 'Créés lentement. Portés longtemps.', categoryTitle: 'Trouvez votre pièce.', categoriesLabel: 'Sélection de bijoux', featuredBody: 'Façonnée à la main en petite série, chaque pièce porte de subtiles variations qui la rendent unique.', trustLabel: 'Informations de confiance', assurances: ['Paiement à la livraison', 'Virement bancaire', 'Livraison au Maroc', 'Confirmation WhatsApp'], assuranceDetails: ['Réglez simplement à la réception', 'Une alternative sécurisée sur demande', 'Délais communiqués avant confirmation', 'Stock et livraison vérifiés avec vous'],
+    signatures: ['Fait main', 'Petites séries', 'Maroc et international'], imageAlt: 'Collection de bijoux artisanaux Casa de Perla', imageCaption: 'Créés lentement. Portés longtemps.', categoryTitle: 'Trouvez votre pièce.', categoriesLabel: 'Sélection de bijoux', featuredBody: 'Façonnée à la main en petite série, chaque pièce porte de subtiles variations qui la rendent unique.', trustLabel: 'Informations de confiance', trustEyebrow: 'Casa de Perla', trustTitle: 'Les engagements de la Maison', assurances: ['Paiement à la livraison', 'Virement bancaire', 'Livraison au Maroc', 'Confirmation WhatsApp'], assuranceDetails: ['Réglez simplement à la réception', 'Une alternative sécurisée sur demande', 'Délais communiqués avant confirmation', 'Stock et livraison vérifiés avec vous'],
   },
   ar: {
-    signatures: ['صنع يدوي', 'مجموعات محدودة', 'المغرب ودولياً'], imageAlt: 'مجموعة مجوهرات Casa de Perla المصنوعة يدوياً', imageCaption: 'صُنعت بعناية. لترافقك دائماً.', categoryTitle: 'اختاري قطعتك.', categoriesLabel: 'تشكيلة من المجوهرات', featuredBody: 'تُنجز كل قطعة يدوياً ضمن مجموعات محدودة، وتحمل تفاصيل دقيقة تجعلها خاصة بك.', trustLabel: 'معلومات موثوقة', assurances: ['الدفع عند الاستلام', 'التحويل البنكي', 'التوصيل داخل المغرب', 'التأكيد عبر واتساب'], assuranceDetails: ['ادفعي بسهولة عند الاستلام', 'خيار آمن متاح عند الطلب', 'نؤكد مدة التوصيل قبل الطلب', 'نتحقق معك من التوفر والتوصيل'],
+    signatures: ['صنع يدوي', 'مجموعات محدودة', 'المغرب ودولياً'], imageAlt: 'مجموعة مجوهرات Casa de Perla المصنوعة يدوياً', imageCaption: 'صُنعت بعناية. لترافقك دائماً.', categoryTitle: 'اختاري قطعتك.', categoriesLabel: 'تشكيلة من المجوهرات', featuredBody: 'تُنجز كل قطعة يدوياً ضمن مجموعات محدودة، وتحمل تفاصيل دقيقة تجعلها خاصة بك.', trustLabel: 'معلومات موثوقة', trustEyebrow: 'Casa de Perla', trustTitle: 'التزامات الدار', assurances: ['الدفع عند الاستلام', 'التحويل البنكي', 'التوصيل داخل المغرب', 'التأكيد عبر واتساب'], assuranceDetails: ['ادفعي بسهولة عند الاستلام', 'خيار آمن متاح عند الطلب', 'نؤكد مدة التوصيل قبل الطلب', 'نتحقق معك من التوفر والتوصيل'],
   },
 } as const
-
-const assuranceIcons = [Banknote, Landmark, PackageCheck, MessageCircle] as const
 
 function EditorialProductCard({ product, index, mobile = false }: { product: Product; index: number; mobile?: boolean }) {
   return <Link to={`/products/${product.slug}`} className={`group relative block aspect-[4/5] overflow-hidden bg-burgundy ${mobile ? 'w-full rounded-[6px]' : ''}`}>
@@ -52,13 +50,13 @@ export function HomePage() {
       <div className="mt-8 text-center md:hidden"><Link to="/catalogue" className="button-primary">{t('viewAll')}<ArrowRight size={15} /></Link></div>
     </section>
 
-    <section role="region" aria-label={page.trustLabel} className="border-t border-accent/35 bg-[#FAF7F2] py-8 sm:py-10">
-      <ul className="container-shell grid grid-cols-2 md:grid-cols-4">
-        {page.assurances.map((label, index) => {
-          const Icon = assuranceIcons[index]
-          return <li key={label} className={`min-h-[112px] px-4 py-5 sm:px-6 md:min-h-[124px] md:px-8 ${index % 2 === 1 ? 'border-l border-line' : ''} ${index > 1 ? 'border-t border-line md:border-t-0' : ''} ${index > 0 ? 'md:border-l md:border-line' : ''}`}><Icon size={19} strokeWidth={1.35} className="text-accent" aria-hidden="true" /><h3 className="mt-4 text-[10px] font-bold uppercase leading-4 tracking-[.12em] text-ink">{label}</h3><p className="mt-2 text-[11px] leading-5 text-muted sm:text-xs">{page.assuranceDetails[index]}</p></li>
-        })}
-      </ul>
+    <section role="region" aria-label={page.trustLabel} className="border-y border-accent/45 bg-white py-10 sm:py-12 lg:py-16">
+      <div className="container-shell grid gap-9 lg:grid-cols-[.72fr_1.55fr] lg:items-start lg:gap-20">
+        <header className="lg:sticky lg:top-28"><p className="text-[9px] font-bold uppercase tracking-[.32em] text-accent">{page.trustEyebrow}</p><h2 className="editorial-display mt-3 max-w-sm text-[2.35rem] leading-[.98] text-[#3E3035] sm:text-5xl lg:text-[3.5rem]">{page.trustTitle}</h2><div aria-hidden="true" className="mt-7 flex items-center gap-3"><span className="h-px w-16 bg-accent" /><span className="text-[8px] text-accent">◆</span></div></header>
+        <ol className="grid sm:grid-cols-2 sm:gap-x-10 lg:gap-x-14">
+          {page.assurances.map((label, index) => <li key={label} className="border-t border-line py-5 sm:min-h-[142px] sm:py-6"><div className="flex items-center gap-3"><span data-testid="assurance-index" className="text-[10px] font-semibold tracking-[.22em] text-accent">0{index + 1}</span><span aria-hidden="true" className="h-px flex-1 bg-accent/25" /></div><h3 className="mt-5 text-[10px] font-bold uppercase leading-4 tracking-[.16em] text-[#4B2432]">{label}</h3><p className="mt-2 max-w-xs text-xs leading-5 text-muted">{page.assuranceDetails[index]}</p></li>)}
+        </ol>
+      </div>
     </section>
 
   </main>

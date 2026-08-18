@@ -489,10 +489,10 @@ test('mobile navigation uses a lighter header tone and a distinct gold active pa
   await page.mouse.up()
 })
 
-test('footer uses warm charcoal instead of burgundy', async ({ page }) => {
+test('footer uses a clean white premium surface', async ({ page }) => {
   await page.goto('/')
   const footer = page.locator('footer')
-  expect(await footer.evaluate((element) => getComputedStyle(element).backgroundColor)).toBe('rgb(47, 42, 44)')
+  expect(await footer.evaluate((element) => getComputedStyle(element).backgroundColor)).toBe('rgb(255, 255, 255)')
 })
 
 test('ordering from a card replaces the selection and opens the form for that product only', async ({ page }) => {

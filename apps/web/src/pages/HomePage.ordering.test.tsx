@@ -25,8 +25,10 @@ describe('homepage premium structure', () => {
     const assurances = screen.getByRole('region', { name: 'Informations de confiance' })
 
     expect(screen.getByRole('main').lastElementChild).toBe(assurances)
-    expect(assurances).toHaveClass('bg-[#FAF7F2]')
+    expect(assurances).toHaveClass('bg-white', 'border-accent/45')
+    expect(within(assurances).getByRole('heading', { name: 'Les engagements de la Maison' })).toBeInTheDocument()
     expect(within(assurances).getAllByRole('listitem')).toHaveLength(4)
+    expect(within(assurances).getAllByTestId('assurance-index').map((item) => item.textContent)).toEqual(['01', '02', '03', '04'])
     expect(within(assurances).getByText('Paiement à la livraison')).toBeInTheDocument()
     expect(within(assurances).getByText('Virement bancaire')).toBeInTheDocument()
     expect(within(assurances).getByText('Livraison au Maroc')).toBeInTheDocument()
