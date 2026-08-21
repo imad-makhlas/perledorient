@@ -34,18 +34,18 @@ export function ProductCard({ product }: { product: Product }) {
     navigate('/checkout')
   }
 
-  return <article className="group h-full min-w-0 overflow-hidden rounded-[6px] border border-line bg-white p-2.5 shadow-[0_10px_32px_rgba(47,42,44,0.045)] transition duration-500 hover:-translate-y-1 hover:border-champagne hover:shadow-[0_20px_50px_rgba(47,42,44,0.10)] sm:p-3">
-    <Link to={`/products/${product.slug}`} className="relative block aspect-square overflow-hidden rounded-[6px] bg-[#F3F1ED]">
+  return <article className="group h-full min-w-0 overflow-hidden rounded-[6px] border border-line bg-white p-0 shadow-[0_10px_32px_rgba(47,42,44,0.045)] transition duration-500 hover:-translate-y-1 hover:border-champagne hover:shadow-[0_20px_50px_rgba(47,42,44,0.10)]">
+    <Link to={`/products/${product.slug}`} className="relative block aspect-square overflow-hidden bg-[#F3F1ED]">
       <img src={product.image} alt={product.name} className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.035]" />
       <div className="absolute inset-0 bg-ink/0 transition duration-500 group-hover:bg-ink/[.06]" />
       <div className="absolute left-3 top-3 flex flex-col gap-2">{product.isNew && <span className="bg-white px-3 py-1.5 text-[9px] font-bold uppercase tracking-[.14em] text-ink">{locale === 'fr' ? 'Nouveau' : 'جديد'}</span>}{discount > 0 && <span className="bg-accent px-3 py-1.5 text-[9px] font-bold uppercase tracking-[.14em] text-midnight">-{discount}%</span>}</div>
       <span className="absolute bottom-3 right-3 grid h-10 w-10 translate-y-2 place-items-center border border-white/70 bg-white text-burgundy opacity-0 shadow-lift transition group-hover:translate-y-0 group-hover:opacity-100"><ShoppingBag size={16} strokeWidth={1.5} /></span>
     </Link>
-    <div className="flex flex-col px-2 pb-1 pt-3 sm:px-2 sm:pb-1 sm:pt-4">
+    <div className="flex flex-col px-4 pb-4 pt-4 sm:px-5 sm:pb-5 sm:pt-5">
       <Link to={`/products/${product.slug}`} className="block">
-        <h3 className="display line-clamp-2 min-h-[2.32em] text-[1.05rem] font-semibold leading-[1.16] text-ink sm:text-[1.15rem]">{product.name}</h3>
+        <h3 className="display line-clamp-2 text-[1.05rem] font-semibold leading-[1.16] text-ink sm:text-[1.15rem]">{product.name}</h3>
       </Link>
-      <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-line pt-3">
+      <div className="mt-2 flex flex-wrap items-center justify-between gap-2 border-t border-line pt-3">
         <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1"><span className="text-[15px] font-semibold text-ink sm:text-[16px]">{formatMoney(product.price, locale)}</span>{product.comparisonPrice && <span className="text-[12px] font-normal text-muted line-through">{formatMoney(product.comparisonPrice, locale)}</span>}</div>
         <p className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-[.08em] ${availabilityTone}`}><span className="h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true" />{availabilityLabel}</p>
       </div>
